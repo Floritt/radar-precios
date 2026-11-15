@@ -40,7 +40,17 @@ $showProduct = $product && $product['status'] === 'published';
           </section>
         <?php endif; ?>
 
-        <div class="prose"><?= render_markdown($post['body']) ?></div>
+        <?php
+        $bodyHtml = render_markdown($post['body']);
+        preg_match_all('~<h2 id="([^"]+)">(.*?)</h2>~s', $bodyHtml, $toc, PREG_SET_ORDER);
+        ?>
+        <?php if (count($toc) >= 4): ?>
+          <nav class="toc" aria-label="En este artículo">
+            <p class="toc__title">En este artículo</p>
+            <ol><?php foreach ($toc as $t): ?><li><a href="#<?= e($t[1]) ?>"><?= strip_tags($t[2]) ?></a></li><?php endforeach; ?></ol>
+          </nav>
+        <?php endif; ?>
+        <div class="prose"><?= $bodyHtml ?></div>
       </div>
     </article>
 

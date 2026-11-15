@@ -10,32 +10,34 @@ Todos estos juegos llevan años entre los más vendidos y se explican en pocos m
 
 | Juego | Jugadores | Edad | Duración | Tipo |
 |---|---|---|---|---|
-| Catan | 3 a 4 | 10+ | 75 min | Estrategia y negociación |
-| Carcassonne | 2 a 5 | 7+ | 35 min | Colocar losetas |
-| ¡Aventureros al Tren! Europa | 2 a 5 | 8+ | 30 a 60 min | Rutas y cartas |
-| Azul | 2 a 4 | 8+ | 30 a 45 min | Puzle abstracto |
-| Dixit | 3 a 8 | 8+ | 30 min | Imaginación |
-| Dobble | 2 a 8 | 6+ | 15 min | Rapidez visual |
-| Virus! | 2 a 6 | 8+ | 20 min | Cartas con malicia |
-| Código Secreto | 2 a 8 | 14+ | 15 min | Palabras por equipos |
+| [Catan](/producto/catan) | 3 a 4 | 10+ | 60 a 75 min | Estrategia y negociación |
+| [Carcassonne](/producto/carcassonne) | 2 a 5 | 7+ | 35 min | Colocar losetas |
+| [¡Aventureros al Tren! Europa](/producto/aventureros-al-tren-europa) | 2 a 5 | 8+ | 30 a 60 min | Rutas y cartas |
+| [Azul](/producto/azul) | 2 a 4 | 8+ | 30 a 45 min | Puzle abstracto |
+| [Dixit](/producto/dixit) | 3 a 8 | 8+ | 30 min | Imaginación |
+| [Dobble](/producto/dobble) | 2 a 8 | 6+ | 15 min | Rapidez visual |
+| [Virus!](/producto/virus) | 2 a 6 | 8+ | 20 min | Cartas con malicia |
+| [Código Secreto](/producto/codigo-secreto) | 2 a 8 | 8+ a 14+ | 15 min | Palabras por equipos |
 
-*Datos de las ediciones en castellano. Pueden variar ligeramente entre ediciones.*
+*Datos de las ediciones en castellano. Pueden variar entre ediciones: por ejemplo, Código Secreto indica 8 años en su edición actual y más en las anteriores.*
 
 ## Para grupos grandes con niños y abuelos
 
 **Dixit** y **Dobble** son los que mejor funcionan con mucha gente y edades mezcladas. En Dixit se gana con imaginación, no con estrategia, así que un niño de 8 años puede ganar a un adulto. Dobble es pura rapidez: partidas cortas, risas y se lleva en el bolsillo.
 
-[amazon:Dixit juego de mesa|Ver Dixit en Amazon]
+[producto:dixit]
 
-[amazon:Dobble juego de cartas|Ver Dobble en Amazon]
+[producto:dobble]
 
 ## Para la sobremesa de adultos
 
-**Código Secreto** es un juego de palabras por equipos que engancha en la primera partida. Por la edad recomendada y porque hay que pensar asociaciones, encaja mejor con adolescentes y adultos.
+**Código Secreto** es un juego de palabras por equipos que engancha en la primera partida. Como hay que pensar asociaciones de palabras, encaja mejor con adolescentes y adultos.
 
 **Virus!** es rápido y con mucha interacción: te pasas la partida fastidiando a los demás. Ideal para cuando no apetece algo largo.
 
-[amazon:Codigo Secreto juego de mesa|Ver Código Secreto en Amazon]
+[producto:codigo-secreto]
+
+[producto:virus]
 
 ## Para quien quiere un juego "de verdad"
 
@@ -45,9 +47,13 @@ Todos estos juegos llevan años entre los más vendidos y se explican en pocos m
 
 **Azul** es el más bonito de la lista y el que mejor funciona a dos. Es tranquilo, más de pensar que de hablar.
 
-[amazon:Aventureros al Tren Europa|Ver ¡Aventureros al Tren! Europa]
+[producto:aventureros-al-tren-europa]
 
-[amazon:Carcassonne juego de mesa|Ver Carcassonne en Amazon]
+[producto:catan]
+
+[producto:carcassonne]
+
+[producto:azul]
 
 ## Cuál elegir
 

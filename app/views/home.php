@@ -2,7 +2,7 @@
 /** @var array $deals @var array $popular @var array $reviews @var array $guides @var array $comparisons */
 $niches = all_niches();
 $telegram = setting('telegram_url');
-$hasProducts = $deals || $popular;
+$hasProducts = (bool) $deals;
 ?>
 <div class="wrap page">
   <div class="layout">
@@ -14,9 +14,13 @@ $hasProducts = $deals || $popular;
           <p class="muted">Qué mirar antes de comprar cada tipo de regalo, en qué se diferencian los productos parecidos y cómo saber si una oferta es de verdad.</p>
         </div>
       </section>
+      <?php if ($popular): ?>
+        <div class="section-title"><h2>Regalos que seguimos</h2></div>
+        <div class="grid" style="margin-bottom: 24px"><?php foreach ($popular as $p): partial('pcard', ['p' => $p]); endforeach; ?></div>
+      <?php endif; ?>
       <?php if ($guides): ?>
+        <div class="section-title"><h2>Guías de compra</h2><a href="<?= e(url('blog')) ?>">Ver todas</a></div>
         <div class="acards acards--home"><?php foreach ($guides as $post): partial('acard', ['post' => $post]); endforeach; ?></div>
-        <a class="panel__more panel" href="<?= e(url('blog')) ?>" style="display:block;margin-top:12px">Ver todas las guías</a>
       <?php endif; ?>
       <?php else: ?>
       <section class="panel" aria-labelledby="h-deals">
@@ -84,7 +88,7 @@ $hasProducts = $deals || $popular;
     <div class="section-title"><h2 id="h-guides">Guías de compra</h2><a href="<?= e(url('blog')) ?>">Ver todas</a></div>
     <?php $first = array_shift($guides); ?>
     <a class="feature" href="<?= e(post_url($first)) ?>">
-      <span class="feature__img thumb<?= $first['cover_path'] ? '' : ' thumb--ph' ?>"><?php if ($first['cover_path']): ?><img src="<?= e(upload_url($first['cover_path'])) ?>" alt=""><?php else: ?><?= placeholder_svg($first['niche_slug'] ?? '') ?><?php endif; ?></span>
+      <span class="feature__img thumb<?= $first['cover_path'] ? '' : ' thumb--ph' ?>"<?= $first['cover_path'] ? '' : tint_attr($first) ?>><?php if ($first['cover_path']): ?><img src="<?= e(upload_url($first['cover_path'])) ?>" alt=""><?php else: ?><?= placeholder_svg($first['niche_slug'] ?? '') ?><?php endif; ?></span>
       <span class="feature__body">
         <span class="feature__kicker"><?= e(POST_TYPES[$first['type']] ?? 'Artículo') ?></span>
         <span class="feature__title"><?= e($first['title']) ?></span>

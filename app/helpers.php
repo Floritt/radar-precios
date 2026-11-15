@@ -479,6 +479,7 @@ function site_counts(): array
     if ($c === null) {
         $c = [
             'products' => (int) val("SELECT COUNT(*) FROM products WHERE status = 'published'"),
+            'priced' => (int) val("SELECT COUNT(*) FROM products WHERE status = 'published' AND best_price IS NOT NULL"),
             'reviews' => (int) val("SELECT COUNT(*) FROM posts WHERE type = 'review' AND status = 'published' AND published_at <= ?", [now()]),
             'comparisons' => (int) val("SELECT COUNT(*) FROM posts WHERE type = 'comparison' AND status = 'published' AND published_at <= ?", [now()]),
         ];
@@ -491,4 +492,11 @@ function amazon_search_url(string $query): string
 {
     $tag = amazon_tag();
     return 'https://' . config('amazon.marketplace', 'www.amazon.es') . '/s?k=' . rawurlencode($query) . ($tag ? '&tag=' . rawurlencode($tag) : '');
+}
+
+/** Atributo style con el color de la categoría, para teñir los iconos de las fichas sin foto. */
+function tint_attr(array $row): string
+{
+    $c = (string) ($row['niche_color'] ?? '');
+    return preg_match('/^#[0-9A-Fa-f]{6}$/', $c) ? ' style="--tint: ' . $c . '"' : '';
 }

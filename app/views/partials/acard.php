@@ -4,7 +4,7 @@ $isReview = $post['type'] === 'review'; ?>
   <?php if ($post['cover_path']): ?>
     <span class="acard__img"><img src="<?= e(upload_url($post['cover_path'])) ?>" alt="" loading="lazy"></span>
   <?php else: ?>
-    <span class="acard__img thumb--ph"><?= placeholder_svg($post['niche_slug'] ?? '') ?></span>
+    <span class="acard__img thumb--ph"<?= tint_attr($post) ?>><?= placeholder_svg($post['niche_slug'] ?? '') ?></span>
   <?php endif; ?>
   <span class="acard__body">
     <span class="acard__kicker"><?= e(POST_TYPES[$post['type']] ?? 'Artículo') ?><?= !empty($post['niche_name']) ? ' en ' . e($post['niche_name']) : '' ?></span>

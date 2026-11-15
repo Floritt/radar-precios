@@ -46,7 +46,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
       <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     </form>
     <nav class="header-links" aria-label="Secciones">
-      <?php if (site_counts()['products']): ?><a href="<?= e(url('ofertas')) ?>"<?= str_starts_with($path, '/ofertas') ? ' aria-current="page"' : '' ?>>Ofertas</a><?php endif; ?>
+      <?php if (site_counts()['priced']): ?><a href="<?= e(url('ofertas')) ?>"<?= str_starts_with($path, '/ofertas') ? ' aria-current="page"' : '' ?>>Ofertas</a><?php endif; ?>
       <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>"<?= str_starts_with($path, '/resenas') ? ' aria-current="page"' : '' ?>>Reseñas</a><?php endif; ?>
       <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>"<?= str_starts_with($path, '/comparativas') ? ' aria-current="page"' : '' ?>>Comparativas</a><?php endif; ?>
       <a href="<?= e(url('blog')) ?>"<?= str_starts_with($path, '/blog') ? ' aria-current="page"' : '' ?>>Guías</a>
@@ -55,7 +55,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menú</button>
   </div>
   <nav class="mobile-menu" id="mobile-menu" aria-label="Menú">
-    <?php if (site_counts()['products']): ?><a href="<?= e(url('ofertas')) ?>">Ofertas</a><?php endif; ?>
+    <?php if (site_counts()['priced']): ?><a href="<?= e(url('ofertas')) ?>">Ofertas</a><?php endif; ?>
     <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>">Reseñas</a><?php endif; ?>
     <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>">Comparativas</a><?php endif; ?>
     <a href="<?= e(url('blog')) ?>">Guías de compra</a>
@@ -89,7 +89,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     <div>
       <p class="site-footer__title">Secciones</p>
       <ul>
-        <?php if (site_counts()['products']): ?><li><a href="<?= e(url('ofertas')) ?>">Ofertas</a></li><?php endif; ?>
+        <?php if (site_counts()['priced']): ?><li><a href="<?= e(url('ofertas')) ?>">Ofertas</a></li><?php endif; ?>
         <?php if (site_counts()['reviews']): ?><li><a href="<?= e(url('resenas')) ?>">Reseñas</a></li><?php endif; ?>
         <?php if (site_counts()['comparisons']): ?><li><a href="<?= e(url('comparativas')) ?>">Comparativas</a></li><?php endif; ?>
         <li><a href="<?= e(url('blog')) ?>">Guías de compra</a></li>

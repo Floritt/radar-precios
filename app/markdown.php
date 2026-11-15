@@ -43,6 +43,18 @@ function render_markdown(?string $text): string
     $html = preg_replace_callback('~<p>\[amazon:([^\]|<]{2,90})(?:\|([^\]<]{1,90}))?\]</p>~u', fn ($m) => $amazon($m, true), $html) ?? $html;
     $html = preg_replace_callback('~\[amazon:([^\]|<]{2,90})(?:\|([^\]<]{1,90}))?\]~u', fn ($m) => $amazon($m, false), $html) ?? $html;
 
+    // Cada h2 recibe un id para poder enlazarlo desde el índice del artículo.
+    $seen = [];
+    $html = preg_replace_callback('~<h2>(.*?)</h2>~s', function ($m) use (&$seen) {
+        $id = slugify(html_entity_decode(strip_tags($m[1]), ENT_QUOTES, 'UTF-8')) ?: 'seccion';
+        $base = $id;
+        for ($i = 2; isset($seen[$id]); $i++) {
+            $id = $base . '-' . $i;
+        }
+        $seen[$id] = true;
+        return '<h2 id="' . $id . '">' . $m[1] . '</h2>';
+    }, $html) ?? $html;
+
     // Las tablas de Markdown se envuelven para poder desplazarse en el móvil.
     $html = str_replace(['<table>', '</table>'], ['<div class="table-scroll"><table>', '</table></div>'], $html);
     return $html;

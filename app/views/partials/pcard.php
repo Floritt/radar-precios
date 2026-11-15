@@ -9,7 +9,7 @@ $n = store_count($p);
   <?php elseif ($off): ?><span class="pcard__badge badge badge--off">−<?= e(pct($off, false)) ?></span><?php endif; ?>
   <span class="pcard__title"><?= e($p['name']) ?></span>
   <span class="pcard__price">
-    <?php if ($tp): ?>desde<strong><?= e(money($tp['price'])) ?></strong><?php else: ?><strong>Ver precio</strong><?php endif; ?>
+    <?php if ($tp): ?>desde<strong><?= e(money($tp['price'])) ?></strong><?php else: ?><span class="pcard__noprice">Ver precio en la tienda</span><?php endif; ?>
   </span>
   <span class="pcard__stores"><?= $n === 1 ? 'En 1 tienda' : 'Comparado en ' . $n . ' tiendas' ?></span>
 </a>

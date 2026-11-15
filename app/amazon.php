@@ -35,6 +35,13 @@ function amazon_tag(): string
 function amazon_link(array $p): ?string
 {
     if (!empty($p['amazon_url'])) {
+        // Producto sin ASIN enlazado a una búsqueda: se rehace con el ID de afiliado actual.
+        if (preg_match('~amazon\.[a-z.]+/s\?~', $p['amazon_url'])) {
+            parse_str((string) parse_url($p['amazon_url'], PHP_URL_QUERY), $q);
+            if (!empty($q['k'])) {
+                return amazon_search_url((string) $q['k']);
+            }
+        }
         return $p['amazon_url'];
     }
     if (empty($p['asin'])) {

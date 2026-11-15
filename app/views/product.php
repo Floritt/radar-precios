@@ -40,7 +40,7 @@ $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp_
         <table class="offers">
           <thead><tr><th>Tienda</th><th>Precio</th><th><span class="visually-hidden">Comprar</span></th></tr></thead>
           <tbody>
-          <?php foreach ($sorted as $o): $isBest = $best && $o['store'] === $best['store']; ?>
+          <?php foreach ($sorted as $i => $o): $isBest = $best ? $o['store'] === $best['store'] : $i === 0; ?>
             <tr<?= $isBest ? ' class="is-best"' : '' ?>>
               <td class="offers__store"><?= e($o['name']) ?>
                 <span class="offers__note">

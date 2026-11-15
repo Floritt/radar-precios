@@ -12,7 +12,7 @@ Cuando no sabes nada de la persona, acierta más un objeto de uso diario de buen
 
 ## Con 10 euros
 
-- **Juego de cartas rápido** para jugar en grupo, como Dobble o Virus!.
+- **Juego de cartas rápido** para jugar en grupo, como [Dobble](/producto/dobble) o [Virus!](/producto/virus).
 - **Taza térmica** o vaso reutilizable con tapa.
 - **Calcetines navideños** de buena calidad (los baratos se notan al tacto).
 - **Funda o soporte para el móvil**, si sabes qué móvil tiene.
@@ -24,7 +24,7 @@ Cuando no sabes nada de la persona, acierta más un objeto de uso diario de buen
 
 - **Manta de sofá** tipo borreguito.
 - **Set de cuidado personal**: crema de manos con bálsamo labial, o un kit de barba.
-- **Juego de mesa familiar pequeño** para 2 a 6 jugadores.
+- **Juego de mesa familiar pequeño**, como [Código Secreto](/producto/codigo-secreto) o [Carcassonne](/producto/carcassonne). Tienes más en la [comparativa de juegos de mesa](/comparativas/juegos-de-mesa-familiares-comparativa).
 - **Luz de lectura** recargable o lámpara pequeña con luz cálida.
 - **Botella térmica** de acero que mantenga frío y calor.
 

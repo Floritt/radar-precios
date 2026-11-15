@@ -16,9 +16,6 @@ function page_home(): void
 {
     $byDrop = 'p.at_low DESC, CASE WHEN p.change30 IS NULL THEN 1 ELSE 0 END, p.change30 ASC';
     $deals = product_list('(p.at_low = 1 OR p.change30 < 0) AND p.best_price IS NOT NULL', [], $byDrop, 8);
-    if (count($deals) < 4) {
-        $deals = product_list('1=1', [], 'p.updated_at DESC', 8);
-    }
     $popular = rows(
         "SELECT p.*, n.name AS niche_name, n.slug AS niche_slug, n.color AS niche_color,
                 (SELECT COUNT(*) FROM clicks c WHERE c.product_id = p.id AND c.created_at > ?) AS clicks30
@@ -31,7 +28,7 @@ function page_home(): void
         'deals' => $deals,
         'popular' => $popular,
         'reviews' => published_posts("po.type = 'review'", [], 4),
-        'guides' => ($deals || $popular) ? published_posts("po.type <> 'review'", [], 4) : published_posts(section_where('blog'), [], 6),
+        'guides' => $deals ? published_posts("po.type <> 'review'", [], 4) : published_posts(section_where('blog'), [], 6),
         'comparisons' => published_posts(section_where('comparison'), [], 4),
     ]);
 }
@@ -115,7 +112,7 @@ function page_product(string $slug): void
     }
     $chart = chart_payload($p);
     $related = rows(
-        "SELECT po.*, n.name AS niche_name, n.slug AS niche_slug FROM posts po LEFT JOIN niches n ON n.id = po.niche_id
+        "SELECT po.*, n.name AS niche_name, n.slug AS niche_slug, n.color AS niche_color FROM posts po LEFT JOIN niches n ON n.id = po.niche_id
          WHERE po.status = 'published' AND po.published_at <= ? AND (po.product_id = ? OR po.body LIKE ?) ORDER BY po.published_at DESC LIMIT 3",
         [now(), (int) $p['id'], '%[producto:' . $p['slug'] . ']%']
     );
@@ -139,7 +136,9 @@ function page_product(string $slug): void
         'best' => $best,
         'stats' => $stats,
         'statsStore' => $store,
-        'verdict' => price_verdict($stats),
+        'verdict' => array_filter(array_column($offers, 'price'), fn ($v) => $v !== null)
+            ? price_verdict($stats)
+            : ['key' => 'none', 'label' => 'Precio en la tienda', 'text' => 'Todavía no mostramos el precio de este producto aquí. Pulsa en la tienda para ver el precio de hoy.'],
         'chart' => $chart,
         'related' => $related,
         'similar' => $similar,

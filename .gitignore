@@ -1,0 +1,9 @@
+/config.php
+/storage/*.sqlite*
+/storage/install.lock
+/storage/cron.lock
+/storage/amazon_token.json
+/storage/logs/*.log
+/uploads/*
+!/uploads/.htaccess
+!/uploads/.gitkeep

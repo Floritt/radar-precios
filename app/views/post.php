@@ -20,6 +20,7 @@ $showProduct = $product && $product['status'] === 'published';
         <p class="byline">
           <?= $post['author'] ? 'Por <strong>' . e($post['author']) . '</strong>. ' : '' ?><?= e(date_es($post['published_at'] ?: $post['created_at'])) ?><?php if ($post['updated_at'] && substr($post['updated_at'], 0, 10) > substr((string) $post['published_at'], 0, 10)): ?>, actualizado el <?= e(date_es($post['updated_at'])) ?><?php endif; ?>. <?= reading_minutes($post['body']) ?> min de lectura.
         </p>
+        <p class="affiliate-note">Algunos enlaces de esta página son de afiliado: si compras a través de ellos, cobramos una pequeña comisión y a ti te cuesta lo mismo.</p>
       </header>
       <?php if ($post['cover_path']): ?><figure class="art__cover"><img src="<?= e(upload_url($post['cover_path'])) ?>" alt=""></figure><?php endif; ?>
 

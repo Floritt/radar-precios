@@ -46,16 +46,18 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
       <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     </form>
     <nav class="header-links" aria-label="Secciones">
-      <a href="<?= e(url('ofertas')) ?>"<?= str_starts_with($path, '/ofertas') ? ' aria-current="page"' : '' ?>>Ofertas</a>
-      <a href="<?= e(url('resenas')) ?>"<?= str_starts_with($path, '/resenas') ? ' aria-current="page"' : '' ?>>Reseñas</a>
+      <?php if (site_counts()['products']): ?><a href="<?= e(url('ofertas')) ?>"<?= str_starts_with($path, '/ofertas') ? ' aria-current="page"' : '' ?>>Ofertas</a><?php endif; ?>
+      <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>"<?= str_starts_with($path, '/resenas') ? ' aria-current="page"' : '' ?>>Reseñas</a><?php endif; ?>
+      <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>"<?= str_starts_with($path, '/comparativas') ? ' aria-current="page"' : '' ?>>Comparativas</a><?php endif; ?>
       <a href="<?= e(url('blog')) ?>"<?= str_starts_with($path, '/blog') ? ' aria-current="page"' : '' ?>>Guías</a>
       <?php if ($telegram): ?><a class="btn-channel" href="<?= e($telegram) ?>" rel="noopener">Telegram</a><?php endif; ?>
     </nav>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menú</button>
   </div>
   <nav class="mobile-menu" id="mobile-menu" aria-label="Menú">
-    <a href="<?= e(url('ofertas')) ?>">Ofertas</a>
-    <a href="<?= e(url('resenas')) ?>">Reseñas</a>
+    <?php if (site_counts()['products']): ?><a href="<?= e(url('ofertas')) ?>">Ofertas</a><?php endif; ?>
+    <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>">Reseñas</a><?php endif; ?>
+    <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>">Comparativas</a><?php endif; ?>
     <a href="<?= e(url('blog')) ?>">Guías de compra</a>
     <?php if ($telegram): ?><a href="<?= e($telegram) ?>" rel="noopener">Canal de Telegram</a><?php endif; ?>
   </nav>
@@ -87,8 +89,9 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     <div>
       <p class="site-footer__title">Secciones</p>
       <ul>
-        <li><a href="<?= e(url('ofertas')) ?>">Ofertas</a></li>
-        <li><a href="<?= e(url('resenas')) ?>">Reseñas</a></li>
+        <?php if (site_counts()['products']): ?><li><a href="<?= e(url('ofertas')) ?>">Ofertas</a></li><?php endif; ?>
+        <?php if (site_counts()['reviews']): ?><li><a href="<?= e(url('resenas')) ?>">Reseñas</a></li><?php endif; ?>
+        <?php if (site_counts()['comparisons']): ?><li><a href="<?= e(url('comparativas')) ?>">Comparativas</a></li><?php endif; ?>
         <li><a href="<?= e(url('blog')) ?>">Guías de compra</a></li>
         <li><a href="<?= e(url('legal/afiliacion')) ?>">Cómo nos financiamos</a></li>
       </ul>
@@ -103,7 +106,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     </div>
   </div>
   <div class="wrap site-footer__note">
-    <p>Como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. También participamos en los programas de afiliados de Temu y Shein. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado.</p>
+    <p>Como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. También participamos en los programas de afiliados de Temu y Shein. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado. Amazon y el logotipo de Amazon son marcas registradas de Amazon.com, Inc. o sus filiales.</p>
     <p>&copy; <?= date('Y') ?> <?= e(setting('legal_owner', site_name())) ?></p>
   </div>
 </footer>

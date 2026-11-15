@@ -4,13 +4,16 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Fuerza HTTPS (descomenta cuando el certificado SSL esté activo)
-    # RewriteCond %{HTTPS} !=on
-    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Fuerza HTTPS (coméntalo si tu dominio aún no tiene certificado SSL)
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Carpetas internas: nunca accesibles desde el navegador
-    RewriteRule ^(app|cron|storage)(/|$) - [F,L]
-    RewriteRule ^(config\.php|config\.example\.php|README\.md)$ - [F,L]
+    RewriteRule ^(app|cron|storage|content)(/|$) - [F,L]
+    RewriteRule (^|/)\.(?!well-known/) - [F,L]
+    RewriteRule ^(config\.php|config\.example\.php|README\.md|\.gitignore)$ - [F,L]
 
     # Archivos reales (CSS, JS, imágenes, instalador) se sirven tal cual
     RewriteCond %{REQUEST_FILENAME} -f [OR]

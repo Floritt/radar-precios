@@ -7,7 +7,7 @@ function published_posts(string $where = '1=1', array $params = [], int $limit =
         "SELECT po.*, n.name AS niche_name, n.slug AS niche_slug, n.color AS niche_color
          FROM posts po LEFT JOIN niches n ON n.id = po.niche_id
          WHERE po.status = 'published' AND po.published_at <= ? AND ($where)
-         ORDER BY po.published_at DESC LIMIT $limit OFFSET $offset",
+         ORDER BY po.published_at DESC, po.id DESC LIMIT $limit OFFSET $offset",
         array_merge([now()], $params)
     );
 }
@@ -31,7 +31,8 @@ function page_home(): void
         'deals' => $deals,
         'popular' => $popular,
         'reviews' => published_posts("po.type = 'review'", [], 4),
-        'guides' => published_posts("po.type <> 'review'", [], 4),
+        'guides' => ($deals || $popular) ? published_posts("po.type <> 'review'", [], 4) : published_posts(section_where('blog'), [], 6),
+        'comparisons' => published_posts(section_where('comparison'), [], 4),
     ]);
 }
 
@@ -151,7 +152,7 @@ function list_page(string $kind): void
 {
     $page = max(1, (int) input('pagina', '1'));
     $perPage = 12;
-    $where = $kind === 'review' ? "po.type = 'review'" : "po.type <> 'review'";
+    $where = section_where($kind);
     $nicheSlug = input('nicho', '');
     $params = [];
     $niche = null;
@@ -164,14 +165,16 @@ function list_page(string $kind): void
     }
     $total = (int) val("SELECT COUNT(*) FROM posts po WHERE po.status = 'published' AND po.published_at <= ? AND ($where)", array_merge([now()], $params));
     $posts = published_posts($where, $params, $perPage, ($page - 1) * $perPage);
-    $title = $kind === 'review' ? 'Reseñas' : 'Guías y artículos';
+    $title = post_section($kind)[0];
 
     render('list', [
         'meta' => meta([
             'title' => $title . ($niche ? ': ' . $niche['name'] : ''),
-            'description' => $kind === 'review'
-                ? 'Reseñas con nota, pros y contras, y el historial de precio de cada producto.'
-                : 'Guías de compra y consejos para pagar menos en Amazon, Temu y Shein.',
+            'description' => match ($kind) {
+                'review' => 'Reseñas con nota, pros y contras, y el historial de precio de cada producto.',
+                'comparison' => 'Comparativas entre productos del mismo tipo: diferencias, para quién es cada uno y cuál conviene.',
+                default => 'Guías de compra y consejos para pagar menos en Amazon, Temu y Shein.',
+            },
             'noindex' => $page > 1,
         ]),
         'title' => $title,
@@ -193,6 +196,11 @@ function page_reviews(): void
     list_page('review');
 }
 
+function page_comparisons(): void
+{
+    list_page('comparison');
+}
+
 function page_post(string $slug): void
 {
     $post = row(
@@ -205,7 +213,7 @@ function page_post(string $slug): void
     if (!$post || (($post['status'] !== 'published' || $post['published_at'] > now()) && !$isPreview)) {
         not_found();
     }
-    $expected = $post['type'] === 'review' ? '/resenas/' : '/blog/';
+    $expected = '/' . post_section($post['type'])[1] . '/';
     if (!str_starts_with(request_path(), $expected)) {
         redirect(ltrim(substr(post_url($post), strlen(base_path())), '/'));
     }
@@ -214,7 +222,7 @@ function page_post(string $slug): void
         : null;
     $more = published_posts('po.id <> ? AND (po.niche_id = ? OR po.type = ?)', [(int) $post['id'], (int) $post['niche_id'], $post['type']], 3);
 
-    $section = $post['type'] === 'review' ? ['Reseñas', 'resenas'] : ['Guías y artículos', 'blog'];
+    $section = post_section($post['type']);
     render('post', [
         'meta' => meta([
             'title' => $post['title'],
@@ -277,7 +285,9 @@ function page_legal(string $slug): void
 function page_sitemap(): void
 {
     header('Content-Type: application/xml; charset=utf-8');
-    $urls = [['', date('Y-m-d')], ['blog', null], ['resenas', null]];
+    $urls = [['', date('Y-m-d')], ['blog', null]];
+    if (site_counts()['reviews']) $urls[] = ['resenas', null];
+    if (site_counts()['comparisons']) $urls[] = ['comparativas', null];
     foreach (all_niches() as $n) {
         $urls[] = ['nicho/' . $n['slug'], null];
     }
@@ -285,7 +295,7 @@ function page_sitemap(): void
         $urls[] = ['producto/' . $p['slug'], substr($p['updated_at'], 0, 10)];
     }
     foreach (rows("SELECT slug, type, updated_at FROM posts WHERE status = 'published' AND published_at <= ?", [now()]) as $p) {
-        $urls[] = [($p['type'] === 'review' ? 'resenas/' : 'blog/') . $p['slug'], substr($p['updated_at'], 0, 10)];
+        $urls[] = [post_section($p['type'])[1] . '/' . $p['slug'], substr($p['updated_at'], 0, 10)];
     }
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     foreach ($urls as [$path, $mod]) {

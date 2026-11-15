@@ -389,7 +389,7 @@ function admin_posts(): void
 function admin_post_edit(string $id): void
 {
     $user = require_login();
-    $empty = ['id' => null, 'type' => input('tipo') === 'review' ? 'review' : 'blog', 'niche_id' => null, 'product_id' => null, 'title' => '', 'slug' => '',
+    $empty = ['id' => null, 'type' => array_key_exists((string) input('tipo'), POST_TYPES) ? (string) input('tipo') : 'blog', 'niche_id' => null, 'product_id' => null, 'title' => '', 'slug' => '',
         'excerpt' => '', 'body' => '', 'cover_path' => null, 'rating' => null, 'pros' => '', 'cons' => '', 'verdict' => '',
         'author' => $user['name'] ?: setting('default_author', ''), 'status' => 'draft', 'published_at' => null];
     $post = $id === 'nuevo' ? $empty : row('SELECT * FROM posts WHERE id = ?', [(int) $id]);

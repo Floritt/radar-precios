@@ -342,3 +342,8 @@ small, .muted { color: var(--muted); }
 .site-footer li { margin-bottom: 6px; }
 .site-footer__note { border-top: 1px solid var(--border); margin-top: 24px; padding-top: 14px; font-size: 12px; }
 @media (max-width: 760px) { .site-footer__grid { grid-template-columns: 1fr 1fr; } .site-footer__about { grid-column: 1 / -1; } }
+
+.prose .amz-cta { display: inline-block; margin: 4px 10px 22px 0; }
+.affiliate-note { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.prose .amz-cta .btn { text-decoration: none; }
+.side-list span:empty { display: none; }

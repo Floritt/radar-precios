@@ -15,6 +15,8 @@ $routes = [
     ['GET', '#^/ofertas$#', 'page_deals'],
     ['GET', '#^/blog$#', 'page_blog'],
     ['GET', '#^/blog/([a-z0-9\-]+)$#', 'page_post'],
+    ['GET', '#^/comparativas$#', 'page_comparisons'],
+    ['GET', '#^/comparativas/([a-z0-9\-]+)$#', 'page_post'],
     ['GET', '#^/resenas$#', 'page_reviews'],
     ['GET', '#^/resenas/([a-z0-9\-]+)$#', 'page_post'],
     ['GET', '#^/buscar$#', 'page_search'],

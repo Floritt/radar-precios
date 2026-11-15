@@ -61,6 +61,7 @@
   <ul class="plain">
     <li><a href="<?= e(url('admin/productos/nuevo')) ?>">Añadir un producto</a></li>
     <li><a href="<?= e(url('admin/articulos/nuevo?tipo=review')) ?>">Escribir una reseña</a></li>
+    <li><a href="<?= e(url('admin/articulos/nuevo?tipo=comparison')) ?>">Escribir una comparativa</a></li>
     <li><a href="<?= e(url('admin/articulos/nuevo')) ?>">Escribir una guía o artículo</a></li>
     <li><a href="<?= e(url('admin/ajustes')) ?>">Completar tus datos legales</a></li>
   </ul>

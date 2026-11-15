@@ -3,6 +3,7 @@
   <h1>Artículos y reseñas</h1>
   <div class="btns">
     <a class="btn btn--primary" href="<?= e(url('admin/articulos/nuevo?tipo=review')) ?>">Nueva reseña</a>
+    <a class="btn" href="<?= e(url('admin/articulos/nuevo?tipo=comparison')) ?>">Nueva comparativa</a>
     <a class="btn" href="<?= e(url('admin/articulos/nuevo')) ?>">Nuevo artículo</a>
   </div>
 </div>

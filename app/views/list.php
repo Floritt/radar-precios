@@ -1,12 +1,17 @@
 <?php
 /** @var string $title @var string $kind @var array $posts @var ?array $niche @var int $page @var int $pages */
-$base = $kind === 'review' ? 'resenas' : 'blog';
+$base = post_section($kind)[1];
+$intro = match ($kind) {
+    'review' => 'Productos que hemos usado, con nota, pros y contras y su historial de precio.',
+    'comparison' => 'Productos del mismo tipo cara a cara: en qué se diferencian y cuál conviene a cada persona.',
+    default => 'Consejos para elegir bien y no pagar de más.',
+};
 ?>
 <div class="wrap page">
   <div class="list-head">
     <div>
       <h1><?= e($title) ?></h1>
-      <p><?= $kind === 'review' ? 'Productos que hemos probado, con nota, pros y contras y su historial de precio.' : 'Consejos para elegir bien y no pagar de más.' ?></p>
+      <p><?= e($intro) ?></p>
     </div>
   </div>
   <nav class="chips" aria-label="Categoría">

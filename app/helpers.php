@@ -327,7 +327,7 @@ function has_demo_content(): bool
 
 function post_url(array $post): string
 {
-    return url(($post['type'] === 'review' ? 'resenas/' : 'blog/') . $post['slug']);
+    return url(post_section($post['type'])[1] . '/' . $post['slug']);
 }
 
 function product_url(array $product): string
@@ -340,7 +340,27 @@ function niche_url(array $niche): string
     return url('nicho/' . $niche['slug']);
 }
 
-const POST_TYPES = ['blog' => 'Artículo', 'guide' => 'Guía de compra', 'review' => 'Reseña'];
+const POST_TYPES = ['blog' => 'Artículo', 'guide' => 'Guía de compra', 'review' => 'Reseña', 'comparison' => 'Comparativa'];
+
+/** Sección pública de cada tipo de artículo: [nombre, ruta]. */
+function post_section(string $type): array
+{
+    return match ($type) {
+        'review' => ['Reseñas', 'resenas'],
+        'comparison' => ['Comparativas', 'comparativas'],
+        default => ['Guías y artículos', 'blog'],
+    };
+}
+
+/** Condición SQL para listar una sección. */
+function section_where(string $kind): string
+{
+    return match ($kind) {
+        'review' => "po.type = 'review'",
+        'comparison' => "po.type = 'comparison'",
+        default => "po.type NOT IN ('review', 'comparison')",
+    };
+}
 
 /* ---------- Subida de imágenes ---------- */
 
@@ -450,4 +470,25 @@ function deal_discount(array $p): ?float
 function store_label(array $p, string $store): string
 {
     return $store === 'other' ? (($p['other_name'] ?? '') ?: 'Otra tienda') : (STORES[$store] ?? $store);
+}
+
+/** Cuántos productos y reseñas publicadas hay, para ocultar secciones vacías. */
+function site_counts(): array
+{
+    static $c = null;
+    if ($c === null) {
+        $c = [
+            'products' => (int) val("SELECT COUNT(*) FROM products WHERE status = 'published'"),
+            'reviews' => (int) val("SELECT COUNT(*) FROM posts WHERE type = 'review' AND status = 'published' AND published_at <= ?", [now()]),
+            'comparisons' => (int) val("SELECT COUNT(*) FROM posts WHERE type = 'comparison' AND status = 'published' AND published_at <= ?", [now()]),
+        ];
+    }
+    return $c;
+}
+
+/** Enlace de afiliado a una búsqueda de Amazon, con el ID de seguimiento de Ajustes. */
+function amazon_search_url(string $query): string
+{
+    $tag = amazon_tag();
+    return 'https://' . config('amazon.marketplace', 'www.amazon.es') . '/s?k=' . rawurlencode($query) . ($tag ? '&tag=' . rawurlencode($tag) : '');
 }

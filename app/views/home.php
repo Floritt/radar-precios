@@ -1,11 +1,24 @@
 <?php
-/** @var array $deals @var array $popular @var array $reviews @var array $guides */
+/** @var array $deals @var array $popular @var array $reviews @var array $guides @var array $comparisons */
 $niches = all_niches();
 $telegram = setting('telegram_url');
+$hasProducts = $deals || $popular;
 ?>
 <div class="wrap page">
   <div class="layout">
     <div>
+      <?php if (!$hasProducts): ?>
+      <section class="panel intro-panel">
+        <div class="panel__body">
+          <h1>Guías y comparativas para acertar con los regalos de Navidad</h1>
+          <p class="muted">Qué mirar antes de comprar cada tipo de regalo, en qué se diferencian los productos parecidos y cómo saber si una oferta es de verdad.</p>
+        </div>
+      </section>
+      <?php if ($guides): ?>
+        <div class="acards acards--home"><?php foreach ($guides as $post): partial('acard', ['post' => $post]); endforeach; ?></div>
+        <a class="panel__more panel" href="<?= e(url('blog')) ?>" style="display:block;margin-top:12px">Ver todas las guías</a>
+      <?php endif; ?>
+      <?php else: ?>
       <section class="panel" aria-labelledby="h-deals">
         <div class="panel__head">
           <h1 id="h-deals">Bajadas de precio de hoy</h1>
@@ -29,9 +42,17 @@ $telegram = setting('telegram_url');
         <div class="grid"><?php foreach ($popular as $p): partial('pcard', ['p' => $p]); endforeach; ?></div>
       </section>
       <?php endif; ?>
+      <?php endif; ?>
     </div>
 
     <aside>
+      <?php if (!$hasProducts && $comparisons): ?>
+      <section class="panel">
+        <div class="panel__head"><h2>Comparativas</h2><a href="<?= e(url('comparativas')) ?>">Ver todas</a></div>
+        <?php foreach ($comparisons as $post): partial('mini-post', ['post' => $post]); endforeach; ?>
+      </section>
+      <?php endif; ?>
+
       <?php if ($reviews): ?>
       <section class="panel">
         <div class="panel__head"><h2>Reseñas</h2><a href="<?= e(url('resenas')) ?>">Ver todas</a></div>
@@ -51,14 +72,14 @@ $telegram = setting('telegram_url');
         <div class="panel__head"><h2>Categorías</h2></div>
         <ul class="side-list">
           <?php foreach ($niches as $n): ?>
-            <li><a href="<?= e(niche_url($n)) ?>"><?= e($n['name']) ?> <span><?= (int) $n['product_count'] ?></span></a></li>
+            <li><a href="<?= e(niche_url($n)) ?>"><?= e($n['name']) ?> <span><?= (int) $n['product_count'] ?: '' ?></span></a></li>
           <?php endforeach; ?>
         </ul>
       </section>
     </aside>
   </div>
 
-  <?php if ($guides): ?>
+  <?php if ($guides && $hasProducts): ?>
   <section aria-labelledby="h-guides" style="margin-top: 12px">
     <div class="section-title"><h2 id="h-guides">Guías de compra</h2><a href="<?= e(url('blog')) ?>">Ver todas</a></div>
     <?php $first = array_shift($guides); ?>

@@ -7,3 +7,4 @@
 /uploads/*
 !/uploads/.htaccess
 !/uploads/.gitkeep
+/storage/setup_token.txt

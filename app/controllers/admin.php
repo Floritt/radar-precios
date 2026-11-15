@@ -469,6 +469,7 @@ const SETTING_FIELDS = [
     'tagline' => 'Descripción corta (aparece en Google y en el pie)',
     'home_lead' => 'Texto de presentación de la portada',
     'default_author' => 'Autor por defecto de los artículos',
+    'amazon_tag' => 'ID de seguimiento de Amazon Afiliados',
     'telegram_url' => 'Enlace a tu canal de Telegram',
     'whatsapp_url' => 'Enlace a tu canal de WhatsApp',
     'legal_owner' => 'Titular (nombre y apellidos o razón social)',
@@ -482,8 +483,13 @@ function admin_settings(): void
     require_login();
     if (is_post()) {
         csrf_check();
+        $tag = trim((string) input('amazon_tag', ''));
+        if ($tag !== '' && !preg_match('/^[A-Za-z0-9_-]{3,40}$/', $tag)) {
+            flash('El ID de Amazon solo lleva letras, números y guiones, por ejemplo tunombre-21. No se ha guardado ningún cambio.', 'error');
+            redirect('admin/ajustes');
+        }
         foreach (array_keys(SETTING_FIELDS) as $k) {
-            save_setting($k, mb_substr((string) input($k), 0, 600));
+            save_setting($k, mb_substr(trim((string) input($k)), 0, 600));
         }
         flash('Ajustes guardados.');
         redirect('admin/ajustes');

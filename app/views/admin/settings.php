@@ -15,6 +15,11 @@
     <?php endforeach; ?>
   </section>
   <section class="card">
+    <h2>Afiliados</h2>
+    <label><?= e(SETTING_FIELDS['amazon_tag']) ?> <small>Lo ves arriba a la izquierda en afiliados.amazon.es. En España acaba en -21. Se añade solo a todos los enlaces de Amazon.</small><input name="amazon_tag" value="<?= e($values['amazon_tag']) ?>" placeholder="tunombre-21" autocomplete="off"></label>
+    <p class="muted">Los enlaces de Temu, Shein y otras tiendas se pegan ya con tu código de afiliado en cada producto.</p>
+  </section>
+  <section class="card">
     <h2>Canales</h2>
     <p class="muted">Si los rellenas, aparecen en la portada y en el pie.</p>
     <?php foreach (['telegram_url', 'whatsapp_url'] as $k): ?>

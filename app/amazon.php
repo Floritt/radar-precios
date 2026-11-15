@@ -9,7 +9,7 @@ declare(strict_types=1);
 function amazon_enabled(): bool
 {
     return (bool) config('amazon.enabled')
-        && config('amazon.client_id') && config('amazon.client_secret') && config('amazon.partner_tag');
+        && config('amazon.client_id') && config('amazon.client_secret') && amazon_tag() !== '';
 }
 
 /** Extrae el ASIN de un enlace de Amazon o lo valida si ya es un ASIN. */
@@ -26,6 +26,12 @@ function extract_asin(string $input): ?string
 }
 
 /** Enlace de afiliado al producto. Usa el que devuelve la API cuando existe. */
+/** ID de seguimiento: el de Ajustes del panel y, si está vacío, el de config.php. */
+function amazon_tag(): string
+{
+    return setting('amazon_tag') ?: (string) config('amazon.partner_tag', '');
+}
+
 function amazon_link(array $p): ?string
 {
     if (!empty($p['amazon_url'])) {
@@ -34,7 +40,7 @@ function amazon_link(array $p): ?string
     if (empty($p['asin'])) {
         return null;
     }
-    $tag = config('amazon.partner_tag');
+    $tag = amazon_tag();
     $domain = config('amazon.marketplace', 'www.amazon.es');
     return 'https://' . $domain . '/dp/' . rawurlencode($p['asin']) . ($tag ? '?tag=' . rawurlencode($tag) : '');
 }
@@ -103,7 +109,7 @@ function amazon_get_items(array $asins): array
         'itemIds' => $asins,
         'itemIdType' => 'ASIN',
         'marketplace' => $marketplace,
-        'partnerTag' => config('amazon.partner_tag'),
+        'partnerTag' => amazon_tag(),
         'condition' => 'New',
         'languagesOfPreference' => ['es_ES'],
         'resources' => [

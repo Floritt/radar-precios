@@ -1,8 +1,9 @@
 ---
-title: Auriculares inalámbricos de botón, de diadema o deportivos: cuál regalar
+title: ¿Qué auriculares inalámbricos regalar: de botón, de diadema o deportivos?
+seo_title: Auriculares de botón, diadema o deportivos
 type: comparison
 niche: tecnologia-para-regalar
-excerpt: Tres formatos de auriculares Bluetooth comparados: comodidad, aislamiento, autonomía, uso con el móvil y para qué tipo de persona encaja cada uno.
+excerpt: De botón para el uso diario y el transporte, de diadema para trabajar o viajar, y deportivos para correr. Si no sabes sus hábitos, de botón.
 ---
 Antes de mirar marcas conviene acertar con el formato. Unos auriculares estupendos en el formato equivocado acaban olvidados en un cajón.
 
@@ -47,3 +48,17 @@ Llevan ganchos o aletas para que no se muevan al correr, y suelen ser resistente
 - **No sabes nada de sus hábitos**: de botón, el formato que más gente usa.
 
 Antes de comprar, comprueba que encajen con su móvil. Lo explicamos en la [guía de regalos tecnológicos](/blog/regalos-tecnologicos-menos-de-50-euros).
+
+## Preguntas frecuentes
+
+### ¿Qué auriculares son mejores para el transporte público?
+
+Los de botón con cancelación de ruido.
+
+### ¿Qué auriculares aíslan mejor del ruido?
+
+Los de diadema, sobre todo si tienen cancelación de ruido.
+
+### ¿Qué auriculares usar para correr por la calle?
+
+Unos deportivos resistentes al sudor, con IPX4 o superior. Los de conducción ósea no tapan la oreja y dejan oír el tráfico, a costa de peor calidad de sonido.

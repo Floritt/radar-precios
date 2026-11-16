@@ -1,8 +1,9 @@
 ---
-title: Luces de Navidad LED: cómo elegir las de interior y las de exterior
+title: ¿Qué luces de Navidad LED comprar para interior y para exterior?
+seo_title: Qué luces de Navidad LED comprar
 type: guide
 niche: decoracion-de-navidad
-excerpt: Protección IP, color de la luz, alimentación y longitud real. Lo que conviene mirar en la ficha antes de comprar luces para el árbol, el balcón o la fachada.
+excerpt: Para interior basta IP20. Para balcones y terrazas cubiertas, IP44, y para fachadas o jardín, IP65. Después elige color, alimentación y longitud.
 ---
 Casi todas las luces de Navidad que se venden hoy son LED, así que la pregunta ya no es si gastan mucho (gastan poco), sino si sirven para el sitio donde las vas a poner. Estas son las cinco cosas que más diferencian unas de otras.
 
@@ -50,3 +51,17 @@ El **mando a distancia** y los modos de parpadeo son un extra. Si las luces van 
 [amazon:luces navidad led exterior ip44|Ver luces LED de exterior en Amazon]
 
 [amazon:luces navidad pilas temporizador|Ver luces a pilas con temporizador]
+
+## Preguntas frecuentes
+
+### ¿Qué IP necesitan las luces de Navidad de exterior?
+
+IP44 para balcones, porches y terrazas cubiertas. IP65 o más si les va a llover de lleno, como en fachadas o en el jardín.
+
+### ¿Cuántas luces necesita un árbol de 180 cm?
+
+Entre 300 y 600, según lo iluminado que te guste. La referencia es unas 100 luces por cada 30 cm de altura para un árbol muy iluminado, y la mitad para algo discreto.
+
+### ¿Las luces solares sirven en Navidad?
+
+Solo si el panel recibe sol directo varias horas. En diciembre, en un patio interior o en una fachada al norte, apenas se encienden.

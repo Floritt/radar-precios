@@ -13,6 +13,7 @@ if (PHP_SAPI !== 'cli') {
 }
 chdir(dirname(__DIR__));
 require 'app/bootstrap.php';
+ensure_schema();
 
 // --nombre=BASE64 cambia el nombre de la web (en base64 para poder pasar acentos desde una tarea cron).
 foreach ($argv as $arg) {
@@ -97,11 +98,13 @@ foreach ($files as $file) {
     }
     [$meta, $body] = $md;
     $slug = $meta['slug'] ?? basename($file, '.md');
-    $existing = row('SELECT id, body, created_at, updated_at FROM posts WHERE slug = ?', [$slug]);
+    $existing = row('SELECT id, title, excerpt, seo_title, body, created_at, updated_at FROM posts WHERE slug = ?', [$slug]);
+    $seoTitle = trim((string) ($meta['seo_title'] ?? '')) ?: null;
     if ($existing) {
         // Con --actualizar se refrescan los artículos que nadie ha tocado desde el panel.
-        if ($update && $existing['updated_at'] === $existing['created_at'] && $existing['body'] !== $body) {
-            q('UPDATE posts SET title = ?, excerpt = ?, body = ? WHERE id = ?', [$meta['title'] ?? $slug, $meta['excerpt'] ?? '', $body, (int) $existing['id']]);
+        $changed = $existing['body'] !== $body || $existing['title'] !== ($meta['title'] ?? $slug) || (string) $existing['excerpt'] !== ($meta['excerpt'] ?? '') || $existing['seo_title'] !== $seoTitle;
+        if ($update && $existing['updated_at'] === $existing['created_at'] && $changed) {
+            q('UPDATE posts SET title = ?, seo_title = ?, excerpt = ?, body = ? WHERE id = ?', [$meta['title'] ?? $slug, $seoTitle, $meta['excerpt'] ?? '', $body, (int) $existing['id']]);
             echo "Actualizado: $slug\n";
         }
         continue;
@@ -114,6 +117,7 @@ foreach ($files as $file) {
         'product_id' => null,
         'title' => $meta['title'] ?? $slug,
         'slug' => $slug,
+        'seo_title' => $seoTitle,
         'excerpt' => $meta['excerpt'] ?? '',
         'body' => $body,
         'author' => $author,

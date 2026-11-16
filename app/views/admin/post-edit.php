@@ -15,6 +15,7 @@ $publishedLocal = $post['published_at'] ? date('Y-m-d\TH:i', strtotime($post['pu
     <section class="card">
       <label>Título<input name="title" required maxlength="220" value="<?= e($post['title']) ?>" data-slug-source class="input-lg"></label>
       <label>Dirección web<input name="slug" value="<?= e($post['slug']) ?>" data-slug-target pattern="[a-z0-9\-]*"></label>
+      <label>Título para Google <small>Opcional. Una versión corta del título, de unos 40 caracteres. El año y el nombre de la web se añaden solos.</small><input name="seo_title" maxlength="120" value="<?= e($post['seo_title'] ?? '') ?>"></label>
       <label>Entradilla <small>Dos o tres frases. Aparece bajo el título, en los listados y en Google.</small><textarea name="excerpt" rows="3"><?= e($post['excerpt']) ?></textarea></label>
       <label>Texto
         <small>Markdown: ## Subtítulo, **negrita**, - listas, [enlace](https://...). Para insertar un producto con su precio y botones, escribe en una línea aparte <code>[producto:direccion-del-producto]</code>. Para una tabla comparativa: <code>[comparativa:producto-uno,producto-dos]</code>.</small>

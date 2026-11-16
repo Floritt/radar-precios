@@ -49,6 +49,13 @@ $showProduct = $product && $product['status'] === 'published';
         </nav>
       <?php endif; ?>
       <div class="prose"><?= $bodyHtml ?></div>
+      <aside class="follow-cta">
+        <div>
+          <strong>¿Ya sabes cuál quieres?</strong>
+          <p>Pega su enlace de Amazon y mira si hoy es buen momento para comprarlo.</p>
+        </div>
+        <a class="btn btn--buy" href="<?= e(url('seguir')) ?>">Seguir un precio</a>
+      </aside>
     </article>
 
     <aside<?= $showProduct ? '' : ' class="sticky"' ?>>

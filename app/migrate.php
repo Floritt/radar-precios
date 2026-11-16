@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 
 function ensure_schema(): void
 {
@@ -67,6 +67,12 @@ function ensure_schema(): void
         // La columna ya existe.
     }
     $indexes[] = ['idx_alert_email', 'alerts', 'email', false];
+    // v4: título corto para buscadores en los artículos.
+    try {
+        db()->exec('ALTER TABLE posts ADD COLUMN seo_title VARCHAR(120) NULL');
+    } catch (Throwable $e) {
+        // La columna ya existe.
+    }
     foreach ($indexes as [$name, $table, $cols, $unique]) {
         try {
             db()->exec(($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ') . ($mysql ? '' : 'IF NOT EXISTS ') . "$name ON $table ($cols)");

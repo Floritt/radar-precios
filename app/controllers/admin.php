@@ -396,7 +396,7 @@ function admin_posts(): void
 function admin_post_edit(string $id): void
 {
     $user = require_login();
-    $empty = ['id' => null, 'type' => array_key_exists((string) input('tipo'), POST_TYPES) ? (string) input('tipo') : 'blog', 'niche_id' => null, 'product_id' => null, 'title' => '', 'slug' => '',
+    $empty = ['id' => null, 'type' => array_key_exists((string) input('tipo'), POST_TYPES) ? (string) input('tipo') : 'blog', 'niche_id' => null, 'product_id' => null, 'title' => '', 'seo_title' => '', 'slug' => '',
         'excerpt' => '', 'body' => '', 'cover_path' => null, 'rating' => null, 'pros' => '', 'cons' => '', 'verdict' => '',
         'author' => $user['name'] ?: setting('default_author', ''), 'status' => 'draft', 'published_at' => null];
     $post = $id === 'nuevo' ? $empty : row('SELECT * FROM posts WHERE id = ?', [(int) $id]);
@@ -412,6 +412,7 @@ function admin_post_edit(string $id): void
             'niche_id' => (int) input('niche_id', '0') ?: null,
             'product_id' => (int) input('product_id', '0') ?: null,
             'title' => mb_substr((string) input('title'), 0, 220),
+            'seo_title' => mb_substr(trim((string) input('seo_title')), 0, 120) ?: null,
             'excerpt' => (string) input('excerpt'),
             'body' => (string) ($_POST['body'] ?? ''),
             'rating' => $rating === '' ? null : max(0, min(10, round((float) str_replace(',', '.', $rating), 1))),

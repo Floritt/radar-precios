@@ -1,8 +1,9 @@
 ---
-title: Freidora de aire de cesta, de doble cesta o tipo horno: comparativa
+title: ¿Freidora de aire de cesta, de doble cesta o tipo horno?
+seo_title: Freidora de cesta, doble cesta u horno
 type: comparison
 niche: cocina-para-las-fiestas
-excerpt: Tres formatos de freidora de aire frente a frente: capacidad, espacio en la encimera, facilidad de limpieza y para qué casa encaja cada una.
+excerpt: Cesta única para una a cuatro personas o cocinas pequeñas, doble cesta para familias y tipo horno si quieres sustituir un horno pequeño.
 ---
 Las tres cocinan con aire caliente y consiguen resultados parecidos. Lo que cambia es cuánto cabe, cuánto ocupan y lo cómodo que es el día a día.
 
@@ -49,3 +50,17 @@ Su límite: ocupan mucho, tardan algo más en calentar y limpiar bandejas y reji
 - **Cocina pequeña**: cesta única, sin dudarlo.
 
 Si aún no tienes claro el tamaño, lo explicamos en la [guía de capacidad de la freidora de aire](/blog/freidora-de-aire-que-capacidad-necesitas).
+
+## Preguntas frecuentes
+
+### ¿Merece la pena una freidora de doble cesta?
+
+Sí, para familias que cocinan a diario: permite hacer dos cosas a la vez, cada una a su temperatura. Es ancha, así que mide antes la encimera.
+
+### ¿Cabe un pollo entero en una freidora de doble cesta?
+
+Puede no caber: cada cesta por separado es más pequeña que una cesta única con el mismo total de litros.
+
+### ¿Qué freidora de aire se limpia mejor?
+
+La de cesta única. Las de tipo horno dan más trabajo por las bandejas y las rejillas.

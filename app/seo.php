@@ -55,3 +55,50 @@ function jsonld_article(array $post): array
     }
     return $data;
 }
+
+/**
+ * Título del artículo para buscadores: el corto si lo tiene, con el año de la última revisión.
+ * El año va en el título y no en la dirección, para no tener que redirigir cada enero.
+ */
+function post_seo_title(array $post): string
+{
+    $t = trim((string) ($post['seo_title'] ?? '')) ?: (string) $post['title'];
+    if (!preg_match('/\b20\d\d\b/', $t)) {
+        $t .= ' (' . date('Y', strtotime((string) ($post['updated_at'] ?: $post['published_at'] ?: 'now'))) . ')';
+    }
+    return $t;
+}
+
+/** Preguntas del apartado "## Preguntas frecuentes" de un artículo: cada "### pregunta" con su respuesta en texto plano. */
+function post_faqs(string $body): array
+{
+    if (!preg_match('/^##\s+Preguntas frecuentes\s*$(.*?)(?=^##\s|\z)/msu', $body, $m)) {
+        return [];
+    }
+    $faqs = [];
+    foreach (preg_split('/^###\s+/m', $m[1]) as $i => $chunk) {
+        if ($i === 0) {
+            continue;
+        }
+        [$q, $a] = array_pad(explode("\n", $chunk, 2), 2, '');
+        $a = html_entity_decode(strip_tags(render_markdown(trim($a))), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $a = trim((string) preg_replace('/\s+/u', ' ', $a));
+        if (trim($q) !== '' && $a !== '') {
+            $faqs[] = [trim($q), $a];
+        }
+    }
+    return $faqs;
+}
+
+function jsonld_faq(array $faqs): array
+{
+    return [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => array_map(fn($f) => [
+            '@type' => 'Question',
+            'name' => $f[0],
+            'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f[1]],
+        ], $faqs),
+    ];
+}

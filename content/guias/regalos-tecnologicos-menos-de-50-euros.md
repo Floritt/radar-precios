@@ -1,8 +1,9 @@
 ---
-title: Regalos tecnológicos por menos de 50 euros: cómo no fallar con la compatibilidad
+title: ¿Qué regalo tecnológico comprar por menos de 50 euros?
+seo_title: Regalos tecnológicos por menos de 50 €
 type: guide
 niche: tecnologia-para-regalar
-excerpt: Auriculares, baterías externas, cargadores y enchufes inteligentes. Qué comprobar antes de regalar tecnología para que funcione con el móvil de quien lo recibe.
+excerpt: Auriculares inalámbricos, una batería externa, un cargador rápido o un enchufe inteligente. Antes, comprueba que sea compatible con su móvil.
 ---
 Con tecnología, el fallo no suele ser de gusto sino de compatibilidad: el cargador que no carga rápido, los auriculares que suenan peor con ese móvil o el enchufe inteligente que no aparece en su asistente. Esto es lo que conviene saber de cada tipo de regalo.
 
@@ -38,3 +39,17 @@ Un cargador **USB-C de 20 W o más con Power Delivery** permite la carga rápida
 [amazon:auriculares bluetooth cancelacion ruido|Ver auriculares inalámbricos]
 
 [amazon:bateria externa 10000 mah usb c|Ver baterías externas USB-C]
+
+## Preguntas frecuentes
+
+### ¿Cómo sé si un cargador sirve para su móvil?
+
+Desde el iPhone 15, los iPhone usan USB-C, igual que casi todos los Android. Los iPhone anteriores usan Lightning. Un cargador USB-C de 20 W o más con Power Delivery da carga rápida en la mayoría de móviles actuales.
+
+### ¿Se puede llevar una batería externa en el avión?
+
+La norma general permite llevar en cabina baterías de hasta 100 Wh sin pedir permiso a la aerolínea. Una de 20.000 mAh ronda los 74 Wh.
+
+### ¿Por qué no se conecta un enchufe inteligente?
+
+Muchos solo funcionan con redes wifi de 2,4 GHz. También hay que comprobar que sea compatible con el asistente que ya tiene en casa: Alexa, Google Home o Apple Home.

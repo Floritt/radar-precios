@@ -1,8 +1,9 @@
 ---
-title: Árbol de Navidad artificial: qué mirar antes de comprarlo
+title: ¿Qué árbol de Navidad artificial comprar? Altura, puntas y materiales
+seo_title: Qué árbol de Navidad artificial comprar
 type: guide
 niche: decoracion-de-navidad
-excerpt: Altura según tu techo, número de puntas, PVC o PE, tipo de ramas y base. Un árbol artificial bien elegido dura diez Navidades; uno mal elegido, dos.
+excerpt: Uno que mida unos 30 cm menos que tu techo, con más de 500 puntas si es de 180 cm y, si el presupuesto llega, de material mixto PE y PVC.
 ---
 Un árbol artificial es una compra para muchos años, así que merece la pena dedicarle cinco minutos a la ficha. Estas son las cifras y los materiales que separan un árbol que parece de verdad de uno que se ve pelado.
 
@@ -48,3 +49,17 @@ Los árboles con luces integradas ahorran el momento de enrollar guirnaldas. A c
 - Si el árbol es de importación, cuenta con unos días más de envío.
 
 [amazon:arbol navidad artificial 180 cm|Ver árboles de 180 cm en Amazon]
+
+## Preguntas frecuentes
+
+### ¿Qué altura de árbol de Navidad necesito?
+
+Resta unos 30 cm a la altura del techo para dejar sitio a la estrella. Con un techo de 2,50 m, un árbol de 180 cm deja margen y uno de 210 cm es el máximo cómodo.
+
+### ¿Cuántas puntas debe tener un árbol de 180 cm?
+
+Entre 500 y 800 puntas tiene un aspecto normal. Con menos de 500 se ve escaso y con más de 800 queda frondoso.
+
+### ¿Es mejor un árbol de PVC o de PE?
+
+El de PE parece más real y es más caro. El de PVC es el más barato. Los mixtos, con PE en la capa exterior, suelen ser el mejor equilibrio entre precio y aspecto.

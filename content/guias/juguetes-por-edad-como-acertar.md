@@ -1,8 +1,9 @@
 ---
-title: Cómo elegir un juguete según la edad, sin sustos de seguridad
+title: ¿Cómo elegir un juguete según la edad del niño?
+seo_title: Cómo elegir un juguete según la edad
 type: guide
 niche: juguetes-y-juegos-de-mesa
-excerpt: Qué tipo de juguete encaja en cada etapa, qué avisos de la caja importan de verdad y por qué las pilas de botón merecen atención especial.
+excerpt: La edad de la caja es sobre todo un aviso de seguridad. Qué leer en la etiqueta y qué tipo de juguete encaja en cada etapa, de 0 a más de 9 años.
 ---
 La edad de la caja no es un número orientativo para saber si el juguete gustará: es sobre todo una indicación de seguridad. Con eso claro, elegir es mucho más fácil.
 
@@ -37,3 +38,17 @@ Las **pilas de botón** (las redondas y planas) son peligrosas si un niño se la
 [amazon:juguetes 3 años|Ver juguetes para 3 años en Amazon]
 
 [amazon:juegos de construccion 8 años|Ver construcciones para 8 años]
+
+## Preguntas frecuentes
+
+### ¿Qué significa «no conviene para menores de 36 meses»?
+
+Que el juguete tiene piezas pequeñas que un niño pequeño se puede tragar. Es un aviso de seguridad, no una recomendación de gusto.
+
+### ¿Qué debe llevar la caja de un juguete seguro?
+
+El marcado CE, obligatorio en la Unión Europea, y los datos del fabricante o del importador con una dirección en la UE.
+
+### ¿Por qué hay que tener cuidado con las pilas de botón?
+
+Porque son peligrosas si un niño se las traga. En los juguetes infantiles, el compartimento de las pilas debe cerrarse con tornillo.

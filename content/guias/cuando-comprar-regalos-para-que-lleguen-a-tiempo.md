@@ -1,7 +1,8 @@
 ---
-title: Cuándo comprar los regalos para que lleguen a tiempo a Nochebuena y a Reyes
+title: ¿Cuándo comprar los regalos de Navidad y Reyes para que lleguen a tiempo?
+seo_title: Cuándo comprar los regalos de Navidad
 type: guide
-excerpt: Plazos de entrega orientativos según el tipo de tienda, qué fechas evitar y cómo aprovechar las rebajas sin quedarte sin el regalo.
+excerpt: Con envío nacional, antes del 15 de diciembre para Nochebuena y del 28 para Reyes. Si el envío viene de Asia, antes del 5 y del 15 de diciembre.
 ---
 Comprar demasiado pronto puede costarte una bajada de precio. Comprar demasiado tarde, quedarte sin regalo. Este calendario te ayuda a encontrar el punto medio.
 
@@ -41,3 +42,17 @@ Para juguetes y artículos de temporada, el precio puede seguir bajando en dicie
 ## La devolución también cuenta
 
 Por ley, en una compra por internet tienes al menos **14 días** para desistir desde que recibes el producto. En Navidad, muchas tiendas amplían ese plazo hasta enero para las compras de noviembre y diciembre, pero cada una pone sus fechas. Antes de comprar con mucha antelación, comprueba hasta cuándo puedes devolver.
+
+## Preguntas frecuentes
+
+### ¿Hasta qué día puedo pedir para que llegue antes de Nochebuena?
+
+Como referencia: hasta el 5 de diciembre con envío desde Asia, hasta el 15 con envío estándar nacional y hasta el 20 o 21 con entrega rápida, con más riesgo cuanto más apures.
+
+### ¿Es mejor comprar en el Black Friday o esperar a diciembre?
+
+El Black Friday conviene para productos caros y fáciles de comparar, como tecnología y pequeño electrodoméstico, y para regalos con envío lento. En juguetes el precio puede seguir bajando, pero también se agotan.
+
+### ¿Cuánto tiempo tengo para devolver un regalo comprado por internet?
+
+Por ley, al menos 14 días desde que lo recibes. Muchas tiendas amplían el plazo en Navidad, pero cada una pone sus fechas.

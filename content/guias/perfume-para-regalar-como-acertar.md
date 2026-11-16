@@ -1,8 +1,9 @@
 ---
-title: Perfume para regalar: cómo acertar aunque no conozcas sus gustos
+title: ¿Cómo elegir un perfume para regalar sin conocer sus gustos?
+seo_title: Cómo elegir un perfume para regalar
 type: guide
 niche: perfumes-y-sets-de-regalo
-excerpt: Familias olfativas, diferencia entre eau de toilette y eau de parfum, tamaño del frasco y qué pasa con la devolución si se abre el precinto.
+excerpt: Averigua qué familia de olores le gusta y regala otro de la misma. Si no puedes, las cítricas y las florales ligeras son las más seguras.
 ---
 Regalar perfume asusta porque es muy personal, pero hay forma de reducir mucho el riesgo. La clave es averiguar qué tipo de olor le gusta, no qué marca.
 
@@ -45,3 +46,17 @@ Comprueba también quién vende. En los marketplaces, un perfume de marca muy po
 [amazon:set regalo perfume mujer|Ver sets de perfume de mujer]
 
 [amazon:set regalo perfume hombre|Ver sets de perfume de hombre]
+
+## Preguntas frecuentes
+
+### ¿Qué perfume regalar si no sé cuál usa?
+
+Uno de la familia cítrica o floral ligera, que son las que menos rechazo generan, y en frasco pequeño, de 30 a 50 ml.
+
+### ¿Se puede devolver un perfume?
+
+En una compra por internet tienes 14 días para desistir, pero los productos precintados por higiene no se pueden devolver una vez desprecintados. No abras el celofán hasta estar seguro.
+
+### ¿Qué diferencia hay entre eau de toilette y eau de parfum?
+
+La concentración de esencia. La eau de parfum está más concentrada, dura bastante más y suele costar algo más.

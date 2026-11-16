@@ -222,9 +222,10 @@ function page_post(string $slug): void
     $more = published_posts('po.id <> ? AND (po.niche_id = ? OR po.type = ?)', [(int) $post['id'], (int) $post['niche_id'], $post['type']], 3);
 
     $section = post_section($post['type']);
+    $faqs = post_faqs((string) $post['body']);
     render('post', [
         'meta' => meta([
-            'title' => $post['title'],
+            'title' => post_seo_title($post),
             'description' => excerpt($post['excerpt'] ?: (string) $post['body'], 155),
             'image' => $post['cover_path'] ? absolute_url('uploads/' . $post['cover_path']) : null,
             'type' => 'article',
@@ -232,6 +233,7 @@ function page_post(string $slug): void
             'jsonld' => [
                 jsonld_article($post),
                 jsonld_breadcrumbs([['Inicio', ''], [$section[0], $section[1]], [$post['title'], ltrim(substr(post_url($post), strlen(base_path())), '/')]]),
+                ...($faqs ? [jsonld_faq($faqs)] : []),
             ],
         ]),
         'post' => $post,

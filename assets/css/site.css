@@ -427,6 +427,11 @@ small, .muted { color: var(--gris); }
 .prose .amz-cta { display: inline-block; margin: 6px 10px 16px 0; }
 .prose .amz-cta .btn { text-decoration: none; }
 
+.follow-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; background: var(--azul); color: #fff; border-radius: 16px; padding: 22px 24px; margin-top: 40px; max-width: 720px; }
+.follow-cta strong { display: block; font-family: var(--display); font-size: 20px; font-weight: 800; letter-spacing: -0.015em; }
+.follow-cta p { margin: 2px 0 0; color: rgba(255, 255, 255, 0.92); }
+.follow-cta :focus-visible { outline-color: var(--amarillo); }
+
 /* Producto dentro de un artículo */
 .pbox { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 20px; align-items: center; border: 1px solid var(--linea); border-left: 5px solid var(--amarillo); border-radius: 14px; padding: 18px 20px; margin: 26px 0; max-width: 720px; font-size: 16px; line-height: 1.45; }
 .pbox--img { grid-template-columns: 84px minmax(0, 1fr) auto; }

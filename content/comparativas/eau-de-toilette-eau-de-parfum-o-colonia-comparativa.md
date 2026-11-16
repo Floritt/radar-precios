@@ -1,8 +1,9 @@
 ---
-title: Eau de toilette, eau de parfum, parfum o colonia: comparativa de concentraciones
+title: ¿Eau de toilette, eau de parfum, parfum o colonia? Diferencias y cuál elegir
+seo_title: Eau de toilette o eau de parfum
 type: comparison
 niche: perfumes-y-sets-de-regalo
-excerpt: Qué cambia entre una colonia, una eau de toilette, una eau de parfum y un parfum: concentración, duración, intensidad y cuál conviene regalar.
+excerpt: Cambia la concentración: la colonia dura poco, la eau de toilette unas horas, la eau de parfum buena parte del día y el parfum, aún más.
 ---
 El mismo perfume puede venderse en varias concentraciones, y la diferencia de precio entre ellas no siempre es grande. Esta tabla te ayuda a elegir la versión adecuada para quien lo va a llevar.
 
@@ -48,3 +49,17 @@ La versión más intensa y cara. Con una o dos aplicaciones basta para todo el d
 - **Para una ocasión especial**: eau de parfum o parfum.
 
 En la [guía para regalar perfume](/blog/perfume-para-regalar-como-acertar) tienes cómo averiguar su familia olfativa y qué pasa con la devolución.
+
+## Preguntas frecuentes
+
+### ¿Qué dura más, la eau de toilette o la eau de parfum?
+
+La eau de parfum: está más concentrada y dura buena parte del día. La eau de toilette dura unas horas.
+
+### ¿La eau de parfum huele igual que la eau de toilette del mismo perfume?
+
+No siempre. Las casas de perfumes ajustan la fórmula de cada versión, así que no son simplemente la misma pero más fuerte.
+
+### ¿Qué concentración regalar si no conozco sus gustos?
+
+Una eau de toilette en frasco pequeño.

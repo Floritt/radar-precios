@@ -1,8 +1,9 @@
 ---
-title: Jerséis navideños y pijamas a juego: tallas, tejidos y cuándo pedirlos
+title: ¿Qué talla pedir de jersey navideño y de pijama a juego?
+seo_title: Qué talla de jersey navideño pedir
 type: guide
 niche: jerseis-y-pijamas-navidenos
-excerpt: Cómo leer la tabla de tallas, qué tejido pica y cuál no, y con cuánta antelación pedir los pijamas de toda la familia para que lleguen a tiempo.
+excerpt: Guíate por la tabla en centímetros del vendedor, no por la letra, y entre dos tallas elige la grande. Para pijamas, mejor algodón.
 ---
 El jersey navideño y el pijama a juego se compran para unas pocas semanas al año, así que nadie quiere gastar mucho. Pero hay tres detalles que deciden si se usan o se quedan en el cajón: la talla, el tejido y la fecha de entrega.
 
@@ -41,3 +42,17 @@ Los pijamas a juego para la foto de Nochebuena se agotan en las tallas más comu
 [amazon:pijama navidad familia a juego|Ver pijamas familiares a juego]
 
 [amazon:jersey navideño unisex|Ver jerséis navideños]
+
+## Preguntas frecuentes
+
+### ¿Cómo sé mi talla si compro en una tienda de fuera?
+
+Mide de axila a axila un jersey que te quede bien, multiplica por dos y compáralo con la tabla en centímetros del vendedor. En tiendas con ropa hecha para el mercado asiático, la talla suele quedar pequeña.
+
+### ¿Qué tejido no pica en un jersey navideño?
+
+El algodón o una mezcla con mucho algodón. El acrílico, el más común en los jerséis baratos, puede picar a algunas personas.
+
+### ¿Cuándo hay que pedir los pijamas navideños a juego?
+
+Con envío desde Asia, antes del 5 de diciembre. Las tallas más comunes se agotan a mediados de mes.

@@ -1,8 +1,9 @@
 ---
-title: Freidora de aire: qué capacidad necesitas y qué mirar antes de comprarla
+title: ¿De cuántos litros necesito la freidora de aire?
+seo_title: Freidora de aire: ¿cuántos litros?
 type: guide
 niche: cocina-para-las-fiestas
-excerpt: Litros según cuántos sois, cesta o doble cesta, potencia, limpieza y ruido. Las preguntas que conviene hacerse antes de elegir una freidora de aire.
+excerpt: De 2 a 4 litros para una o dos personas, de 4,5 a 6 para tres o cuatro y 6 o más, o doble cesta, si sois más. Y qué más mirar en la ficha.
 ---
 La freidora de aire es uno de los regalos de cocina más pedidos, y también uno de los que más se devuelven por quedarse pequeña. Lo primero es acertar con el tamaño.
 
@@ -41,3 +42,17 @@ Al calentar un espacio pequeño, suele gastar menos que encender el horno para l
 [amazon:freidora de aire 5 litros|Ver freidoras de 4 a 6 litros]
 
 [amazon:freidora de aire doble cesta|Ver freidoras de doble cesta]
+
+## Preguntas frecuentes
+
+### ¿Qué freidora de aire necesito para 4 personas?
+
+Una de 4,5 a 6 litros. Si cocináis a menudo raciones grandes o un pollo entero, mejor 6 litros o más, o una de doble cesta.
+
+### ¿Cuánta potencia debe tener una freidora de aire?
+
+Entre 1.400 y 1.800 W es lo normal en las de una cesta. Las de doble cesta suelen superar los 2.000 W.
+
+### ¿Gasta menos una freidora de aire que el horno?
+
+Al calentar un espacio más pequeño, suele gastar menos para la misma ración. Se nota sobre todo en raciones pequeñas y al recalentar.

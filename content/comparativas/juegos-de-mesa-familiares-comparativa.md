@@ -1,8 +1,9 @@
 ---
-title: Juegos de mesa para jugar en familia en Navidad: comparativa de los clásicos
+title: ¿Qué juego de mesa comprar para jugar en familia en Navidad?
+seo_title: Qué juego de mesa familiar comprar
 type: comparison
 niche: juguetes-y-juegos-de-mesa
-excerpt: Catan, Carcassonne, ¡Aventureros al Tren!, Azul, Dixit, Dobble, Virus! y Código Secreto cara a cara: jugadores, edad, duración y para qué grupo encaja cada uno.
+excerpt: Dixit para mucha gente y edades mezcladas, Dobble o Virus! para algo rápido, Azul o Carcassonne para dos y ¡Aventureros al Tren! para empezar con estrategia.
 ---
 Todos estos juegos llevan años entre los más vendidos y se explican en pocos minutos. La diferencia está en cuántos sois, qué edades hay en la mesa y cuánto rato queréis jugar.
 
@@ -62,3 +63,17 @@ Todos estos juegos llevan años entre los más vendidos y se explican en pocos m
 - **Pareja o dos jugadores**: Azul o Carcassonne.
 - **Primer juego de estrategia para la familia**: ¡Aventureros al Tren!.
 - **Grupo de amigos adultos**: Código Secreto o Catan.
+
+## Preguntas frecuentes
+
+### ¿Qué juego de mesa funciona mejor con niños y abuelos?
+
+Dixit y Dobble. En Dixit se gana con imaginación y no con estrategia, así que un niño de 8 años puede ganar a un adulto.
+
+### ¿Qué juego de mesa es mejor para dos jugadores?
+
+Azul o Carcassonne.
+
+### ¿Catan o ¡Aventureros al Tren!?
+
+¡Aventureros al Tren! se explica más fácil y funciona desde dos jugadores, por eso suele ser mejor primer juego para familias. Catan necesita al menos tres jugadores y sus partidas son más largas.

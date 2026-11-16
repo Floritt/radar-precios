@@ -1,8 +1,9 @@
 ---
-title: Luces de Navidad a pilas, de enchufe, USB o solares: cuál conviene en cada sitio
+title: ¿Luces de Navidad a pilas, de enchufe, USB o solares? Cuál conviene en cada sitio
+seo_title: Luces de Navidad: pilas, enchufe o solares
 type: comparison
 niche: decoracion-de-navidad
-excerpt: Comparamos los cuatro tipos de alimentación de las guirnaldas LED: cuánta luz dan, dónde se pueden poner, cuánto cuestan de mantener y sus pegas.
+excerpt: De enchufe para el árbol y la fachada, a pilas para coronas y centros de mesa, USB para el dormitorio y solares solo con sol directo.
 ---
 El tipo de alimentación decide dónde puedes poner las luces y cuánto te van a dar la lata. Esta es la comparación directa.
 
@@ -55,3 +56,17 @@ Su pega: dependen del tiempo. En una fachada orientada al norte o en un patio in
 - **Jardín soleado sin enchufes cerca**: solares.
 
 Más detalles sobre el color de la luz, la protección IP y la longitud en nuestra [guía de luces LED](/blog/luces-de-navidad-led-como-elegir).
+
+## Preguntas frecuentes
+
+### ¿Funcionan las luces solares de Navidad en invierno?
+
+Solo si el panel recibe varias horas de sol directo. En una fachada orientada al norte o en un patio interior casi no funcionan.
+
+### ¿Cómo hacer que duren más las pilas de las luces?
+
+Con modelos que tengan temporizador, que se encienden solos unas horas al día. Si las usas a diario, compensan unas pilas recargables.
+
+### ¿Qué luces de Navidad dan más luz?
+
+Las de enchufe: son las únicas con luz suficiente para un árbol grande o una fachada.

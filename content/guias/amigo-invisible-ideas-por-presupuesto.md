@@ -1,8 +1,9 @@
 ---
-title: Amigo invisible: ideas que funcionan con 10, 20 y 30 euros
+title: ¿Qué regalar en el amigo invisible por 10, 20 o 30 euros?
+seo_title: Qué regalar en el amigo invisible
 type: guide
 niche: juguetes-y-juegos-de-mesa
-excerpt: Regalos que encajan casi con cualquiera según el presupuesto del grupo, y un truco para acertar cuando no conoces bien a la persona.
+excerpt: Un objeto de uso diario de buena calidad o algo para compartir acierta casi siempre. Ideas concretas para 10, 20 y 30 euros.
 ---
 El amigo invisible tiene dos reglas no escritas: no pasarse del presupuesto y no regalar algo que acabe en un cajón. Estas ideas funcionan bien con personas que conoces poco, que es lo habitual en el amigo invisible del trabajo.
 
@@ -44,3 +45,17 @@ Cuando no sabes nada de la persona, acierta más un objeto de uso diario de buen
 - Incluye siempre el **tique regalo**.
 - Evita la ropa con talla si no sabes cuál usa. Mejor gorros, bufandas o guantes.
 - Si el grupo sortea con antelación, compra pronto: los regalos más baratos de las tiendas con envío desde Asia pueden tardar dos semanas.
+
+## Preguntas frecuentes
+
+### ¿Qué regalar en el amigo invisible a alguien que casi no conoces?
+
+Algo de uso diario y de buena calidad, como una taza térmica, una manta o una botella térmica, o algo para compartir, como un juego de cartas o un dulce.
+
+### ¿Es buena idea regalar ropa en el amigo invisible?
+
+Solo si no depende de la talla: gorros, bufandas o guantes. Con jerséis o camisetas es fácil fallar.
+
+### ¿Con cuánta antelación hay que comprar el regalo?
+
+En cuanto se haga el sorteo. Los regalos más baratos de las tiendas con envío desde Asia pueden tardar dos semanas. Incluye siempre el tique regalo.

@@ -5,6 +5,14 @@ require __DIR__ . '/app/bootstrap.php';
 require APP . '/controllers/public.php';
 require APP . '/controllers/admin.php';
 
+// Un solo dominio: cualquier otro nombre que apunte a la web (alias, www, subdominio antiguo) redirige al de base_url.
+$canonicalHost = strtolower((string) parse_url((string) config('base_url'), PHP_URL_HOST));
+$requestHost = strtolower(preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')));
+if (config('env') === 'production' && $canonicalHost !== '' && $requestHost !== '' && $requestHost !== $canonicalHost) {
+    header('Location: ' . rtrim((string) config('base_url'), '/') . ($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
+    exit;
+}
+
 send_security_headers();
 try {
     ensure_schema();

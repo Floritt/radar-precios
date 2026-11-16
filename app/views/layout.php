@@ -117,7 +117,7 @@ if ($counts['reviews']) { $links[] = ['resenas', 'Reseñas']; }
     </div>
   </div>
   <div class="wrap foot__note">
-    <p>Como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado. Amazon y el logotipo de Amazon son marcas registradas de Amazon.com, Inc. o sus filiales.</p>
+    <p>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado. Amazon y el logotipo de Amazon son marcas registradas de Amazon.com, Inc. o sus filiales.</p>
     <p>&copy; <?= date('Y') ?> <?= e(setting('legal_owner', site_name())) ?></p>
   </div>
 </footer>

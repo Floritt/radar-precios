@@ -72,7 +72,7 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <p><?= e($site) ?> es gratuita para ti. Nos financiamos con los programas de afiliados de las tiendas que enlazamos: cuando compras después de pulsar uno de nuestros enlaces, la tienda nos paga una pequeña comisión. A ti te cuesta exactamente lo mismo.</p>
     <h2>Programas en los que participamos</h2>
     <ul>
-      <li><strong>Amazon:</strong> como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</li>
+      <li><strong>Amazon:</strong> en calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</li>
     </ul>
     <h2>Lo que la comisión no cambia</h2>
     <ul>

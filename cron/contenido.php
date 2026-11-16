@@ -35,6 +35,35 @@ if (in_array('--borrar-ejemplo', $argv, true)) {
 
 $update = in_array('--actualizar', $argv, true);
 $author = setting('default_author') ?: (string) val('SELECT name FROM users ORDER BY id LIMIT 1') ?: '';
+// Nichos nuevos de content/nichos (los que ya existen no se tocan).
+foreach (glob('content/nichos/*.md') ?: [] as $file) {
+    $raw = (string) file_get_contents($file);
+    if (!preg_match('/^---\s*\n(.*?)\n---\s*\n(.*)$/s', $raw, $m)) {
+        continue;
+    }
+    $meta = [];
+    foreach (explode("\n", $m[1]) as $line) {
+        if (str_contains($line, ':')) {
+            [$k, $v] = array_map('trim', explode(':', $line, 2));
+            $meta[$k] = $v;
+        }
+    }
+    $slug = basename($file, '.md');
+    if (val('SELECT id FROM niches WHERE slug = ?', [$slug])) {
+        continue;
+    }
+    insert('niches', [
+        'name' => $meta['name'] ?? $slug,
+        'slug' => $slug,
+        'intro' => trim($m[2]),
+        'color' => preg_match('/^#[0-9A-Fa-f]{6}$/', $meta['color'] ?? '') ? $meta['color'] : '#1F3FD8',
+        'sort_order' => (int) ($meta['orden'] ?? 50),
+        'is_demo' => 0,
+        'created_at' => now(),
+    ]);
+    echo "Nicho: $slug\n";
+}
+
 $niches = [];
 foreach (rows('SELECT id, slug FROM niches') as $n) {
     $niches[$n['slug']] = (int) $n['id'];
@@ -89,7 +118,7 @@ foreach (glob('content/productos/*.md') ?: [] as $file) {
 }
 echo "Productos nuevos: $newProducts\n";
 
-$files = array_filter(glob('content/*/*.md') ?: [], fn ($f) => !str_starts_with($f, 'content/productos/'));
+$files = array_filter(glob('content/*/*.md') ?: [], fn ($f) => !str_starts_with($f, 'content/productos/') && !str_starts_with($f, 'content/nichos/'));
 sort($files);
 $added = 0;
 foreach ($files as $file) {

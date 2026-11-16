@@ -83,8 +83,8 @@ function page_niche(string $slug): void
 
     render('niche', [
         'meta' => meta([
-            'title' => $niche['name'] . ': precios y reseñas',
-            'description' => excerpt($niche['intro'] ?: 'Historial de precios y reseñas de ' . mb_strtolower($niche['name']) . '.', 155),
+            'title' => $niche['name'] . ': guías y qué comprar',
+            'description' => excerpt($niche['intro'] ?: 'Guías de compra y productos de ' . mb_strtolower($niche['name']) . '.', 155),
             'jsonld' => [jsonld_breadcrumbs([['Inicio', ''], [$niche['name'], 'nicho/' . $niche['slug']]])],
         ]),
         'niche' => $niche,
@@ -123,7 +123,7 @@ function page_product(string $slug): void
     $GLOBALS['track'] = ['product', (int) $p['id']];
     render('product', [
         'meta' => meta([
-            'title' => $p['name'] . ': historial de precios',
+            'title' => $p['name'] . (empty($p['best_price']) ? ': qué es, para quién y dónde comprarlo' : ': historial de precios'),
             'description' => excerpt($p['summary'] ?: 'Evolución del precio de ' . $p['name'] . ' en ' . implode(', ', array_column($offers, 'name')) . '. Mira si es buen momento para comprar.', 155),
             'image' => upload_url($p['image_path']) ? absolute_url('uploads/' . $p['image_path']) : null,
             'noindex' => $p['status'] !== 'published',

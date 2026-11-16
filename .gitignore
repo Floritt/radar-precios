@@ -8,3 +8,4 @@
 !/uploads/.htaccess
 !/uploads/.gitkeep
 /storage/setup_token.txt
+storage/gasolina.lock

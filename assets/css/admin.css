@@ -128,3 +128,24 @@ code { background: #E8ECF2; padding: 1px 5px; border-radius: 4px; font-size: 0.9
 .table .r { text-align: right; font-variant-numeric: tabular-nums; }
 .table tr.is-zero td { color: var(--soft); }
 .table tr.is-zero a { color: inherit; }
+.cols--4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1100px) { .cols--4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 860px) { .cols--4 { grid-template-columns: 1fr; } }
+.cols + .cols { margin-top: 18px; }
+.card__sub { font-size: 15px; margin: 18px 0 8px; }
+.barlist { list-style: none; margin: 0; padding: 0; }
+.barlist li { position: relative; display: flex; justify-content: space-between; gap: 10px; padding: 7px 10px; margin-bottom: 4px; border-radius: 8px; overflow: hidden; font-size: 14.5px; }
+.barlist i { position: absolute; inset: 0 auto 0 0; background: #E9EDFF; z-index: 0; border-radius: 8px; }
+.barlist__label, .barlist__n { position: relative; z-index: 1; }
+.barlist__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barlist__n { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.barlist__n small { font-weight: 500; color: var(--soft); margin-left: 4px; }
+.hourbars { display: flex; align-items: flex-end; gap: 3px; height: 130px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.hourbars div { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; }
+.hourbars i { display: block; width: 100%; min-height: 1px; background: #1F3FD8; border-radius: 3px 3px 0 0; }
+.hourbars span { position: absolute; bottom: -18px; font-size: 11px; color: var(--soft); }
+.hourbars--week { gap: 10px; }
+.hourbars--week i { background: #AEBBF5; }
+.zero-list { margin-top: 12px; font-size: 14px; }
+.zero-list summary { cursor: pointer; color: var(--soft); }
+.zero-list p { line-height: 1.7; }

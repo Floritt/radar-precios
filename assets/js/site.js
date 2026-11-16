@@ -33,6 +33,10 @@
     var visit = new FormData();
     visit.append('kind', kind);
     visit.append('ref', ref);
+    try { visit.append('tz', Intl.DateTimeFormat().resolvedOptions().timeZone || ''); } catch (e) { /* navegador antiguo */ }
+    visit.append('lang', navigator.language || '');
+    visit.append('w', String(window.screen ? window.screen.width : 0));
+    visit.append('src', document.referrer || '');
     try { navigator.sendBeacon(base + 'api/visita', visit); } catch (e) { /* sin conexión: no pasa nada */ }
   }
   document.addEventListener('click', function (ev) {

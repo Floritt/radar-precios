@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
 
 function ensure_schema(): void
 {
@@ -113,6 +113,27 @@ function ensure_schema(): void
             activated_at DATETIME NULL,
             sent_at DATETIME NULL,
             sent_price DECIMAL(6,3) NULL
+        )$tail",
+        // v7: visitas por hora, datos agregados de cada visita y búsquedas.
+        "CREATE TABLE IF NOT EXISTS visits_hourly (
+            day DATE NOT NULL,
+            hour TINYINT NOT NULL,
+            views INT NOT NULL DEFAULT 0,
+            PRIMARY KEY (day, hour)
+        )$tail",
+        "CREATE TABLE IF NOT EXISTS visit_dims (
+            day DATE NOT NULL,
+            dim VARCHAR(12) NOT NULL,
+            val VARCHAR(60) NOT NULL,
+            views INT NOT NULL DEFAULT 0,
+            PRIMARY KEY (day, dim, val)
+        )$tail",
+        "CREATE TABLE IF NOT EXISTS search_terms (
+            day DATE NOT NULL,
+            scope VARCHAR(10) NOT NULL,
+            term VARCHAR(80) NOT NULL,
+            hits INT NOT NULL DEFAULT 0,
+            PRIMARY KEY (day, scope, term)
         )$tail",
     ];
     $indexes = [

@@ -60,7 +60,7 @@ function fuel_province(string $pslug): void
     }
     $fuel = fuel_key((string) input('c', 'g95'));
     $name = FUEL_PROVINCES[$pid];
-    $GLOBALS['track'] = ['fuel', $pid];
+    $GLOBALS['track'] = ['fprov', $pid];
     render('fuel-place', [
         'meta' => meta([
             'title' => "Gasolineras más baratas en $name hoy",
@@ -96,7 +96,7 @@ function fuel_muni(string $pslug, string $mslug): void
     $fuel = fuel_key((string) input('c', 'g95'));
     $prov = FUEL_PROVINCES[$pid];
     $stations = fuel_stations('s.muni_id = ?', [(int) $m['id']], $fuel, 300);
-    $GLOBALS['track'] = ['fuel', (int) $m['id']];
+    $GLOBALS['track'] = ['fmuni', (int) $m['id']];
     render('fuel-place', [
         'meta' => meta([
             'title' => "Gasolineras más baratas en {$m['name']} hoy",
@@ -157,7 +157,7 @@ function fuel_station(string $id): void
         $rank[$f] = ['pos' => (int) $r['below'] + 1, 'n' => (int) $r['n'], 'avg' => (float) $r['avg']];
     }
     $pslug = fuel_province_slug((int) $s['province_id']);
-    $GLOBALS['track'] = ['fuel', (int) $s['id']];
+    $GLOBALS['track'] = ['fstat', (int) $s['id']];
     render('fuel-station', [
         'meta' => meta([
             'title' => "{$s['name']} en {$s['muni_name']}: precio de la gasolina hoy",
@@ -194,6 +194,7 @@ function fuel_near(): void
             }
         }
     }
+    $GLOBALS['track'] = ['fnear', 0];
     header('X-Robots-Tag: noindex');
     render('fuel-near', [
         'meta' => meta(['title' => 'Gasolineras baratas cerca de ti', 'noindex' => true]),
@@ -210,6 +211,7 @@ function fuel_search(): void
 {
     fuel_require();
     $q = trim(mb_substr((string) input('q', ''), 0, 80));
+    record_search('gasolina', $q);
     $results = [];
     if (preg_match('/^\d{5}$/', $q)) {
         $m = row('SELECT m.* FROM fuel_stations s JOIN fuel_munis m ON m.id = s.muni_id WHERE s.cp = ? AND s.active = 1 LIMIT 1', [$q]);
@@ -227,6 +229,7 @@ function fuel_search(): void
             redirect('gasolina/' . fuel_province_slug($pid));
         }
     }
+    $GLOBALS['track'] = ['fsearch', 0];
     header('X-Robots-Tag: noindex');
     render('fuel-search', [
         'meta' => meta(['title' => 'Buscar gasolineras', 'noindex' => true]),

@@ -39,6 +39,8 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <h2>Qué datos tratamos</h2>
     <ul>
       <li><strong>Navegación:</strong> el servidor guarda registros técnicos (dirección IP, fecha, página visitada) para mantener la web segura y funcionando. Se conservan un máximo de 90 días.</li>
+      <li><strong>Estadísticas de visitas:</strong> contamos cuántas veces se ve cada página y, de forma agregada, la hora, el país aproximado (según la zona horaria de tu navegador), el idioma, el tipo de dispositivo, el navegador y la web desde la que llegas. No usamos cookies para esto ni guardamos tu dirección IP ni nada que permita identificarte.</li>
+      <li><strong>Búsquedas:</strong> guardamos el texto que buscas en la web, sin asociarlo a ti, para saber qué interesa.</li>
       <li><strong>Clics hacia tiendas:</strong> contamos cuántas veces se pulsa cada botón de compra, sin guardar ningún dato que te identifique.</li>
       <li><strong>Correos que nos envíes:</strong> los usamos solo para responderte y los borramos cuando dejan de ser necesarios.</li>
     </ul>

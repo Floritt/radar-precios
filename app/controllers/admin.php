@@ -119,13 +119,11 @@ function admin_stats(): void
     $fromTime = $fromDay . ' 00:00:00';
 
     $views = ['product' => [], 'post' => []];
-    $totals = ['views' => 0, 'home' => 0, 'fuel' => 0];
+    $totals = ['views' => 0, 'home' => 0];
     foreach (rows('SELECT kind, ref_id, SUM(views) AS v FROM visits WHERE day >= ? GROUP BY kind, ref_id', [$fromDay]) as $r) {
         $totals['views'] += (int) $r['v'];
         if ($r['kind'] === 'home') {
             $totals['home'] += (int) $r['v'];
-        } elseif ($r['kind'] === 'fuel') {
-            $totals['fuel'] += (int) $r['v'];
         } elseif (isset($views[$r['kind']])) {
             $views[$r['kind']][(int) $r['ref_id']] = (int) $r['v'];
         }
@@ -164,10 +162,85 @@ function admin_stats(): void
         }
     }
 
+    // Horas del día y días de la semana del periodo.
+    $hours = array_fill(0, 24, 0);
+    $weekdays = array_fill(1, 7, 0);
+    foreach (rows('SELECT day, hour, views FROM visits_hourly WHERE day >= ?', [$fromDay]) as $r) {
+        $hours[(int) $r['hour']] += (int) $r['views'];
+        $weekdays[(int) date('N', strtotime(substr((string) $r['day'], 0, 10)))] += (int) $r['views'];
+    }
+    $dim = function (string $name, int $limit = 12) use ($fromDay): array {
+        return array_map(fn ($r) => ['label' => (string) $r['val'], 'n' => (int) $r['n']],
+            rows('SELECT val, SUM(views) AS n FROM visit_dims WHERE day >= ? AND dim = ? GROUP BY val ORDER BY n DESC LIMIT ' . $limit, [$fromDay, $name]));
+    };
+    $countries = array_map(fn ($c) => ['label' => $c['label'] === '??' ? 'Desconocido' : country_name($c['label']), 'n' => $c['n']], $dim('country', 15));
+    $langNames = ['es' => 'Español', 'ca' => 'Catalán', 'gl' => 'Gallego', 'eu' => 'Euskera', 'en' => 'Inglés', 'fr' => 'Francés', 'de' => 'Alemán', 'it' => 'Italiano', 'pt' => 'Portugués', 'nl' => 'Neerlandés', 'ro' => 'Rumano', '??' => 'Desconocido'];
+    $langs = array_map(fn ($l) => ['label' => $langNames[$l['label']] ?? strtoupper($l['label']), 'n' => $l['n']], $dim('lang'));
+    $kinds = [];
+    foreach (rows('SELECT kind, SUM(views) AS n FROM visits WHERE day >= ? GROUP BY kind ORDER BY n DESC', [$fromDay]) as $r) {
+        $kinds[] = ['label' => VISIT_KINDS[$r['kind']] ?? $r['kind'], 'n' => (int) $r['n']];
+    }
+    $fuelTop = function (string $kind, string $sql) use ($fromDay): array {
+        $out = [];
+        foreach (rows("SELECT ref_id, SUM(views) AS n FROM visits WHERE day >= ? AND kind = ? GROUP BY ref_id ORDER BY n DESC LIMIT 10", [$fromDay, $kind]) as $r) {
+            if ($kind === 'fprov') {
+                $label = FUEL_PROVINCES[(int) $r['ref_id']] ?? '';
+            } elseif ($kind === 'fstat') {
+                $st = row('SELECT s.name, m.name AS muni FROM fuel_stations s LEFT JOIN fuel_munis m ON m.id = s.muni_id WHERE s.id = ?', [(int) $r['ref_id']]);
+                $label = $st ? $st['name'] . ' (' . $st['muni'] . ')' : '';
+            } else {
+                $label = (string) val($sql, [(int) $r['ref_id']]);
+            }
+            $out[] = ['label' => $label ?: '#' . $r['ref_id'], 'n' => (int) $r['n']];
+        }
+        return $out;
+    };
+    $terms = fn (string $scope) => array_map(fn ($r) => ['label' => (string) $r['term'], 'n' => (int) $r['n']],
+        rows('SELECT term, SUM(hits) AS n FROM search_terms WHERE day >= ? AND scope = ? GROUP BY term ORDER BY n DESC LIMIT 15', [$fromDay, $scope]));
+    // Avisos de producto y de gasolina.
+    $alertStats = function (string $table) use ($fromTime): array {
+        return [
+            'new' => (int) val("SELECT COUNT(*) FROM $table WHERE created_at >= ?", [$fromTime]),
+            'confirmed' => (int) val("SELECT COUNT(*) FROM $table WHERE activated_at >= ?", [$fromTime]),
+            'sent' => (int) val("SELECT COUNT(*) FROM $table WHERE sent_at >= ?", [$fromTime]),
+            'active' => (int) val("SELECT COUNT(*) FROM $table WHERE status = 'active'"),
+            'pending' => (int) val("SELECT COUNT(*) FROM $table WHERE status = 'pending'"),
+        ];
+    };
+    $signups = [];
+    foreach (rows("SELECT a.created_at, a.status, a.target_price, a.email, a.chat_id, p.name, p.id AS pid FROM alerts a LEFT JOIN products p ON p.id = a.product_id ORDER BY a.created_at DESC LIMIT 15") as $r) {
+        $signups[] = ['at' => $r['created_at'], 'type' => 'Producto', 'what' => (string) $r['name'], 'url' => 'admin/productos/' . $r['pid'], 'target' => money((float) $r['target_price']), 'who' => $r['email'] ? mask_email((string) $r['email']) : 'Telegram', 'status' => $r['status']];
+    }
+    foreach (rows("SELECT a.created_at, a.status, a.target_price, a.email, a.fuel, s.name, s.id AS sid, m.name AS muni_name FROM fuel_alerts a LEFT JOIN fuel_stations s ON s.id = a.station_id LEFT JOIN fuel_munis m ON m.id = s.muni_id ORDER BY a.created_at DESC LIMIT 15") as $r) {
+        $signups[] = ['at' => $r['created_at'], 'type' => 'Gasolina', 'what' => fuel_name((string) $r['fuel']) . ' en ' . $r['name'] . ' (' . $r['muni_name'] . ')', 'url' => null, 'target' => fuel_money((float) $r['target_price']), 'who' => mask_email((string) $r['email']), 'status' => $r['status']];
+    }
+    usort($signups, fn ($a, $b) => strcmp((string) $b['at'], (string) $a['at']));
+
     admin_render('stats', [
         'days' => $days,
-        'totals' => $totals + ['clicks' => (int) val('SELECT COUNT(*) FROM clicks WHERE created_at >= ?', [$fromTime])],
+        'totals' => $totals + [
+            'clicks' => (int) val('SELECT COUNT(*) FROM clicks WHERE created_at >= ?', [$fromTime]),
+            'fuel' => (int) val("SELECT COALESCE(SUM(views), 0) FROM visits WHERE day >= ? AND kind IN ('fuel', 'fprov', 'fmuni', 'fstat', 'fnear', 'fsearch')", [$fromDay]),
+        ],
         'series' => $series,
+        'hours' => $hours,
+        'weekdays' => $weekdays,
+        'countries' => $countries,
+        'areas' => $dim('area', 5),
+        'sources' => $dim('source', 15),
+        'devices' => $dim('device', 5),
+        'browsers' => $dim('browser', 8),
+        'oses' => $dim('os', 8),
+        'langs' => $langs,
+        'kinds' => $kinds,
+        'fuelProv' => $fuelTop('fprov', ''),
+        'fuelMuni' => $fuelTop('fmuni', 'SELECT name FROM fuel_munis WHERE id = ?'),
+        'fuelStation' => $fuelTop('fstat', ''),
+        'fuelTerms' => $terms('gasolina'),
+        'webTerms' => $terms('web'),
+        'alertsProduct' => $alertStats('alerts'),
+        'alertsFuel' => $alertStats('fuel_alerts'),
+        'signups' => array_slice($signups, 0, 15),
         'products' => $build(rows("SELECT id, name FROM products WHERE status <> 'draft' ORDER BY name"), $views['product'], $clicksProduct, 'admin/productos/'),
         'posts' => $build(rows("SELECT id, title AS name FROM posts WHERE status = 'published' ORDER BY title"), $views['post'], $clicksPost, 'admin/articulos/'),
         'links' => rows("SELECT label, COUNT(*) AS c FROM clicks WHERE created_at >= ? AND label IS NOT NULL AND label <> '' GROUP BY label ORDER BY c DESC LIMIT 15", [$fromTime]),

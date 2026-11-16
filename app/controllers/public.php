@@ -257,6 +257,9 @@ function page_search(): void
     $products = [];
     $posts = [];
     $follow = null;
+    if (!$isLink) {
+        record_search('web', $q);
+    }
     if (mb_strlen($q) >= 2) {
         $asin = $isLink ? resolve_amazon_input($raw) : extract_asin($q);
         if ($asin) {
@@ -377,16 +380,13 @@ function api_visit(): void
 {
     $kind = (string) input('kind', '');
     $ref = (int) input('ref', '0');
-    if (in_array($kind, ['product', 'post', 'home', 'list', 'fuel'], true) && $ref >= 0 && !is_untracked_request()) {
-        $day = date('Y-m-d');
-        $done = q('UPDATE visits SET views = views + 1 WHERE day = ? AND kind = ? AND ref_id = ?', [$day, $kind, $ref])->rowCount();
-        if (!$done) {
-            try {
-                insert('visits', ['day' => $day, 'kind' => $kind, 'ref_id' => $ref, 'views' => 1]);
-            } catch (Throwable $e) {
-                q('UPDATE visits SET views = views + 1 WHERE day = ? AND kind = ? AND ref_id = ?', [$day, $kind, $ref]);
-            }
-        }
+    if (isset(VISIT_KINDS[$kind]) && $ref >= 0 && !is_untracked_request()) {
+        record_visit($kind, $ref, [
+            'tz' => (string) input('tz', ''),
+            'lang' => (string) input('lang', ''),
+            'w' => (int) input('w', '0'),
+            'src' => mb_substr((string) input('src', ''), 0, 300),
+        ]);
     }
     http_response_code(204);
 }

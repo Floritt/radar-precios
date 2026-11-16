@@ -1,7 +1,7 @@
 <?php
 /** @var string $slug @var string $title */
 $owner = setting('legal_owner', '[Nombre y apellidos o razón social]');
-$nif = setting('legal_nif', '[NIF]');
+$nif = setting('legal_nif');
 $address = setting('legal_address', '[Domicilio]');
 $email = setting('legal_email', '[correo de contacto]');
 $site = site_name();
@@ -17,8 +17,8 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <p>En cumplimiento del artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico (LSSI), se informa de los datos del titular de <?= e($domain) ?>.</p>
     <ul>
       <li>Titular: <?= e($owner) ?></li>
-      <li>NIF: <?= e($nif) ?></li>
-      <li>Domicilio: <?= e($address) ?></li>
+<?php if ($nif !== ''): ?>      <li>NIF: <?= e($nif) ?></li>
+<?php endif; ?>      <li>Domicilio: <?= e($address) ?></li>
       <li>Correo electrónico: <?= e($email) ?></li>
     </ul>
     <h2>Objeto</h2>
@@ -35,7 +35,7 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
 <?php elseif ($slug === 'privacidad'): ?>
     <p>Esta web trata los mínimos datos personales posibles. Aquí te explicamos cuáles y por qué, conforme al Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD).</p>
     <h2>Responsable</h2>
-    <p><?= e($owner) ?>, NIF <?= e($nif) ?>, <?= e($address) ?>. Contacto: <?= e($email) ?>.</p>
+    <p><?= e($owner) ?><?= $nif !== '' ? ', NIF ' . e($nif) : '' ?>, <?= e($address) ?>. Contacto: <?= e($email) ?>.</p>
     <h2>Qué datos tratamos</h2>
     <ul>
       <li><strong>Navegación:</strong> el servidor guarda registros técnicos (dirección IP, fecha, página visitada) para mantener la web segura y funcionando. Se conservan un máximo de 90 días.</li>

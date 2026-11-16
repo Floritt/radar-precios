@@ -42,8 +42,16 @@ foreach ($argv as $arg) {
     if (str_starts_with($arg, '--afiliado=') && preg_match('/^[A-Za-z0-9_-]{3,40}$/', substr($arg, 11))) {
         save_setting('amazon_tag', substr($arg, 11));
     }
+    // --titular=BASE64 cambia el nombre del titular que sale en el aviso legal; --sin-nif quita el NIF de la web.
+    if (str_starts_with($arg, '--titular=') && ($t = base64_decode(substr($arg, 10), true)) !== false && trim($t) !== '') {
+        save_setting('legal_owner', mb_substr(trim($t), 0, 120));
+    }
+    if ($arg === '--sin-nif') {
+        save_setting('legal_nif', '');
+    }
 }
 echo 'ID de afiliado: ', amazon_tag() ?: 'sin poner', "\n";
+echo 'Aviso legal: titular ', setting('legal_owner') ?: 'sin poner', ' | NIF ', setting('legal_nif') !== '' ? 'visible' : 'quitado', "\n";
 echo 'Correo: ', mail_enabled() ? 'activado' : 'sin configurar', "\n";
 if (mail_enabled() && setting('mail_token') !== 'log') {
     // Comprueba la clave y el buzón sin enviar ningún correo.

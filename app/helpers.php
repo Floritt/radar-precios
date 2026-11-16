@@ -500,3 +500,16 @@ function tint_attr(array $row): string
     $c = (string) ($row['niche_color'] ?? '');
     return preg_match('/^#[0-9A-Fa-f]{6}$/', $c) ? ' style="--tint: ' . $c . '"' : '';
 }
+
+/** Variante de tono (0 a 2) para que las portadas de una misma categoría no sean todas iguales. */
+function cover_shade(string $slug): int
+{
+    return crc32($slug) % 3;
+}
+
+/** Portada de artículo sin foto: color de la categoría y su icono. */
+function article_cover(array $post, string $class): string
+{
+    $variant = isset($post['slug']) && crc32((string) $post['slug']) % 2 ? ' acover--b' : '';
+    return '<span class="' . $class . ' acover' . $variant . '">' . placeholder_svg($post['niche_slug'] ?? '') . '</span>';
+}

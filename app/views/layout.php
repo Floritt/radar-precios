@@ -21,8 +21,9 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
 <meta property="og:url" content="<?= e($meta['canonical']) ?>">
 <meta property="og:locale" content="es_ES">
 <?php if ($meta['image']): ?><meta property="og:image" content="<?= e($meta['image']) ?>"><?php endif; ?>
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#173B2F">
 <link rel="icon" href="<?= e(asset('img/icon.svg')) ?>" type="image/svg+xml">
+<link rel="preload" href="<?= e(url('assets/fonts/barlow-semi-condensed-700.woff2')) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= e(asset('css/site.css')) ?>">
 <?php foreach ($meta['jsonld'] as $ld): ?>
 <script type="application/ld+json"><?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
@@ -37,7 +38,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
 <header class="site-header">
   <div class="wrap site-header__bar">
     <a class="brand" href="<?= e(url('')) ?>">
-      <span class="brand__mark"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9Z"/><circle cx="8" cy="8" r="1.6" fill="#fff" stroke="none"/></svg></span>
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 16 12.5 6H28a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H12.5Z" fill="#FFD84D"/><circle cx="12" cy="16" r="2.4" fill="#173B2F"/></svg>
       <span class="brand__name"><?= e(site_name()) ?></span>
     </a>
     <form class="header-search" action="<?= e(url('buscar')) ?>" method="get" role="search">
@@ -64,7 +65,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
   <nav class="cat-bar" aria-label="Categorías">
     <ul class="wrap">
       <?php foreach ($niches as $n): ?>
-        <li><a href="<?= e(niche_url($n)) ?>"<?= $path === '/nicho/' . $n['slug'] ? ' aria-current="page"' : '' ?>><?= e($n['name']) ?></a></li>
+        <li><a href="<?= e(niche_url($n)) ?>"<?= tint_attr(['niche_color' => $n['color']]) ?><?= $path === '/nicho/' . $n['slug'] ? ' aria-current="page"' : '' ?>><?= e($n['name']) ?></a></li>
       <?php endforeach; ?>
     </ul>
   </nav>

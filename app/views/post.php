@@ -11,10 +11,10 @@ $showProduct = $product && $product['status'] === 'published';
     <?php if ($post['niche_name']): ?> / <a href="<?= e(url('nicho/' . $post['niche_slug'])) ?>"><?= e($post['niche_name']) ?></a><?php endif; ?>
   </nav>
   <div class="layout">
-    <article class="art">
+    <article class="art"<?= tint_attr($post) ?>>
       <header class="art__head">
         <?php if ($isDraft): ?><p class="draft-note">Borrador: solo lo ves tú porque has entrado en el panel.</p><?php endif; ?>
-        <p class="feature__kicker"><?= e(POST_TYPES[$post['type']] ?? 'Artículo') ?></p>
+        <p class="kicker"><?= e(POST_TYPES[$post['type']] ?? 'Artículo') ?><?= !empty($post['niche_name']) ? ' de ' . e(mb_strtolower(mb_substr($post['niche_name'], 0, 1)) . mb_substr($post['niche_name'], 1)) : '' ?></p>
         <h1><?= e($post['title']) ?></h1>
         <?php if ($post['excerpt']): ?><p class="art__lead"><?= e($post['excerpt']) ?></p><?php endif; ?>
         <p class="byline">

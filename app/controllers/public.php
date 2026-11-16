@@ -292,7 +292,8 @@ function page_legal(string $slug): void
         not_found();
     }
     render('legal', [
-        'meta' => meta(['title' => $pages[$slug]]),
+        // Las páginas con datos del titular no se muestran en buscadores.
+        'meta' => meta(['title' => $pages[$slug], 'noindex' => in_array($slug, ['aviso-legal', 'privacidad'], true)]),
         'slug' => $slug,
         'title' => $pages[$slug],
     ]);

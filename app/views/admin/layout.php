@@ -5,6 +5,7 @@ $nav = [
     'admin' => 'Escritorio',
     'admin/productos' => 'Productos',
     'admin/articulos' => 'Artículos y reseñas',
+    'admin/estadisticas' => 'Estadísticas',
     'admin/nichos' => 'Nichos',
     'admin/ajustes' => 'Ajustes',
 ];

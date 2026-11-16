@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 function ensure_schema(): void
 {
@@ -49,6 +49,14 @@ function ensure_schema(): void
             ip_hash VARCHAR(64) NOT NULL,
             created_at DATETIME NOT NULL
         )$tail",
+        // v5: visitas por día a fichas, artículos y portada.
+        "CREATE TABLE IF NOT EXISTS visits (
+            id $id,
+            day DATE NOT NULL,
+            kind VARCHAR(10) NOT NULL,
+            ref_id INT NOT NULL DEFAULT 0,
+            views INT NOT NULL DEFAULT 0
+        )$tail",
     ];
     $indexes = [
         ['uq_track_asin', 'track_requests', 'asin', true],
@@ -73,6 +81,16 @@ function ensure_schema(): void
     } catch (Throwable $e) {
         // La columna ya existe.
     }
+    // v5: los clics guardan también el artículo desde el que se pulsó y el texto del enlace.
+    foreach (['post_id INT NULL', 'label VARCHAR(120) NULL'] as $col) {
+        try {
+            db()->exec('ALTER TABLE clicks ADD COLUMN ' . $col);
+        } catch (Throwable $e) {
+            // La columna ya existe.
+        }
+    }
+    $indexes[] = ['uq_visits', 'visits', 'day, kind, ref_id', true];
+    $indexes[] = ['idx_clicks_post', 'clicks', 'post_id, created_at', false];
     foreach ($indexes as [$name, $table, $cols, $unique]) {
         try {
             db()->exec(($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ') . ($mysql ? '' : 'IF NOT EXISTS ') . "$name ON $table ($cols)");

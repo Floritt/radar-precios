@@ -38,7 +38,7 @@ if ($counts['reviews']) { $links[] = ['resenas', 'Reseñas']; }
 <script type="application/ld+json"><?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
 <?php endforeach; ?>
 </head>
-<body<?= $isHome ? ' class="is-home"' : '' ?>>
+<body<?= $isHome ? ' class="is-home"' : '' ?><?php if (!empty($GLOBALS['track'])): ?> data-kind="<?= e($GLOBALS['track'][0]) ?>" data-ref="<?= (int) $GLOBALS['track'][1] ?>"<?php endif; ?>>
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <?php if (has_demo_content()): ?>
 <div class="demo-strip">Contenido de ejemplo con precios inventados. Bórralo desde el panel antes de publicar la web.</div>

@@ -46,6 +46,7 @@
       <?php endforeach; ?>
       </tbody></table>
     <?php else: ?><p class="muted">Todavía no hay clics registrados.</p><?php endif; ?>
+    <p><a href="<?= e(url('admin/estadisticas')) ?>">Ver visitas y clics de cada producto y artículo</a></p>
   </section>
 </div>
 

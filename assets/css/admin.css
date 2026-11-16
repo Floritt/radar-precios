@@ -32,7 +32,7 @@ code { background: #E8ECF2; padding: 1px 5px; border-radius: 4px; font-size: 0.9
 .cols + .card { margin-top: 18px; }
 @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } .cols .card { margin-bottom: 18px; } }
 
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
 .kpi { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
 .kpi b { display: block; font-size: 1.9rem; font-weight: 800; line-height: 1.1; }
 .kpi span { color: var(--soft); font-size: 0.9rem; }
@@ -109,3 +109,22 @@ code { background: #E8ECF2; padding: 1px 5px; border-radius: 4px; font-size: 0.9
 .login-card h1 { margin-bottom: 4px; }
 .login-card p { color: var(--soft); margin-top: 0; }
 .narrow { max-width: 520px; }
+
+/* Estadísticas */
+.seg-links { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; margin: 0 0 18px; }
+.seg-links a { padding: 8px 14px; text-decoration: none; color: inherit; font-weight: 600; font-size: 0.92rem; }
+.seg-links a + a { border-left: 1px solid var(--line); }
+.seg-links a[aria-current] { background: #1F3FD8; color: #fff; }
+.daybars { display: flex; align-items: flex-end; gap: 2px; height: 140px; border-bottom: 1px solid var(--line); }
+.daybars__col { flex: 1; height: 100%; display: flex; align-items: flex-end; gap: 1px; min-width: 2px; }
+.daybars__col i { flex: 1; display: block; min-height: 1px; border-radius: 2px 2px 0 0; }
+.daybars__col .v { background: #AEBBF5; }
+.daybars__col .c { background: #1F3FD8; }
+.daybars__key { margin: 10px 0 0; font-size: 0.9rem; }
+.daybars__key .k { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 8px; }
+.daybars__key .k:first-child { margin-left: 0; }
+.k--v { background: #AEBBF5; }
+.k--c { background: #1F3FD8; }
+.table .r { text-align: right; font-variant-numeric: tabular-nums; }
+.table tr.is-zero td { color: var(--soft); }
+.table tr.is-zero a { color: inherit; }

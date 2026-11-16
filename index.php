@@ -42,6 +42,7 @@ $routes = [
     ['GET', '#^/sitemap\.xml$#', 'page_sitemap'],
     ['GET', '#^/robots\.txt$#', 'page_robots'],
     ['POST', '#^/api/clic$#', 'api_click'],
+    ['POST', '#^/api/visita$#', 'api_visit'],
     ['GET', '#^/tareas/precios$#', 'task_prices'],
 
     // Panel
@@ -61,6 +62,7 @@ $routes = [
     ['GET', '#^/admin/articulos$#', 'admin_posts'],
     ['GET|POST', '#^/admin/articulos/(nuevo|\d+)$#', 'admin_post_edit'],
     ['POST', '#^/admin/articulos/(\d+)/borrar$#', 'admin_post_delete'],
+    ['GET', '#^/admin/estadisticas$#', 'admin_stats'],
     ['GET|POST', '#^/admin/ajustes$#', 'admin_settings'],
     ['POST', '#^/admin/telegram/conectar$#', 'admin_telegram_connect'],
     ['GET|POST', '#^/admin/cuenta$#', 'admin_account'],

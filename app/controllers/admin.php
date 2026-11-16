@@ -108,6 +108,70 @@ function admin_dashboard(): void
     ]);
 }
 
+/* ---------- Estadísticas ---------- */
+
+function admin_stats(): void
+{
+    require_login();
+    $days = (int) input('dias', '30');
+    $days = in_array($days, [7, 30, 90], true) ? $days : 30;
+    $fromDay = date('Y-m-d', time() - ($days - 1) * 86400);
+    $fromTime = $fromDay . ' 00:00:00';
+
+    $views = ['product' => [], 'post' => []];
+    $totals = ['views' => 0, 'home' => 0];
+    foreach (rows('SELECT kind, ref_id, SUM(views) AS v FROM visits WHERE day >= ? GROUP BY kind, ref_id', [$fromDay]) as $r) {
+        $totals['views'] += (int) $r['v'];
+        if ($r['kind'] === 'home') {
+            $totals['home'] += (int) $r['v'];
+        } elseif (isset($views[$r['kind']])) {
+            $views[$r['kind']][(int) $r['ref_id']] = (int) $r['v'];
+        }
+    }
+    $clicksProduct = [];
+    foreach (rows('SELECT product_id, COUNT(*) AS c FROM clicks WHERE created_at >= ? AND product_id > 0 GROUP BY product_id', [$fromTime]) as $r) {
+        $clicksProduct[(int) $r['product_id']] = (int) $r['c'];
+    }
+    $clicksPost = [];
+    foreach (rows('SELECT post_id, COUNT(*) AS c FROM clicks WHERE created_at >= ? AND post_id IS NOT NULL GROUP BY post_id', [$fromTime]) as $r) {
+        $clicksPost[(int) $r['post_id']] = (int) $r['c'];
+    }
+    $build = function (array $items, array $v, array $c, string $path): array {
+        $out = [];
+        foreach ($items as $it) {
+            $id = (int) $it['id'];
+            $out[] = ['id' => $id, 'name' => $it['name'], 'url' => $path . $id, 'views' => $v[$id] ?? 0, 'clicks' => $c[$id] ?? 0];
+        }
+        usort($out, fn ($a, $b) => [$b['clicks'], $b['views'], $a['name']] <=> [$a['clicks'], $a['views'], $b['name']]);
+        return $out;
+    };
+
+    $series = [];
+    for ($i = $days - 1; $i >= 0; $i--) {
+        $series[date('Y-m-d', time() - $i * 86400)] = ['views' => 0, 'clicks' => 0];
+    }
+    foreach (rows('SELECT day, SUM(views) AS v FROM visits WHERE day >= ? GROUP BY day', [$fromDay]) as $r) {
+        $d = substr((string) $r['day'], 0, 10);
+        if (isset($series[$d])) {
+            $series[$d]['views'] = (int) $r['v'];
+        }
+    }
+    foreach (rows('SELECT SUBSTR(created_at, 1, 10) AS d, COUNT(*) AS c FROM clicks WHERE created_at >= ? GROUP BY SUBSTR(created_at, 1, 10)', [$fromTime]) as $r) {
+        if (isset($series[$r['d']])) {
+            $series[$r['d']]['clicks'] = (int) $r['c'];
+        }
+    }
+
+    admin_render('stats', [
+        'days' => $days,
+        'totals' => $totals + ['clicks' => (int) val('SELECT COUNT(*) FROM clicks WHERE created_at >= ?', [$fromTime])],
+        'series' => $series,
+        'products' => $build(rows("SELECT id, name FROM products WHERE status <> 'draft' ORDER BY name"), $views['product'], $clicksProduct, 'admin/productos/'),
+        'posts' => $build(rows("SELECT id, title AS name FROM posts WHERE status = 'published' ORDER BY title"), $views['post'], $clicksPost, 'admin/articulos/'),
+        'links' => rows("SELECT label, COUNT(*) AS c FROM clicks WHERE created_at >= ? AND label IS NOT NULL AND label <> '' GROUP BY label ORDER BY c DESC LIMIT 15", [$fromTime]),
+    ]);
+}
+
 function admin_demo_delete(): void
 {
     require_login();

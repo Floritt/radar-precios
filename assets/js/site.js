@@ -18,11 +18,23 @@
   });
 
   // Cuenta los clics hacia las tiendas sin redirigir el enlace
-  var endpoint = (function () {
+  var base = (function () {
     var brand = document.querySelector('.brand');
     var home = brand ? brand.getAttribute('href') : '/';
-    return home.replace(/\/?$/, '/') + 'api/clic';
+    return home.replace(/\/?$/, '/');
   })();
+  var endpoint = base + 'api/clic';
+  var body = document.body;
+  var kind = body.getAttribute('data-kind');
+  var ref = body.getAttribute('data-ref') || '0';
+
+  // Cuenta la visita a la página (una vez por carga, sin cookies ni datos personales)
+  if (kind && navigator.sendBeacon) {
+    var visit = new FormData();
+    visit.append('kind', kind);
+    visit.append('ref', ref);
+    try { navigator.sendBeacon(base + 'api/visita', visit); } catch (e) { /* sin conexión: no pasa nada */ }
+  }
   document.addEventListener('click', function (ev) {
     var a = ev.target.closest('a[data-out]');
     if (!a || !navigator.sendBeacon) return;
@@ -30,6 +42,8 @@
     data.append('product', a.getAttribute('data-product'));
     data.append('store', a.getAttribute('data-store'));
     data.append('from', a.getAttribute('data-from') || '');
+    data.append('label', a.getAttribute('data-label') || '');
+    if (kind === 'post') { data.append('post', ref); }
     try { navigator.sendBeacon(endpoint, data); } catch (e) { /* sin conexión: no pasa nada */ }
   });
 })();

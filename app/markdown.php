@@ -37,7 +37,7 @@ function render_markdown(?string $text): string
     $amazon = function (array $m, bool $block): string {
         $query = trim(html_entity_decode($m[1], ENT_QUOTES, 'UTF-8'));
         $label = isset($m[2]) && trim($m[2]) !== '' ? trim(html_entity_decode($m[2], ENT_QUOTES, 'UTF-8')) : 'Ver ' . $query . ' en Amazon';
-        $a = '<a href="' . e(amazon_search_url($query)) . '" rel="sponsored nofollow noopener" target="_blank"' . ($block ? ' class="btn btn--buy"' : '') . '>' . e($label) . '</a>';
+        $a = '<a href="' . e(amazon_search_url($query)) . '" rel="sponsored nofollow noopener" target="_blank" data-out data-product="0" data-store="amazon" data-from="post" data-label="' . e($query) . '"' . ($block ? ' class="btn btn--buy"' : '') . '>' . e($label) . '</a>';
         return $block ? '<p class="amz-cta">' . $a . '</p>' : $a;
     };
     $html = preg_replace_callback('~<p>\[amazon:([^\]|<]{2,90})(?:\|([^\]<]{1,90}))?\]</p>~u', fn ($m) => $amazon($m, true), $html) ?? $html;

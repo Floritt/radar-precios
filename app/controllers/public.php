@@ -23,6 +23,7 @@ function page_home(): void
          WHERE p.status = 'published' ORDER BY clicks30 DESC, p.updated_at DESC LIMIT 8",
         [date('Y-m-d H:i:s', time() - 30 * 86400)]
     );
+    $GLOBALS['track'] = ['home', 0];
     render('home', [
         'meta' => meta(['canonical' => absolute_url('')]),
         'deals' => $deals,
@@ -119,6 +120,7 @@ function page_product(string $slug): void
     $review = row("SELECT * FROM posts WHERE type = 'review' AND status = 'published' AND published_at <= ? AND product_id = ? AND rating IS NOT NULL ORDER BY published_at DESC LIMIT 1", [now(), (int) $p['id']]);
     $similar = $p['niche_id'] ? product_list('p.niche_id = ? AND p.id <> ?', [(int) $p['niche_id'], (int) $p['id']], 'CASE WHEN p.change30 IS NULL THEN 1 ELSE 0 END, p.change30 ASC', 4) : [];
 
+    $GLOBALS['track'] = ['product', (int) $p['id']];
     render('product', [
         'meta' => meta([
             'title' => $p['name'] . ': historial de precios',
@@ -223,6 +225,7 @@ function page_post(string $slug): void
 
     $section = post_section($post['type']);
     $faqs = post_faqs((string) $post['body']);
+    $GLOBALS['track'] = ['post', (int) $post['id']];
     render('post', [
         'meta' => meta([
             'title' => post_seo_title($post),
@@ -330,16 +333,47 @@ function page_robots(): void
 /** Registra un clic hacia una tienda (se llama en segundo plano, sin redirecciones). */
 function api_click(): void
 {
-    $ua = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
     $id = (int) input('product', '0');
+    $post = (int) input('post', '0');
     $store = (string) input('store', '');
-    if ($id > 0 && isset(STORES[$store]) && !preg_match('~bot|crawl|spider|slurp|preview~', $ua)) {
+    if (($id > 0 || $post > 0) && isset(STORES[$store]) && !is_untracked_request()) {
         insert('clicks', [
-            'product_id' => $id,
+            'product_id' => max(0, $id),
             'store' => $store,
             'page' => mb_substr((string) input('from', ''), 0, 16),
+            'post_id' => $post > 0 ? $post : null,
+            'label' => mb_substr((string) input('label', ''), 0, 120) ?: null,
             'created_at' => now(),
         ]);
+    }
+    http_response_code(204);
+}
+
+/** Robots y la propia administradora con la sesión abierta no cuentan en las estadísticas. */
+function is_untracked_request(): bool
+{
+    $ua = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
+    if ($ua === '' || preg_match('~bot|crawl|spider|slurp|preview|headless|lighthouse|monitor|curl|wget|python~', $ua)) {
+        return true;
+    }
+    return !empty($_COOKIE['rp_sess']) && current_user() !== null;
+}
+
+/** Cuenta una visita a una ficha, un artículo o la portada (lo llama el navegador en segundo plano). */
+function api_visit(): void
+{
+    $kind = (string) input('kind', '');
+    $ref = (int) input('ref', '0');
+    if (in_array($kind, ['product', 'post', 'home', 'list'], true) && $ref >= 0 && !is_untracked_request()) {
+        $day = date('Y-m-d');
+        $done = q('UPDATE visits SET views = views + 1 WHERE day = ? AND kind = ? AND ref_id = ?', [$day, $kind, $ref])->rowCount();
+        if (!$done) {
+            try {
+                insert('visits', ['day' => $day, 'kind' => $kind, 'ref_id' => $ref, 'views' => 1]);
+            } catch (Throwable $e) {
+                q('UPDATE visits SET views = views + 1 WHERE day = ? AND kind = ? AND ref_id = ?', [$day, $kind, $ref]);
+            }
+        }
     }
     http_response_code(204);
 }

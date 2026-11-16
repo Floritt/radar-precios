@@ -45,11 +45,12 @@ foreach (FUELS_MAIN as $f) { if ($s[$f] !== null) { $first = $f; break; } }
         <input type="hidden" name="gasolinera" value="<?= (int) $s['id'] ?>">
         <p class="alert-box__title"><?= icon('bell') ?> Avísame si baja</p>
         <label for="fa-fuel">Carburante</label>
-        <select id="fa-fuel" class="field fuel-select" name="c">
-          <?php foreach (FUELS_MAIN as $f): if ($s[$f] === null) continue; ?><option value="<?= e($f) ?>"><?= e(fuel_name($f)) ?> (hoy <?= e(fuel_money($s[$f], false)) ?>)</option><?php endforeach; ?>
+        <select id="fa-fuel" class="field fuel-select" name="c" required data-fuel-select>
+          <option value="" selected disabled>Elige el carburante</option>
+          <?php foreach (FUELS_MAIN as $f): if ($s[$f] === null) continue; ?><option value="<?= e($f) ?>" data-suggest="<?= e(number_format(max(0.5, (float) $s[$f] - 0.03), 3, ',', '')) ?>"><?= e(fuel_name($f)) ?> (hoy <?= e(fuel_money($s[$f], false)) ?>)</option><?php endforeach; ?>
         </select>
         <label for="fa-price">Cuando baje de</label>
-        <div class="alert-box__row"><input id="fa-price" class="field" name="precio" inputmode="decimal" required value="<?= e(number_format(max(0.5, (float) $s[$first] - 0.03), 3, ',', '')) ?>"> €/l</div>
+        <div class="alert-box__row"><input id="fa-price" class="field" name="precio" inputmode="decimal" required placeholder="1,499" data-fuel-price> €/l</div>
         <label for="fa-mail">Tu correo</label>
         <input id="fa-mail" class="field" type="email" name="correo" required autocomplete="email" placeholder="tu@correo.es">
         <button class="btn btn--blue" type="submit">Crear aviso</button>

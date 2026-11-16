@@ -15,12 +15,11 @@ $base = url('gasolina/cerca?lat=' . rawurlencode((string) $lat) . '&lng=' . rawu
     <nav class="fuel-tabs" aria-label="Distancia">
       <?php foreach ([5, 10, 25] as $km): ?><a href="<?= e(url('gasolina/cerca?lat=' . rawurlencode((string) $lat) . '&lng=' . rawurlencode((string) $lng) . '&km=' . $km . '&c=' . $fuel)) ?>"<?= $km === $radius ? ' aria-current="true"' : '' ?>><?= $km ?> km</a><?php endforeach; ?>
     </nav>
-    <?php partial('fuel-tabs', ['fuel' => $fuel, 'base' => $base]); ?>
   </div>
   <?php endif; ?>
   <?php if ($stations):
     $vals = array_map(fn ($s) => (float) $s[$fuel], $stations);
-    partial('fuel-table', ['stations' => $stations, 'fuel' => $fuel, 'avg' => array_sum($vals) / count($vals), 'showMuni' => true, 'showKm' => true]);
+    partial('fuel-table', ['stations' => $stations, 'fuel' => $fuel, 'avg' => array_sum($vals) / count($vals), 'showMuni' => true, 'showKm' => true, 'base' => $base]);
   else: ?>
     <p class="empty"><?= $valid ? 'No hay gasolineras con ' . e(mb_strtolower(fuel_name($fuel))) . ' a esa distancia. Prueba con un radio mayor.' : 'Pulsa «Cerca de mí» y permite el acceso a tu ubicación, o busca tu municipio.' ?></p>
   <?php endif; ?>

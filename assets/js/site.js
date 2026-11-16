@@ -65,4 +65,19 @@
       }, { timeout: 10000, maximumAge: 300000 });
     });
   }
+
+  // Aviso de gasolina: al elegir carburante se propone un precio 3 céntimos por debajo del de hoy.
+  var fuelSelect = document.querySelector('[data-fuel-select]');
+  var fuelPrice = document.querySelector('[data-fuel-price]');
+  if (fuelSelect && fuelPrice) {
+    fuelSelect.addEventListener('change', function () {
+      var opt = fuelSelect.options[fuelSelect.selectedIndex];
+      var suggest = opt ? opt.getAttribute('data-suggest') : '';
+      if (suggest && (fuelPrice.value === '' || fuelPrice.dataset.auto === '1')) {
+        fuelPrice.value = suggest;
+        fuelPrice.dataset.auto = '1';
+      }
+    });
+    fuelPrice.addEventListener('input', function () { fuelPrice.dataset.auto = '0'; });
+  }
 })();

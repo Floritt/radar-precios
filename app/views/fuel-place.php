@@ -25,12 +25,9 @@ $natAvg = $national[$fuel]['avg'];
   <?php endif; ?>
 
   <section class="block">
-    <div class="fuel-sec-head">
-      <h2><?= $kind === 'muni' ? 'De la más barata a la más cara' : 'Las ' . count($stations) . ' más baratas de la provincia' ?></h2>
-      <?php partial('fuel-tabs', ['fuel' => $fuel, 'base' => $base]); ?>
-    </div>
+    <h2><?= $kind === 'muni' ? 'De la más barata a la más cara' : 'Las ' . count($stations) . ' más baratas de la provincia' ?></h2>
     <?php if ($stations): ?>
-      <?php partial('fuel-table', ['stations' => $stations, 'fuel' => $fuel, 'avg' => $avg, 'showMuni' => $kind === 'province']); ?>
+      <?php partial('fuel-table', ['stations' => $stations, 'fuel' => $fuel, 'avg' => $avg, 'showMuni' => $kind === 'province', 'base' => $base]); ?>
     <?php else: ?>
       <p class="empty">Ninguna gasolinera de aquí tiene <?= e(mb_strtolower(fuel_name($fuel))) ?> ahora mismo.</p>
     <?php endif; ?>

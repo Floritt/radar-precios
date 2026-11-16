@@ -39,11 +39,8 @@
   <?php endif; ?>
 
   <section class="block">
-    <div class="fuel-sec-head">
-      <h2>Las gasolineras más baratas de España</h2>
-      <?php partial('fuel-tabs', ['fuel' => $fuel, 'base' => url('gasolina')]); ?>
-    </div>
-    <?php partial('fuel-table', ['stations' => $cheapest, 'fuel' => $fuel, 'avg' => $today[$fuel]['avg'], 'showMuni' => true]); ?>
+    <h2>Las gasolineras más baratas de España</h2>
+    <?php partial('fuel-table', ['stations' => $cheapest, 'fuel' => $fuel, 'avg' => $today[$fuel]['avg'], 'showMuni' => true, 'base' => url('gasolina')]); ?>
   </section>
 
   <section class="block">

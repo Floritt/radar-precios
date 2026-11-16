@@ -243,13 +243,16 @@ function fuel_alert_create(): void
     if (!$s || !mail_enabled()) {
         not_found();
     }
-    $fuel = fuel_key((string) input('c', 'g95'));
+    $chosen = (string) input('c', '');
+    $fuel = fuel_key($chosen);
     $raw = str_replace([' ', '€', '/l'], '', (string) input('precio', ''));
     $raw = str_replace(',', '.', $raw);
     $target = is_numeric($raw) ? (float) $raw : 0.0;
     $email = mb_strtolower(trim(mb_substr((string) input('correo', ''), 0, 190)));
     $error = null;
-    if ($target < 0.5 || $target > 4) {
+    if (!in_array($chosen, FUELS_MAIN, true) || $s[$chosen] === null) {
+        $error = 'Elige el carburante del aviso: gasolina 95, diésel o gasolina 98.';
+    } elseif ($target < 0.5 || $target > 4) {
         $error = 'Escribe el precio por litro al que quieres repostar, por ejemplo 1,499.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Escribe un correo válido para poder avisarte.';

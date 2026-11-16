@@ -25,11 +25,13 @@ if ((int) val('SELECT COUNT(*) FROM users') === 0) {
     echo "Usuario del panel ya creado\n";
 }
 
+ensure_schema();
+echo 'Esquema v', setting('schema_version'), ' | avisos activos ', val("SELECT COUNT(*) FROM alerts WHERE status = 'active'"), ' | peticiones en cola ', val("SELECT COUNT(*) FROM track_requests WHERE status = 'pending'"), "\n";
 echo 'PHP ', PHP_VERSION, ' | productos ', val('SELECT COUNT(*) FROM products'), ' | nichos ', val('SELECT COUNT(*) FROM niches'),
     ' | ultima tarea de precios: ', setting('cron_last_run', 'nunca'), "\n";
 
 $base = rtrim((string) config('base_url'), '/');
-foreach (['/', '/ofertas', '/producto/freidora-de-aire-5-5-litros', '/resenas', '/blog', '/admin/entrar', '/config.php', '/storage/install.lock', '/install/cli.php'] as $u) {
+foreach (['/', '/seguir', '/producto/dixit', '/blog', '/comparativas', '/admin/entrar', '/config.php', '/storage/install.lock', '/install/cli.php', '/.git/config'] as $u) {
     $h = @get_headers($base . $u);
     echo $u, ' ', $h ? $h[0] : 'sin respuesta', "\n";
 }

@@ -38,7 +38,12 @@ foreach ($argv as $arg) {
             save_setting('mail_token', $m[2]);
         }
     }
+    // php cron/ops.php --afiliado=mitienda-21  guarda el ID de seguimiento de Amazon Afiliados
+    if (str_starts_with($arg, '--afiliado=') && preg_match('/^[A-Za-z0-9_-]{3,40}$/', substr($arg, 11))) {
+        save_setting('amazon_tag', substr($arg, 11));
+    }
 }
+echo 'ID de afiliado: ', amazon_tag() ?: 'sin poner', "\n";
 echo 'Correo: ', mail_enabled() ? 'activado' : 'sin configurar', "\n";
 if (mail_enabled() && setting('mail_token') !== 'log') {
     // Comprueba la clave y el buzón sin enviar ningún correo.

@@ -435,7 +435,7 @@ function niche_icon(?string $nicheSlug, string $class = ''): string
 {
     $map = ['decor' => 'tree-evergreen', 'jugu' => 'lego', 'juego' => 'dice-five', 'perfum' => 'drop', 'jersei' => 'hoodie', 'pijama' => 'hoodie',
         'ropa' => 't-shirt', 'cocina' => 'cooking-pot', 'tecno' => 'headphones', 'lectura' => 'book-open', 'libro' => 'book-open',
-        'hogar' => 'house-line', 'deporte' => 'barbell', 'bebe' => 'baby', 'cuidado' => 'hand-soap', 'mascota' => 'paw-print', 'regalo' => 'gift'];
+        'hogar' => 'house-line', 'deporte' => 'barbell', 'bebe' => 'baby', 'cuidado' => 'hand-soap', 'mascota' => 'paw-print', 'brico' => 'wrench', 'viaje' => 'suitcase-rolling', 'regalo' => 'gift'];
     foreach ($map as $key => $name) {
         if (str_contains((string) $nicheSlug, $key)) {
             return icon($name, $class);

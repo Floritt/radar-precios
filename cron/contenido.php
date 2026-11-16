@@ -1,7 +1,7 @@
 <?php
 /**
  * Publica los productos (content/productos) y artículos (resto de content/) y, con --borrar-ejemplo, quita los de ejemplo.
- * php cron/contenido.php [--borrar-ejemplo] [--actualizar]
+ * php cron/contenido.php [--borrar-ejemplo] [--actualizar] [--nombre=BASE64]
  * Cada archivo .md empieza con una cabecera entre líneas "---" (title, type, niche, excerpt). No toca los artículos
  * que ya existan con el mismo slug, así que se puede ejecutar varias veces.
  */
@@ -13,6 +13,14 @@ if (PHP_SAPI !== 'cli') {
 }
 chdir(dirname(__DIR__));
 require 'app/bootstrap.php';
+
+// --nombre=BASE64 cambia el nombre de la web (en base64 para poder pasar acentos desde una tarea cron).
+foreach ($argv as $arg) {
+    if (str_starts_with($arg, '--nombre=') && ($name = base64_decode(substr($arg, 9), true)) !== false && trim($name) !== '') {
+        save_setting('site_name', mb_substr(trim($name), 0, 80));
+        echo 'Nombre de la web: ', trim($name), "\n";
+    }
+}
 
 if (in_array('--borrar-ejemplo', $argv, true)) {
     foreach (array_column(rows('SELECT id FROM products WHERE is_demo = 1'), 'id') as $id) {

@@ -1,5 +1,5 @@
 <?php
-/** @var array $post @var ?array $product @var array $more @var array $section @var bool $isDraft */
+/** @var array $post @var ?array $product @var array $more @var array $section @var bool $isDraft @var array $picks */
 $isReview = $post['type'] === 'review';
 $pros = lines($post['pros']);
 $cons = lines($post['cons']);
@@ -19,6 +19,7 @@ $showProduct = $product && $product['status'] === 'published';
     </p>
     <p class="affiliate-note">Algunos enlaces de esta página son de afiliado: si compras a través de ellos, cobramos una pequeña comisión y a ti te cuesta lo mismo.</p>
   </header>
+  <?php if (!empty($picks) && count($picks) >= 2): partial('quick-picks', ['picks' => $picks]); endif; ?>
   <?php if ($post['cover_path']): ?><figure class="art__cover"><img src="<?= e(upload_url($post['cover_path'])) ?>" alt=""></figure><?php endif; ?>
 
   <div class="layout art-wrap">

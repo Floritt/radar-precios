@@ -514,3 +514,62 @@ function amazon_search_url(string $query): string
     return 'https://' . config('amazon.marketplace', 'www.amazon.es') . '/s?k=' . rawurlencode($query) . ($tag ? '&tag=' . rawurlencode($tag) : '');
 }
 
+/** Datos rápidos de un producto, sacados de las líneas «- **Etiqueta:** valor» de su descripción. */
+function product_facts(array $p): array
+{
+    $out = [];
+    if (preg_match_all('/^\s*[-*]\s+\*\*([^*:]{2,40}):\*\*\s*(.+)$/mu', (string) ($p['summary'] ?? ''), $m, PREG_SET_ORDER)) {
+        foreach ($m as $r) {
+            $out[trim($r[1])] = trim(strip_tags(preg_replace('/\[([^\]]+)\]\([^)]*\)/', '$1', $r[2])));
+        }
+    }
+    return $out;
+}
+
+/** Primer párrafo de la descripción, sin formato. */
+function product_intro(array $p, int $max = 240): string
+{
+    $parts = preg_split('/\n\s*\n/', trim((string) ($p['summary'] ?? '')));
+    $first = trim((string) ($parts[0] ?? ''));
+    if ($first === '' || preg_match('/^\s*[-*]\s/', $first)) {
+        return '';
+    }
+    $first = preg_replace('/\[([^\]]+)\]\([^)]*\)/', '$1', $first);
+    return excerpt(str_replace(['**', '*'], '', $first), $max);
+}
+
+/** Productos destacados en un artículo con [producto:slug], en orden y sin repetir. */
+function post_picks(string $body, int $max = 6): array
+{
+    if (!preg_match_all('/^\[producto:([a-z0-9\-]+)\]\s*$/m', $body, $m)) {
+        return [];
+    }
+    $out = [];
+    foreach (array_unique($m[1]) as $slug) {
+        $p = row("SELECT p.*, n.name AS niche_name, n.color AS niche_color, n.slug AS niche_slug FROM products p LEFT JOIN niches n ON n.id = p.niche_id WHERE p.slug = ? AND p.status = 'published'", [$slug]);
+        if ($p) {
+            $out[] = $p;
+        }
+        if (count($out) >= $max) {
+            break;
+        }
+    }
+    return $out;
+}
+
+/**
+ * Campaña de temporada que se anuncia en la web mientras está en curso o a punto de empezar.
+ * Devuelve [titular, texto, búsqueda en Amazon, guía] o null.
+ */
+function season_campaign(): ?array
+{
+    $now = date('Y-m-d H:i');
+    if ($now >= '2026-11-12 00:00' && $now < '2026-11-19 00:00') {
+        return ['El Black Friday de Amazon empieza el 19 de noviembre', 'Las ofertas duran hasta el lunes 30, Cyber Monday incluido. Mira ya qué quieres para no comprar con prisa.', 'black friday', 'cuando-es-el-black-friday'];
+    }
+    if ($now >= '2026-11-19 00:00' && $now < '2026-12-01 00:00') {
+        return ['Semana del Black Friday en Amazon', 'Del 19 al 30 de noviembre. Comprueba que el precio baja de verdad antes de comprar.', 'black friday', 'como-saber-si-una-oferta-es-real'];
+    }
+    return null;
+}
+

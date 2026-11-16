@@ -433,16 +433,47 @@ small, .muted { color: var(--gris); }
 .follow-cta :focus-visible { outline-color: var(--amarillo); }
 
 /* Producto dentro de un artículo */
-.pbox { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 20px; align-items: center; border: 1px solid var(--linea); border-left: 5px solid var(--amarillo); border-radius: 14px; padding: 18px 20px; margin: 26px 0; max-width: 720px; font-size: 16px; line-height: 1.45; }
+.pbox { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 22px; align-items: center; border: 1px solid var(--linea); border-left: 5px solid var(--amarillo); border-radius: 14px; padding: 18px 20px; margin: 26px 0; max-width: 720px; font-size: 16px; line-height: 1.45; background: #fff; }
 .pbox--img { grid-template-columns: 84px minmax(0, 1fr) auto; }
 .pbox__img { width: 84px; height: 84px; display: grid; place-items: center; }
 .pbox__img img { width: 100%; height: 100%; object-fit: contain; margin: 0; border-radius: 0; }
-.pbox__name { font-family: var(--display); font-weight: 700; font-size: 18px; margin: 0; letter-spacing: -0.01em; }
+.pbox__name { font-family: var(--display); font-weight: 800; font-size: 19px; margin: 0; letter-spacing: -0.01em; }
 .prose .pbox__name a { color: var(--tinta); text-decoration: none; }
 .prose .pbox__name a:hover { color: var(--azul); }
-.pbox__price { margin: 4px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 15px; }
+.pbox__brand { font-family: var(--body); font-weight: 500; font-size: 14px; color: var(--gris); letter-spacing: 0; }
+.pbox__why { margin: 6px 0 0; font-size: 15.5px; color: #333B60; }
+.pbox__facts, .prose .pbox__facts { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.pbox__facts li, .prose .pbox__facts li { margin: 0; padding: 4px 10px; border-radius: 999px; background: var(--niebla); font-size: 14px; line-height: 1.35; }
+.pbox__facts li::before { content: none; }
+.pbox__facts span { color: var(--gris); }
+.pbox__price { margin: 8px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 15px; }
 .pbox__price strong { font-family: var(--display); font-size: 22px; font-weight: 800; }
-.pbox__actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pbox__actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center; }
+.prose .pbox__more, .pbox__more { font-size: 14px; color: var(--gris); }
+.picks { max-width: 760px; margin: 4px 0 30px; padding: 18px 20px 8px; border-radius: 16px; background: var(--amarillo-suave); }
+.picks h2 { font-size: 20px; margin: 0 0 8px; }
+.picks__list { list-style: none; margin: 0; padding: 0; counter-reset: pick; }
+.picks__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid rgba(16, 22, 47, 0.1); counter-increment: pick; }
+.picks__item:first-child { border-top: 0; }
+.picks__name { font-weight: 700; color: var(--tinta); text-decoration: none; }
+.picks__name::before { content: counter(pick) ". "; color: var(--gris); font-weight: 600; }
+.picks__name:hover { color: var(--azul); text-decoration: underline; }
+.picks__why { display: block; font-size: 14px; color: #333B60; }
+.pp__intro { font-size: 18px; line-height: 1.55; color: #333B60; margin: 6px 0 12px; max-width: 60ch; }
+.pp__ideal { margin: 0 0 4px; }
+.pp__facts { margin: 8px 0 22px; }
+.pp__again { margin: 22px 0 0; }
+.season { background: var(--tinta); color: #fff; font-size: 15px; }
+.season__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; padding: 10px 0; }
+.season p { margin: 0; }
+.season a:not(.btn) { color: var(--amarillo); }
+@media (max-width: 640px) {
+  .pbox, .pbox--img { grid-template-columns: minmax(0, 1fr); }
+  .pbox__img { display: none; }
+  .pbox__actions .btn { width: 100%; }
+  .season { font-size: 14px; }
+  .season .btn { width: 100%; }
+}
 .prose .pbox .btn { text-decoration: none; }
 .pbox .fineprint { grid-column: 1 / -1; margin: 0; }
 @media (max-width: 620px) { .pbox, .pbox--img { grid-template-columns: 1fr; } .pbox__img { display: none; } }

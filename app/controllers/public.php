@@ -226,7 +226,9 @@ function page_post(string $slug): void
     $section = post_section($post['type']);
     $faqs = post_faqs((string) $post['body']);
     $GLOBALS['track'] = ['post', (int) $post['id']];
+    $picks = post_picks((string) $post['body']);
     render('post', [
+        'picks' => $picks,
         'meta' => meta([
             'title' => post_seo_title($post),
             'description' => excerpt($post['excerpt'] ?: (string) $post['body'], 155),

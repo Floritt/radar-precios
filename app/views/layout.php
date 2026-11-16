@@ -84,6 +84,7 @@ if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
 </nav>
 <?php endif; ?>
 
+<?php if (!preg_match('#^/(gasolina|aviso|legal|buscar)#', $path)): partial('season'); endif; ?>
 <main id="contenido">
 <?= $content ?>
 </main>

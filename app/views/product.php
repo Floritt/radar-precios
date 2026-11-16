@@ -5,7 +5,12 @@ usort($sorted, fn($a, $b) => ($a['price'] ?? INF) <=> ($b['price'] ?? INF));
 $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' verdict--' . $verdict['key'] : '';
 $img = product_image($p);
 $single = count($sorted) === 1 ? $sorted[0] : null;
-$showAlert = alerts_enabled();
+// Sin precio no hay bajada que avisar: la caja vuelve sola cuando el producto tenga precio.
+$showAlert = alerts_enabled() && $best !== null;
+$facts = product_facts($p);
+$ideal = $facts['Ideal para'] ?? null;
+unset($facts['Ideal para']);
+$intro = product_intro($p, 260);
 $hasSide = $img || $showAlert || $best || $related;
 $out = fn(array $o, string $from) => 'href="' . e($o['url']) . '" rel="sponsored nofollow noopener" target="_blank" data-out data-product="' . (int) $p['id'] . '" data-store="' . e($o['store']) . '" data-from="' . $from . '"';
 ?>
@@ -25,10 +30,16 @@ $out = fn(array $o, string $from) => 'href="' . e($o['url']) . '" rel="sponsored
         <?php if ($review): ?><a href="<?= e(post_url($review)) ?>"><span class="score"><?= e(number_format((float) $review['rating'], 1, ',', '')) ?><small>/10</small></span> Leer nuestra reseña</a><?php endif; ?>
       </div>
 
+      <?php if ($best): ?>
       <div class="verdict<?= $verdictClass ?>">
         <span class="verdict__dot"></span>
         <div><strong><?= e($verdict['label']) ?></strong><?= e($verdict['text']) ?></div>
       </div>
+      <?php else: ?>
+        <?php if ($intro): ?><p class="pp__intro"><?= e($intro) ?></p><?php endif; ?>
+        <?php if ($ideal): ?><p class="pp__ideal"><strong>Ideal para:</strong> <?= e($ideal) ?></p><?php endif; ?>
+        <?php if ($facts): ?><ul class="pbox__facts pp__facts"><?php foreach ($facts as $k => $v): ?><li><span><?= e($k) ?></span> <?= e($v) ?></li><?php endforeach; ?></ul><?php endif; ?>
+      <?php endif; ?>
 
       <?php if ($single): ?>
         <div class="buy">
@@ -132,7 +143,12 @@ $out = fn(array $o, string $from) => 'href="' . e($o['url']) . '" rel="sponsored
   <?php if ($p['summary']): ?>
   <section class="block">
     <h2>Descripción</h2>
-    <div class="prose"><?= render_markdown($p['summary']) ?></div>
+    <?php $desc = (string) $p['summary'];
+      if (!$best && $intro !== '') { $parts = preg_split('/\n\s*\n/', trim($desc), 2); $desc = $parts[1] ?? ''; } ?>
+    <?php if (trim($desc) !== ''): ?><div class="prose"><?= render_markdown($desc) ?></div><?php endif; ?>
+    <?php $go = $best ?: ($sorted ? $sorted[0] : null); if ($go): ?>
+      <p class="pp__again"><a class="btn btn--buy btn--lg" <?= $out($go, 'product-bottom') ?>><?= $go['price'] !== null ? 'Ver oferta en ' : 'Ver precio en ' ?><?= e($go['name']) ?></a></p>
+    <?php endif; ?>
   </section>
   <?php endif; ?>
 

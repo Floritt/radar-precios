@@ -119,11 +119,13 @@ function admin_stats(): void
     $fromTime = $fromDay . ' 00:00:00';
 
     $views = ['product' => [], 'post' => []];
-    $totals = ['views' => 0, 'home' => 0];
+    $totals = ['views' => 0, 'home' => 0, 'fuel' => 0];
     foreach (rows('SELECT kind, ref_id, SUM(views) AS v FROM visits WHERE day >= ? GROUP BY kind, ref_id', [$fromDay]) as $r) {
         $totals['views'] += (int) $r['v'];
         if ($r['kind'] === 'home') {
             $totals['home'] += (int) $r['v'];
+        } elseif ($r['kind'] === 'fuel') {
+            $totals['fuel'] += (int) $r['v'];
         } elseif (isset($views[$r['kind']])) {
             $views[$r['kind']][(int) $r['ref_id']] = (int) $r['v'];
         }

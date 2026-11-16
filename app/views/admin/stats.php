@@ -28,6 +28,7 @@ $table = function (array $items, string $first) use ($pct): void { ?>
   <div class="kpi"><b><?= $totals['clicks'] ?></b><span>clics a Amazon</span></div>
   <div class="kpi"><b><?= e($pct($totals['clicks'], $totals['views']) ?: '0 %') ?></b><span>de las visitas acaban en clic</span></div>
   <div class="kpi"><b><?= $totals['home'] ?></b><span>visitas a la portada</span></div>
+  <div class="kpi"><b><?= $totals['fuel'] ?></b><span>visitas a Gasolina</span></div>
 </div>
 
 <section class="card">

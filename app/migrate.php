@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 function ensure_schema(): void
 {
@@ -57,6 +57,63 @@ function ensure_schema(): void
             ref_id INT NOT NULL DEFAULT 0,
             views INT NOT NULL DEFAULT 0
         )$tail",
+        // v6: gasolineras, municipios, historial diario, medias y avisos de carburante.
+        "CREATE TABLE IF NOT EXISTS fuel_stations (
+            id INT NOT NULL PRIMARY KEY,
+            name VARCHAR(120) NOT NULL,
+            address VARCHAR(200) NOT NULL DEFAULT '',
+            cp VARCHAR(5) NOT NULL DEFAULT '',
+            locality VARCHAR(120) NOT NULL DEFAULT '',
+            muni_id INT NOT NULL,
+            province_id INT NOT NULL,
+            lat DECIMAL(9,6) NULL,
+            lng DECIMAL(9,6) NULL,
+            schedule VARCHAR(200) NOT NULL DEFAULT '',
+            g95 DECIMAL(6,3) NULL,
+            diesel DECIMAL(6,3) NULL,
+            g98 DECIMAL(6,3) NULL,
+            diesel_plus DECIMAL(6,3) NULL,
+            glp DECIMAL(6,3) NULL,
+            active TINYINT NOT NULL DEFAULT 1,
+            updated_at DATETIME NOT NULL
+        )$tail",
+        "CREATE TABLE IF NOT EXISTS fuel_munis (
+            id INT NOT NULL PRIMARY KEY,
+            province_id INT NOT NULL,
+            name VARCHAR(120) NOT NULL,
+            slug VARCHAR(140) NOT NULL,
+            stations INT NOT NULL DEFAULT 0
+        )$tail",
+        "CREATE TABLE IF NOT EXISTS fuel_daily (
+            station_id INT NOT NULL,
+            day DATE NOT NULL,
+            g95 DECIMAL(6,3) NULL,
+            diesel DECIMAL(6,3) NULL,
+            g98 DECIMAL(6,3) NULL,
+            PRIMARY KEY (station_id, day)
+        )$tail",
+        "CREATE TABLE IF NOT EXISTS fuel_stats (
+            day DATE NOT NULL,
+            province_id INT NOT NULL,
+            fuel VARCHAR(12) NOT NULL,
+            avg DECIMAL(6,3) NOT NULL,
+            min DECIMAL(6,3) NOT NULL,
+            stations INT NOT NULL,
+            PRIMARY KEY (day, province_id, fuel)
+        )$tail",
+        "CREATE TABLE IF NOT EXISTS fuel_alerts (
+            id $id,
+            station_id INT NOT NULL,
+            fuel VARCHAR(12) NOT NULL,
+            target_price DECIMAL(6,3) NOT NULL,
+            email VARCHAR(190) NOT NULL,
+            code VARCHAR(32) NOT NULL,
+            status VARCHAR(12) NOT NULL DEFAULT 'pending',
+            created_at DATETIME NOT NULL,
+            activated_at DATETIME NULL,
+            sent_at DATETIME NULL,
+            sent_price DECIMAL(6,3) NULL
+        )$tail",
     ];
     $indexes = [
         ['uq_track_asin', 'track_requests', 'asin', true],
@@ -90,6 +147,13 @@ function ensure_schema(): void
         }
     }
     $indexes[] = ['uq_visits', 'visits', 'day, kind, ref_id', true];
+    $indexes[] = ['idx_fuel_muni', 'fuel_stations', 'muni_id, active', false];
+    $indexes[] = ['idx_fuel_prov', 'fuel_stations', 'province_id, active', false];
+    $indexes[] = ['idx_fuel_geo', 'fuel_stations', 'lat, lng', false];
+    $indexes[] = ['idx_fuel_munis_slug', 'fuel_munis', 'province_id, slug', false];
+    $indexes[] = ['idx_fuel_daily_day', 'fuel_daily', 'day', false];
+    $indexes[] = ['uq_fuel_alert_code', 'fuel_alerts', 'code', true];
+    $indexes[] = ['idx_fuel_alert_status', 'fuel_alerts', 'status, station_id', false];
     $indexes[] = ['idx_clicks_post', 'clicks', 'post_id, created_at', false];
     foreach ($indexes as [$name, $table, $cols, $unique]) {
         try {

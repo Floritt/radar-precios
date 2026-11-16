@@ -46,4 +46,23 @@
     if (kind === 'post') { data.append('post', ref); }
     try { navigator.sendBeacon(endpoint, data); } catch (e) { /* sin conexión: no pasa nada */ }
   });
+
+  // Gasolina: «cerca de mí» pide la posición al navegador y abre la búsqueda. No se guarda en ningún sitio.
+  var near = document.querySelector('[data-near]');
+  if (near && navigator.geolocation) {
+    near.hidden = false;
+    var msg = document.querySelector('[data-near-msg]');
+    near.addEventListener('click', function () {
+      near.disabled = true;
+      if (msg) { msg.hidden = false; msg.textContent = 'Buscando tu ubicación…'; }
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        var lat = pos.coords.latitude.toFixed(4);
+        var lng = pos.coords.longitude.toFixed(4);
+        window.location.href = base + 'gasolina/cerca?lat=' + lat + '&lng=' + lng + '&c=' + (near.getAttribute('data-fuel') || 'g95');
+      }, function () {
+        near.disabled = false;
+        if (msg) { msg.textContent = 'No hemos podido saber tu ubicación. Busca tu municipio o código postal.'; }
+      }, { timeout: 10000, maximumAge: 300000 });
+    });
+  }
 })();

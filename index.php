@@ -4,6 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/app/bootstrap.php';
 require APP . '/controllers/public.php';
 require APP . '/controllers/admin.php';
+require APP . '/controllers/fuel.php';
 
 // Un solo dominio: cualquier otro nombre que apunte a la web (alias, www, subdominio antiguo) redirige al de base_url.
 $canonicalHost = strtolower((string) parse_url((string) config('base_url'), PHP_URL_HOST));
@@ -41,6 +42,15 @@ $routes = [
     ['GET', '#^/legal/([a-z\-]+)$#', 'page_legal'],
     ['GET', '#^/sitemap\.xml$#', 'page_sitemap'],
     ['GET', '#^/robots\.txt$#', 'page_robots'],
+    ['GET', '#^/gasolina$#', 'fuel_home'],
+    ['GET', '#^/gasolina/cerca$#', 'fuel_near'],
+    ['GET', '#^/gasolina/buscar$#', 'fuel_search'],
+    ['POST', '#^/gasolina/aviso$#', 'fuel_alert_create'],
+    ['GET', '#^/gasolina/aviso/confirmar/([a-f0-9]{32})$#', 'fuel_alert_confirm'],
+    ['GET|POST', '#^/gasolina/aviso/baja/([a-f0-9]{32})$#', 'fuel_alert_unsubscribe'],
+    ['GET', '#^/gasolina/gasolinera/(\d+)(?:-[a-z0-9\-]*)?$#', 'fuel_station'],
+    ['GET', '#^/gasolina/([a-z0-9\-]+)$#', 'fuel_province'],
+    ['GET', '#^/gasolina/([a-z0-9\-]+)/([a-z0-9\-]+)$#', 'fuel_muni'],
     ['POST', '#^/api/clic$#', 'api_click'],
     ['POST', '#^/api/visita$#', 'api_visit'],
     ['GET', '#^/tareas/precios$#', 'task_prices'],

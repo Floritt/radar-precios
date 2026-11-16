@@ -99,6 +99,21 @@ $lead = $guides ? array_shift($guides) : null;
 </section>
 <?php endif; ?>
 
+<?php if (fuel_enabled()): $ft = fuel_today(0); ?>
+<section class="sec sec--tight" aria-labelledby="h-fuel">
+  <div class="wrap">
+    <a class="fuel-band" href="<?= e(url('gasolina')) ?>">
+      <?= icon('gas-pump') ?>
+      <div>
+        <h2 id="h-fuel">Precio de la gasolina hoy</h2>
+        <p><?php if ($ft['g95']['avg'] !== null): ?>Gasolina 95 a <?= e(fuel_money($ft['g95']['avg'])) ?> y diésel a <?= e(fuel_money($ft['diesel']['avg'])) ?> de media en España. <?php endif; ?>Encuentra la gasolinera más barata de tu municipio.</p>
+      </div>
+      <span class="btn btn--blue">Ver gasolineras</span>
+    </a>
+  </div>
+</section>
+<?php endif; ?>
+
 <?php if ($reviews): ?>
 <section class="sec sec--tight" aria-labelledby="h-reviews">
   <div class="wrap">

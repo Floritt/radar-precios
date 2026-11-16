@@ -7,12 +7,13 @@ $whatsapp = setting('whatsapp_url');
 $q = $path === '/buscar' ? (string) input('q', '') : '';
 $counts = site_counts();
 $isHome = $path === '/';
-$showCats = !$isHome && !preg_match('#^/(blog|comparativas|resenas|ofertas|buscar|seguir)$#', $path);
+$showCats = !$isHome && !preg_match('#^/(blog|comparativas|resenas|ofertas|buscar|seguir)$|^/gasolina#', $path);
 $links = [];
 if ($counts['priced']) { $links[] = ['ofertas', 'Ofertas']; }
 $links[] = ['blog', 'Guías'];
 if ($counts['comparisons']) { $links[] = ['comparativas', 'Comparativas']; }
 if ($counts['reviews']) { $links[] = ['resenas', 'Reseñas']; }
+if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
@@ -126,6 +127,9 @@ if ($counts['reviews']) { $links[] = ['resenas', 'Reseñas']; }
 <?php if (!empty($loadChart)): ?>
 <script src="<?= e(asset('vendor/chart.umd.min.js')) ?>" defer></script>
 <script src="<?= e(asset('js/product-chart.js')) ?>" defer></script>
+<?php elseif (!empty($fuelChart)): ?>
+<script src="<?= e(asset('vendor/chart.umd.min.js')) ?>" defer></script>
+<script src="<?= e(asset('js/fuel-chart.js')) ?>" defer></script>
 <?php endif; ?>
 </body>
 </html>

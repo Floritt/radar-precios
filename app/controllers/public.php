@@ -314,6 +314,16 @@ function page_sitemap(): void
     foreach (rows("SELECT slug, type, updated_at FROM posts WHERE status = 'published' AND published_at <= ?", [now()]) as $p) {
         $urls[] = [post_section($p['type'])[1] . '/' . $p['slug'], substr($p['updated_at'], 0, 10)];
     }
+    if (fuel_enabled()) {
+        $today = date('Y-m-d');
+        $urls[] = ['gasolina', $today];
+        foreach (array_keys(FUEL_PROVINCES) as $pid) {
+            $urls[] = ['gasolina/' . fuel_province_slug($pid), $today];
+        }
+        foreach (rows('SELECT id, province_id, slug FROM fuel_munis WHERE stations > 0 ORDER BY province_id, slug') as $m) {
+            $urls[] = [fuel_muni_path($m), $today];
+        }
+    }
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     foreach ($urls as [$path, $mod]) {
         echo '  <url><loc>' . e(absolute_url($path)) . '</loc>' . ($mod ? '<lastmod>' . e($mod) . '</lastmod>' : '') . "</url>\n";
@@ -365,7 +375,7 @@ function api_visit(): void
 {
     $kind = (string) input('kind', '');
     $ref = (int) input('ref', '0');
-    if (in_array($kind, ['product', 'post', 'home', 'list'], true) && $ref >= 0 && !is_untracked_request()) {
+    if (in_array($kind, ['product', 'post', 'home', 'list', 'fuel'], true) && $ref >= 0 && !is_untracked_request()) {
         $day = date('Y-m-d');
         $done = q('UPDATE visits SET views = views + 1 WHERE day = ? AND kind = ? AND ref_id = ?', [$day, $kind, $ref])->rowCount();
         if (!$done) {

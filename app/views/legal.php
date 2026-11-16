@@ -51,6 +51,9 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <p>Si creas un aviso de precio, guardamos el producto, el precio que has elegido y tu correo electrónico (o el identificador de tu chat de Telegram, si lo activas en nuestro bot), solo para poder enviarte ese aviso. No usamos esos datos para nada más ni los cedemos a nadie.</p>
     <p>La base legal es tu consentimiento, que das al confirmar el aviso desde el correo que te enviamos o al activarlo en el bot. Puedes retirarlo cuando quieras: cada correo lleva un enlace para borrar tus avisos, y en Telegram basta con escribir /parar al bot. Al borrarlos, tu correo desaparece de nuestra base de datos.</p>
     <p>Los avisos sin confirmar se borran a los 7 días y los ya enviados, a los 30 días. Los correos se envían con el servicio de correo de nuestro proveedor de alojamiento, Hostinger, que actúa como encargado del tratamiento.</p>
+    <p>Los avisos de gasolina funcionan igual: guardamos la gasolinera, el carburante, el precio que has elegido y tu correo, solo para enviarte ese aviso.</p>
+    <h2>Gasolineras cerca de ti</h2>
+    <p>Si usas «Cerca de mí», tu navegador nos envía tu posición aproximada para esa búsqueda. No la guardamos ni la asociamos a ti. Puedes no darle permiso y buscar por municipio o código postal.</p>
     <h2>Productos que nos pides seguir</h2>
     <p>Cuando pegas un enlace de Amazon para que sigamos su precio, guardamos el código del producto. No lo asociamos a ti. Para evitar abusos, guardamos durante 48 horas una huella cifrada de tu dirección IP que no permite identificarte.</p>
     <h2>Tus derechos</h2>

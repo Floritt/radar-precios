@@ -137,3 +137,12 @@ Con PHP instalado, sin MySQL: en `config.php` usa `'driver' => 'sqlite'` y arran
 ## Estadísticas
 
 El panel tiene una página de Estadísticas con las visitas y los clics hacia Amazon de cada producto y de cada artículo, en 7, 30 o 90 días. El navegador avisa en segundo plano a `/api/visita` y `/api/clic`; no se usan cookies ni se guarda ningún dato personal. No cuentan los robots ni las visitas de quien tiene el panel abierto. Las ventas y comisiones solo aparecen en Amazon Afiliados.
+
+## Gasolina
+
+Sección en `/gasolina` con los precios de todas las gasolineras de España, a partir de los datos abiertos del Ministerio para la Transición Ecológica. `cron/gasolina.php` descarga el listado completo, actualiza las gasolineras, guarda el precio del día de cada una (400 días), calcula las medias por provincia y envía los avisos de gasolina por correo. Se programa cada hora:
+
+    23 * * * * /usr/bin/php /ruta/public_html/cron/gasolina.php
+
+Solo se muestran las gasolineras de venta al público. «Cerca de mí» usa la posición del navegador para esa búsqueda y no la guarda.
+

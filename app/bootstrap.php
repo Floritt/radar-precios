@@ -49,6 +49,7 @@ require APP . '/amazon.php';
 require APP . '/telegram.php';
 require APP . '/mailer.php';
 require APP . '/alerts.php';
+require APP . '/fuel.php';
 require APP . '/tracking.php';
 require APP . '/migrate.php';
 require APP . '/markdown.php';

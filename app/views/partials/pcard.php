@@ -7,7 +7,7 @@ $n = store_count($p);
   <?php partial('thumb', ['p' => $p]); ?>
   <?php if ($tp && (int) $p['at_low']): ?><span class="pcard__badge badge badge--low">Mínimo histórico</span>
   <?php elseif ($off): ?><span class="pcard__badge badge badge--off">−<?= e(pct($off, false)) ?></span><?php endif; ?>
-  <?php if (product_image($p)): ?><span class="pcard__title"><?= e($p['name']) ?></span><?php endif; ?>
+  <span class="pcard__title"><?= e($p['name']) ?></span>
   <span class="pcard__price">
     <?php if ($tp): ?>desde<strong><?= e(money($tp['price'])) ?></strong><?php else: ?><span class="pcard__noprice">Ver precio en la tienda</span><?php endif; ?>
   </span>

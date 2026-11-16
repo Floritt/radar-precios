@@ -28,7 +28,7 @@ function page_home(): void
         'deals' => $deals,
         'popular' => $popular,
         'reviews' => published_posts("po.type = 'review'", [], 4),
-        'guides' => published_posts(section_where('blog'), [], $deals ? 5 : 7),
+        'guides' => $deals ? published_posts("po.type <> 'review'", [], 4) : published_posts(section_where('blog'), [], 6),
         'comparisons' => published_posts(section_where('comparison'), [], 4),
     ]);
 }

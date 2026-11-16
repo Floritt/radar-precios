@@ -127,6 +127,5 @@ Con PHP instalado, sin MySQL: en `config.php` usa `'driver' => 'sqlite'` y arran
 
 ## Licencias de terceros
 
-- Fuente Barlow Semi Condensed: SIL Open Font License (`assets/fonts/OFL-Barlow.txt`).
 - Chart.js 4.4.1: licencia MIT (`assets/vendor/LICENSE-chartjs.md`).
 - Parsedown 1.7.4: licencia MIT.

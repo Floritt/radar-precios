@@ -172,7 +172,7 @@ function list_page(string $kind): void
             'description' => match ($kind) {
                 'review' => 'Reseñas con nota, pros y contras, y el historial de precio de cada producto.',
                 'comparison' => 'Comparativas entre productos del mismo tipo: diferencias, para quién es cada uno y cuál conviene.',
-                default => 'Guías de compra y consejos para pagar menos en Amazon, Temu y Shein.',
+                default => 'Guías de compra y consejos para saber cuándo comprar y pagar menos en Amazon.',
             },
             'noindex' => $page > 1,
         ]),

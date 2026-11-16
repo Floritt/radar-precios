@@ -44,7 +44,7 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <h2>Base legal</h2>
     <p>El interés legítimo en mantener la web segura (registros técnicos) y tu consentimiento cuando nos escribes.</p>
     <h2>Tiendas enlazadas</h2>
-    <p>Al pulsar un enlace a Amazon, Temu, Shein u otra tienda, sales de esta web. A partir de ahí se aplica la política de privacidad de esa tienda.</p>
+    <p>Al pulsar un enlace a Amazon u otra tienda, sales de esta web. A partir de ahí se aplica la política de privacidad de esa tienda.</p>
     <h2>Avisos de precio por Telegram</h2>
     <p>Si creas un aviso de precio, guardamos el producto, el precio que has elegido y el identificador de tu chat de Telegram, solo para poder enviarte ese aviso. La base legal es tu consentimiento, que das al activar el aviso en nuestro bot. Puedes retirarlo cuando quieras escribiendo /parar al bot, y tus avisos se cancelan. Los avisos sin activar se borran a los 7 días.</p>
     <h2>Productos que nos pides seguir</h2>
@@ -61,7 +61,7 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     </table></div>
     <p>Es una cookie técnica, necesaria para el funcionamiento del panel, y está exenta de consentimiento según el artículo 22.2 de la LSSI.</p>
     <h2>Cookies de las tiendas</h2>
-    <p>Cuando pulsas un enlace y entras en Amazon, Temu, Shein u otra tienda, esa tienda puede instalar sus propias cookies, entre ellas la que le permite saber que llegaste desde aquí. Puedes consultarlas y gestionarlas en la política de cookies de cada tienda.</p>
+    <p>Cuando pulsas un enlace y entras en Amazon u otra tienda, esa tienda puede instalar sus propias cookies, entre ellas la que le permite saber que llegaste desde aquí. Puedes consultarlas y gestionarlas en la política de cookies de cada tienda.</p>
     <p>Si en el futuro añadimos analítica o publicidad, pediremos tu consentimiento antes y actualizaremos esta página.</p>
 
 <?php else: ?>
@@ -69,7 +69,6 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <h2>Programas en los que participamos</h2>
     <ul>
       <li><strong>Amazon:</strong> como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</li>
-      <li><strong>Temu y Shein:</strong> participamos en sus programas de afiliados y cobramos una comisión por algunas compras.</li>
     </ul>
     <h2>Lo que la comisión no cambia</h2>
     <ul>

@@ -44,8 +44,8 @@
         <?php endif; ?>
       </div>
     <?php endif; ?>
-    <label>Temu: enlace de afiliado<input name="temu_url" type="url" value="<?= e($p['temu_url']) ?>" placeholder="https://temu.to/..."></label>
-    <label>Shein: enlace de afiliado<input name="shein_url" type="url" value="<?= e($p['shein_url']) ?>"></label>
+    <?php if ($p['temu_url']): ?><label>Temu: enlace de afiliado<input name="temu_url" type="url" value="<?= e($p['temu_url']) ?>"></label><?php else: ?><input type="hidden" name="temu_url" value=""><?php endif; ?>
+    <?php if ($p['shein_url']): ?><label>Shein: enlace de afiliado<input name="shein_url" type="url" value="<?= e($p['shein_url']) ?>"></label><?php else: ?><input type="hidden" name="shein_url" value=""><?php endif; ?>
     <div class="row">
       <label>Otra tienda: nombre<input name="other_name" maxlength="80" value="<?= e($p['other_name']) ?>" placeholder="PcComponentes"></label>
       <label>Otra tienda: enlace<input name="other_url" type="url" value="<?= e($p['other_url']) ?>"></label>
@@ -71,7 +71,7 @@
   <?php endif; ?>
 
   <section class="card" id="precios">
-    <h2>Precios de Temu, Shein y otras tiendas</h2>
+    <h2>Precios de otras tiendas</h2>
     <p class="muted">Estas tiendas no tienen API de precios abierta: apunta aquí el precio que ves y el día. Los precios de Amazon no se pueden escribir a mano; llegan solos desde su API.</p>
     <form method="post" action="<?= e(url('admin/productos/' . $p['id'] . '/precio')) ?>" class="form row row--end">
       <?= csrf_field() ?>

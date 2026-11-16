@@ -339,7 +339,7 @@ function admin_product_delete(string $id): void
     redirect('admin/productos');
 }
 
-/** Precio manual de Temu, Shein u otra tienda. Los de Amazon solo llegan por la API. */
+/** Precio manual de otra tienda (no Amazon). Los de Amazon solo llegan por la API. */
 function admin_price_add(string $id): void
 {
     require_login();

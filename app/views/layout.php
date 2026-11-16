@@ -109,7 +109,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     </div>
   </div>
   <div class="wrap site-footer__note">
-    <p>Como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. También participamos en los programas de afiliados de Temu y Shein. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado. Amazon y el logotipo de Amazon son marcas registradas de Amazon.com, Inc. o sus filiales.</p>
+    <p>Como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado. Amazon y el logotipo de Amazon son marcas registradas de Amazon.com, Inc. o sus filiales.</p>
     <p>&copy; <?= date('Y') ?> <?= e(setting('legal_owner', site_name())) ?></p>
   </div>
 </footer>

@@ -1,6 +1,6 @@
-# Radar de Precios
+# Cuándo Comprar
 
-Web de historial de precios, reseñas y guías de compra, monetizada con enlaces de afiliado de Amazon, Temu y Shein. PHP 8 y MySQL, sin frameworks ni servicios externos: funciona en cualquier hosting compartido como Hostinger.
+Web de historial de precios, reseñas y guías de compra, monetizada con enlaces de afiliado de Amazon. PHP 8 y MySQL, sin frameworks ni servicios externos: funciona en cualquier hosting compartido como Hostinger.
 
 ## Qué incluye
 
@@ -9,7 +9,7 @@ Web de historial de precios, reseñas y guías de compra, monetizada con enlaces
 - **Nichos** (empieza con 6 de Navidad) con sus productos ordenables por bajada o precio.
 - **Ficha de producto** con el mejor precio, veredicto ("buen momento", "mejor esperar"…), botones a cada tienda, gráfica de 30, 90 y 180 días y resumen de precios.
 - **Reseñas** con nota, pros, contras y veredicto, y **guías y artículos**. En cualquier texto puedes insertar fichas de producto y tablas comparativas.
-- **Panel de administración** para nichos, productos, precios manuales de Temu, Shein u otras tiendas, artículos, ajustes y datos legales. Cuenta los clics a cada tienda.
+- **Panel de administración** para nichos, productos, precios manuales de otras tiendas, artículos, ajustes y datos legales. Cuenta los clics a cada tienda.
 - **Recolector de precios** de Amazon con su API oficial (Creators API) y publicación automática de mínimos en tu canal de Telegram.
 - **Páginas legales** (aviso legal, privacidad, cookies y afiliación), sitemap.xml, robots.txt y datos estructurados para Google.
 - Sin cookies de terceros ni analítica: no hace falta banner de cookies. La gráfica usa una librería alojada en tu servidor y la letra es la del sistema de cada dispositivo.
@@ -80,9 +80,9 @@ A partir de ahí, el cron trae precio, título, foto y enlace oficial de cada pr
 
 Pendiente de confirmar con el soporte de Afiliados: si guardar los precios para la gráfica histórica está permitido en tu cuenta. Si te dicen que no, pon `'show_history' => false` y la gráfica mostrará solo las otras tiendas.
 
-## Temu, Shein y otras tiendas
+## Otras tiendas
 
-No tienen API abierta de precios. En la ficha del producto (panel) pega tu enlace de afiliado y apunta el precio y el día en "Precios de Temu, Shein y otras tiendas". Esos puntos forman su línea en la gráfica. Un precio manual de hace más de 30 días ya no cuenta como mejor precio.
+No tienen API abierta de precios. En la ficha del producto (panel) pega tu enlace de afiliado y apunta el precio y el día en "Precios de otras tiendas". Esos puntos forman su línea en la gráfica. Un precio manual de hace más de 30 días ya no cuenta como mejor precio.
 
 ## Canal de Telegram
 

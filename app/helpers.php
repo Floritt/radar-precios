@@ -413,27 +413,42 @@ function product_image(array $p): ?string
     return null;
 }
 
-/** Icono neutro para productos sin foto, elegido por el nicho. */
-function placeholder_svg(?string $nicheSlug): string
+/** Icono en línea desde assets/icons (Phosphor, licencia MIT). */
+function icon(string $name, string $class = ''): string
 {
-    $s = (string) $nicheSlug;
-    $paths = [
-        'decor' => '<path d="M32 8 20 26h7l-10 14h8L14 54h36L39 40h8L37 26h7Z"/><path d="M32 54v6"/>',
-        'jugu' => '<rect x="12" y="34" width="18" height="18" rx="2"/><rect x="34" y="34" width="18" height="18" rx="2"/><rect x="23" y="14" width="18" height="18" rx="2"/>',
-        'perfum' => '<rect x="18" y="26" width="28" height="28" rx="6"/><path d="M26 26v-8h12v8M28 18v-6h8v6"/>',
-        'jersei' => '<path d="M22 12h20l12 8-6 10-6-4v28H22V26l-6 4-6-10Z"/><path d="M26 12c0 4 3 6 6 6s6-2 6-6"/>',
-        'pijama' => '<path d="M22 12h20l12 8-6 10-6-4v28H22V26l-6 4-6-10Z"/>',
-        'cocina' => '<path d="M12 28h40v6a14 14 0 0 1-14 14H26a14 14 0 0 1-14-14Z"/><path d="M8 28h48M24 20c0-3 3-3 3-6M33 20c0-3 3-3 3-6"/>',
-        'tecno' => '<path d="M14 40v-6a18 18 0 0 1 36 0v6"/><rect x="10" y="38" width="10" height="14" rx="3"/><rect x="44" y="38" width="10" height="14" rx="3"/>',
-    ];
-    $inner = '<path d="M12 30V14a2 2 0 0 1 2-2h16l22 22-18 18Z"/><circle cx="21" cy="21" r="3"/>';
-    foreach ($paths as $key => $svg) {
-        if (str_contains($s, $key)) {
-            $inner = $svg;
-            break;
+    static $cache = [];
+    if (!isset($cache[$name])) {
+        $file = ROOT . '/assets/icons/' . preg_replace('/[^a-z0-9-]/', '', $name) . '.svg';
+        $cache[$name] = is_file($file) ? trim((string) file_get_contents($file)) : '';
+    }
+    if ($cache[$name] === '') {
+        return '';
+    }
+    return str_replace('<svg ', '<svg class="icon' . ($class !== '' ? ' ' . e($class) : '') . '" aria-hidden="true" focusable="false" ', $cache[$name]);
+}
+
+/** Icono de una categoría, elegido por palabras de su dirección. */
+function niche_icon(?string $nicheSlug, string $class = ''): string
+{
+    $map = ['decor' => 'tree-evergreen', 'jugu' => 'lego', 'juego' => 'dice-five', 'perfum' => 'drop', 'jersei' => 'hoodie', 'pijama' => 'hoodie',
+        'ropa' => 't-shirt', 'cocina' => 'cooking-pot', 'tecno' => 'headphones', 'regalo' => 'gift'];
+    foreach ($map as $key => $name) {
+        if (str_contains((string) $nicheSlug, $key)) {
+            return icon($name, $class);
         }
     }
-    return '<svg class="ph" viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">' . $inner . '</svg>';
+    return icon('tag', $class);
+}
+
+/** Nombre de la categoría con su punto de color. */
+function cat_label(array $row): string
+{
+    if (empty($row['niche_name'])) {
+        return '';
+    }
+    $c = (string) ($row['niche_color'] ?? '');
+    $style = preg_match('/^#[0-9A-Fa-f]{6}$/', $c) ? ' style="background:' . $c . '"' : '';
+    return '<span class="cat"><i' . $style . '></i>' . e($row['niche_name']) . '</span>';
 }
 
 function time_ago(?string $datetime): string
@@ -495,9 +510,3 @@ function amazon_search_url(string $query): string
     return 'https://' . config('amazon.marketplace', 'www.amazon.es') . '/s?k=' . rawurlencode($query) . ($tag ? '&tag=' . rawurlencode($tag) : '');
 }
 
-/** Atributo style con el color de la categoría, para teñir los iconos de las fichas sin foto. */
-function tint_attr(array $row): string
-{
-    $c = (string) ($row['niche_color'] ?? '');
-    return preg_match('/^#[0-9A-Fa-f]{6}$/', $c) ? ' style="--tint: ' . $c . '"' : '';
-}

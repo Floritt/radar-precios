@@ -2,7 +2,12 @@
 /** @var array $p @var array $offers @var ?array $best @var ?array $stats @var ?string $statsStore @var array $verdict @var array $chart @var array $related @var array $similar @var ?array $review */
 $sorted = array_values($offers);
 usort($sorted, fn($a, $b) => ($a['price'] ?? INF) <=> ($b['price'] ?? INF));
-$verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp__verdict--' . $verdict['key'] : '';
+$verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' verdict--' . $verdict['key'] : '';
+$img = product_image($p);
+$single = count($sorted) === 1 ? $sorted[0] : null;
+$showAlert = alerts_enabled();
+$hasSide = $img || $showAlert || $best || $related;
+$out = fn(array $o, string $from) => 'href="' . e($o['url']) . '" rel="sponsored nofollow noopener" target="_blank" data-out data-product="' . (int) $p['id'] . '" data-store="' . e($o['store']) . '" data-from="' . $from . '"';
 ?>
 <div class="wrap page">
   <nav class="crumbs" aria-label="Migas de pan">
@@ -12,32 +17,30 @@ $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp_
   <?php if ($p['status'] === 'unlisted'): ?><p class="draft-note">Producto añadido por un visitante. Seguimos su precio, aunque todavía no aparece en las categorías.</p>
   <?php elseif ($p['status'] !== 'published'): ?><p class="draft-note">Borrador: solo lo ves tú porque has entrado en el panel.</p><?php endif; ?>
 
-  <div class="pp">
-    <div class="panel pp__gallery"><?php partial('thumb', ['p' => $p]); ?></div>
-
-    <div class="panel pp__info">
+  <div class="pp<?= $hasSide ? '' : ' pp--single' ?>">
+    <div class="pp__main">
       <h1><?= e($p['name']) ?></h1>
       <div class="pp__meta">
-        <?php if ($p['brand']): ?><span>Marca: <?= e($p['brand']) ?></span><?php endif; ?>
+        <?php if ($p['brand']): ?><span><?= e($p['brand']) ?></span><?php endif; ?>
         <?php if ($review): ?><a href="<?= e(post_url($review)) ?>"><span class="score"><?= e(number_format((float) $review['rating'], 1, ',', '')) ?><small>/10</small></span> Leer nuestra reseña</a><?php endif; ?>
-        <?php if ((int) $p['at_low'] && $best): ?><span class="badge badge--low">Mínimo histórico</span><?php endif; ?>
       </div>
 
-      <?php if ($best): ?>
-        <div class="pp__best">
-          <span>Mejor precio</span>
-          <strong><?= e(money($best['price'])) ?></strong>
-          <span>en <?= e($best['name']) ?></span>
-          <?php if ($best['list_price'] && $best['list_price'] > $best['price']): ?><s>PVP <?= e(money($best['list_price'])) ?></s><?php endif; ?>
+      <div class="verdict<?= $verdictClass ?>">
+        <span class="verdict__dot"></span>
+        <div><strong><?= e($verdict['label']) ?></strong><?= e($verdict['text']) ?></div>
+      </div>
+
+      <?php if ($single): ?>
+        <div class="buy">
+          <?php if ($single['price'] !== null): ?>
+            <div class="buy__price">
+              <strong><?= e(money($single['price'])) ?></strong>
+              <span>en <?= e($single['name']) ?>, <?= $single['manual'] ? 'visto el ' . e(date('d/m/Y', strtotime($single['at']))) : 'comprobado el ' . e(date_short($single['at'])) ?><?php if ($best && $best['list_price'] && $best['list_price'] > $best['price']): ?>. <s>PVP <?= e(money($best['list_price'])) ?></s><?php endif; ?></span>
+            </div>
+          <?php endif; ?>
+          <a class="btn btn--buy btn--lg" <?= $out($single, 'product') ?>><?= $single['price'] !== null ? 'Ver oferta en ' : 'Ver precio en ' ?><?= e($single['name']) ?></a>
         </div>
-      <?php endif; ?>
-
-      <div class="pp__verdict<?= $verdictClass ?>">
-        <strong><?= e($verdict['label']) ?></strong>
-        <?= e($verdict['text']) ?>
-      </div>
-
-      <?php if ($sorted): ?>
+      <?php elseif ($sorted): ?>
         <table class="offers">
           <thead><tr><th>Tienda</th><th>Precio</th><th><span class="visually-hidden">Comprar</span></th></tr></thead>
           <tbody>
@@ -51,37 +54,51 @@ $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp_
                 </span>
               </td>
               <td class="offers__price"><?= $o['price'] !== null ? e(money($o['price'])) : '' ?></td>
-              <td><a class="btn <?= $isBest ? 'btn--buy' : '' ?> btn--sm" href="<?= e($o['url']) ?>" rel="sponsored nofollow noopener" target="_blank" data-out data-product="<?= (int) $p['id'] ?>" data-store="<?= e($o['store']) ?>" data-from="product">Ir a la tienda</a></td>
+              <td><a class="btn <?= $isBest ? 'btn--buy' : '' ?> btn--sm" <?= $out($o, 'product') ?>>Ir a la tienda</a></td>
             </tr>
           <?php endforeach; ?>
           </tbody>
         </table>
-        <p class="fineprint">
-          <?php if (isset($offers['amazon']) && $offers['amazon']['price'] !== null): ?>El precio de Amazon puede haber cambiado desde la hora indicada; el válido es el que veas en la tienda al comprar. <?php endif; ?>
-          Enlaces de afiliado: si compras, cobramos una pequeña comisión y a ti te cuesta lo mismo.
-        </p>
       <?php else: ?>
         <p class="empty">Aún no hay tiendas enlazadas para este producto.</p>
       <?php endif; ?>
+      <?php if ($sorted): ?>
+        <p class="fineprint">
+          <?php if (isset($offers['amazon']) && $offers['amazon']['price'] !== null): ?>El precio de Amazon puede haber cambiado desde la hora indicada; el válido es el que veas en la tienda al comprar. <?php endif; ?>
+          Enlace de afiliado: si compras, cobramos una pequeña comisión y a ti te cuesta lo mismo.
+        </p>
+      <?php endif; ?>
+    </div>
 
-      <?php if (alerts_enabled()): $suggest = $best ? floor($best['price'] * 0.9) : null; ?>
+    <?php if ($hasSide): ?>
+    <aside class="pp__side">
+      <?php if ($img): ?><div class="pp__img"><img src="<?= e($img) ?>" alt="<?= e($p['name']) ?>"></div><?php endif; ?>
+      <?php if ($showAlert): $suggest = $best ? floor($best['price'] * 0.9) : null; ?>
         <form class="alert-box" method="post" action="<?= e(url('aviso')) ?>">
           <?= csrf_field() ?>
           <input type="hidden" name="producto" value="<?= (int) $p['id'] ?>">
           <label for="aviso-precio"><strong>Avísame por Telegram</strong> cuando baje de</label>
           <div class="alert-box__row">
-            <input id="aviso-precio" name="precio" inputmode="decimal" required placeholder="<?= $suggest ? e(number_format($suggest, 2, ',', '')) : '25,00' ?>" autocomplete="off">
+            <input class="field" id="aviso-precio" name="precio" inputmode="decimal" required placeholder="<?= $suggest ? e(number_format($suggest, 2, ',', '')) : '25,00' ?>" autocomplete="off">
             <span>€</span>
-            <button class="btn" type="submit">Crear aviso</button>
+            <button class="btn btn--blue" type="submit">Crear aviso</button>
           </div>
         </form>
       <?php endif; ?>
-    </div>
+      <?php if ($best): ?>
+        <?php partial('legend', ['class' => 'legend--side']); ?>
+      <?php endif; ?>
+      <?php if ($related): ?>
+        <h2 class="aside-title">Aparece en</h2>
+        <?php foreach ($related as $post): partial('mini-post', ['post' => $post]); endforeach; ?>
+      <?php endif; ?>
+    </aside>
+    <?php endif; ?>
   </div>
 
   <?php if ($chart['series']): ?>
-  <section class="panel" aria-labelledby="h-history">
-    <div class="panel__head chart-head">
+  <section class="chart-card" aria-labelledby="h-history">
+    <div class="chart-head">
       <h2 id="h-history">Historial de precios</h2>
       <div class="seg" role="group" aria-label="Periodo">
         <button type="button" data-range="30">1 mes</button>
@@ -89,36 +106,33 @@ $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp_
         <button type="button" data-range="180">6 meses</button>
       </div>
     </div>
-    <div class="panel__body">
-      <div class="chart-box"><canvas id="price-chart" role="img" aria-label="Historial de precios de <?= e($p['name']) ?>"></canvas></div>
-      <script type="application/json" id="price-data"><?= json_encode($chart, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?></script>
-      <?php if ($stats && $stats['current'] !== null): ?>
-        <p class="stats-caption">Resumen de <?= e(store_label($p, (string) $statsStore)) ?> en los últimos 6 meses</p>
-        <dl class="stats">
-          <div><dt>Precio actual</dt><dd><?= e(money($stats['current'])) ?></dd></div>
-          <div><dt>Media 90 días</dt><dd><?= e(money($stats['avg90'])) ?></dd></div>
-          <div><dt>Más bajo</dt><dd><?= e(money($stats['min'])) ?></dd></div>
-          <div><dt>Más alto</dt><dd><?= e(money($stats['max'])) ?></dd></div>
-        </dl>
-      <?php endif; ?>
-    </div>
+    <div class="chart-box"><canvas id="price-chart" role="img" aria-label="Historial de precios de <?= e($p['name']) ?>"></canvas></div>
+    <script type="application/json" id="price-data"><?= json_encode($chart, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?></script>
+    <p class="chart-key">El punto amarillo marca el precio más bajo del periodo.</p>
+    <?php if ($stats && $stats['current'] !== null): ?>
+      <p class="stats-caption">Resumen de <?= e(store_label($p, (string) $statsStore)) ?> en los últimos 6 meses</p>
+      <dl class="stats">
+        <div><dt>Precio actual</dt><dd><?= e(money($stats['current'])) ?></dd></div>
+        <div><dt>Media de 90 días</dt><dd><?= e(money($stats['avg90'])) ?></dd></div>
+        <div><dt>Más bajo</dt><dd><?= e(money($stats['min'])) ?></dd></div>
+        <div><dt>Más alto</dt><dd><?= e(money($stats['max'])) ?></dd></div>
+      </dl>
+    <?php endif; ?>
   </section>
   <?php endif; ?>
+  <?php if ($best): partial('legend', ['class' => 'legend--below']); endif; ?>
 
   <?php if ($p['summary']): ?>
-  <section class="panel">
-    <div class="panel__head"><h2>Descripción</h2></div>
-    <div class="panel__body prose"><?= render_markdown($p['summary']) ?></div>
+  <section class="block">
+    <h2>Descripción</h2>
+    <div class="prose"><?= render_markdown($p['summary']) ?></div>
   </section>
-  <?php endif; ?>
-
-  <?php if ($related): ?>
-    <div class="section-title"><h2>Reseñas y guías donde aparece</h2></div>
-    <div class="acards" style="margin-bottom: 24px"><?php foreach ($related as $post): partial('acard', ['post' => $post]); endforeach; ?></div>
   <?php endif; ?>
 
   <?php if ($similar): ?>
-    <div class="section-title"><h2>Productos parecidos</h2></div>
+  <section class="block">
+    <h2>Productos parecidos</h2>
     <div class="grid"><?php foreach ($similar as $s): partial('pcard', ['p' => $s]); endforeach; ?></div>
+  </section>
   <?php endif; ?>
 </div>

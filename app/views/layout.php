@@ -5,6 +5,14 @@ $path = request_path();
 $telegram = setting('telegram_url');
 $whatsapp = setting('whatsapp_url');
 $q = $path === '/buscar' ? (string) input('q', '') : '';
+$counts = site_counts();
+$isHome = $path === '/';
+$showCats = !$isHome && !preg_match('#^/(blog|comparativas|resenas|ofertas|buscar|seguir)$#', $path);
+$links = [];
+if ($counts['priced']) { $links[] = ['ofertas', 'Ofertas']; }
+$links[] = ['blog', 'Guías'];
+if ($counts['comparisons']) { $links[] = ['comparativas', 'Comparativas']; }
+if ($counts['reviews']) { $links[] = ['resenas', 'Reseñas']; }
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,86 +29,86 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
 <meta property="og:url" content="<?= e($meta['canonical']) ?>">
 <meta property="og:locale" content="es_ES">
 <?php if ($meta['image']): ?><meta property="og:image" content="<?= e($meta['image']) ?>"><?php endif; ?>
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#1F3FD8">
 <link rel="icon" href="<?= e(asset('img/icon.svg')) ?>" type="image/svg+xml">
+<link rel="preload" href="<?= e(url('assets/fonts/red-hat-display.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= e(url('assets/fonts/red-hat-text.woff2')) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= e(asset('css/site.css')) ?>">
 <?php foreach ($meta['jsonld'] as $ld): ?>
 <script type="application/ld+json"><?= json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
 <?php endforeach; ?>
 </head>
-<body>
+<body<?= $isHome ? ' class="is-home"' : '' ?>>
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <?php if (has_demo_content()): ?>
 <div class="demo-strip">Contenido de ejemplo con precios inventados. Bórralo desde el panel antes de publicar la web.</div>
 <?php endif; ?>
 
-<header class="site-header">
-  <div class="wrap site-header__bar">
-    <a class="brand" href="<?= e(url('')) ?>">
-      <span class="brand__mark"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9Z"/><circle cx="8" cy="8" r="1.6" fill="#fff" stroke="none"/></svg></span>
-      <span class="brand__name"><?= e(site_name()) ?></span>
-    </a>
-    <form class="header-search" action="<?= e(url('buscar')) ?>" method="get" role="search">
-      <label class="visually-hidden" for="hq">Buscar</label>
-      <input id="hq" name="q" type="search" value="<?= e($q) ?>" placeholder="Busca un producto o pega un enlace de Amazon" autocomplete="off">
-      <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
-    </form>
-    <nav class="header-links" aria-label="Secciones">
-      <?php if (site_counts()['priced']): ?><a href="<?= e(url('ofertas')) ?>"<?= str_starts_with($path, '/ofertas') ? ' aria-current="page"' : '' ?>>Ofertas</a><?php endif; ?>
-      <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>"<?= str_starts_with($path, '/resenas') ? ' aria-current="page"' : '' ?>>Reseñas</a><?php endif; ?>
-      <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>"<?= str_starts_with($path, '/comparativas') ? ' aria-current="page"' : '' ?>>Comparativas</a><?php endif; ?>
-      <a href="<?= e(url('blog')) ?>"<?= str_starts_with($path, '/blog') ? ' aria-current="page"' : '' ?>>Guías</a>
-      <a class="header-follow" href="<?= e(url('seguir')) ?>"<?= $path === '/seguir' ? ' aria-current="page"' : '' ?>>Seguir un precio</a>
-      <?php if ($telegram): ?><a class="btn-channel" href="<?= e($telegram) ?>" rel="noopener">Telegram</a><?php endif; ?>
+<header class="top">
+  <div class="wrap top__bar">
+    <?php partial('logo'); ?>
+    <nav class="top__nav" aria-label="Secciones">
+      <?php foreach ($links as [$href, $label]): ?>
+        <a href="<?= e(url($href)) ?>"<?= str_starts_with($path, '/' . $href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+      <?php endforeach; ?>
+      <?php if ($telegram): ?><a href="<?= e($telegram) ?>" rel="noopener">Telegram</a><?php endif; ?>
     </nav>
+    <form class="top__search" action="<?= e(url('buscar')) ?>" method="get" role="search">
+      <label class="visually-hidden" for="hq">Buscar un producto o pegar un enlace de Amazon</label>
+      <input id="hq" name="q" type="search" value="<?= e($q) ?>" placeholder="Busca o pega un enlace" autocomplete="off">
+      <button type="submit" aria-label="Buscar"><?= icon('magnifying-glass') ?></button>
+    </form>
+    <?php if ($path !== '/seguir'): ?><a class="btn btn--buy btn--sm top__cta" href="<?= e(url('seguir')) ?>">Seguir un precio</a><?php endif; ?>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menú</button>
   </div>
   <nav class="mobile-menu" id="mobile-menu" aria-label="Menú">
-    <?php if (site_counts()['priced']): ?><a href="<?= e(url('ofertas')) ?>">Ofertas</a><?php endif; ?>
-    <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>">Reseñas</a><?php endif; ?>
-    <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>">Comparativas</a><?php endif; ?>
-    <a href="<?= e(url('blog')) ?>">Guías de compra</a>
+    <form action="<?= e(url('buscar')) ?>" method="get" role="search">
+      <label class="visually-hidden" for="mq">Buscar</label>
+      <input class="field" id="mq" name="q" type="search" placeholder="Busca o pega un enlace de Amazon" autocomplete="off">
+      <button class="btn btn--buy" type="submit">Buscar</button>
+    </form>
     <a href="<?= e(url('seguir')) ?>">Seguir el precio de un producto</a>
+    <?php foreach ($links as [$href, $label]): ?><a href="<?= e(url($href)) ?>"><?= e($label === 'Guías' ? 'Guías de compra' : $label) ?></a><?php endforeach; ?>
+    <?php foreach ($niches as $n): ?><a href="<?= e(niche_url($n)) ?>"><?= e($n['name']) ?></a><?php endforeach; ?>
     <?php if ($telegram): ?><a href="<?= e($telegram) ?>" rel="noopener">Canal de Telegram</a><?php endif; ?>
   </nav>
-  <nav class="cat-bar" aria-label="Categorías">
-    <ul class="wrap">
-      <?php foreach ($niches as $n): ?>
-        <li><a href="<?= e(niche_url($n)) ?>"<?= $path === '/nicho/' . $n['slug'] ? ' aria-current="page"' : '' ?>><?= e($n['name']) ?></a></li>
-      <?php endforeach; ?>
-    </ul>
-  </nav>
 </header>
+<?php if ($showCats && $niches): ?>
+<nav class="cat-bar" aria-label="Categorías">
+  <ul class="wrap">
+    <?php foreach ($niches as $n): ?>
+      <li><a href="<?= e(niche_url($n)) ?>"<?= $path === '/nicho/' . $n['slug'] ? ' aria-current="page"' : '' ?>><?= e($n['name']) ?></a></li>
+    <?php endforeach; ?>
+  </ul>
+</nav>
+<?php endif; ?>
 
 <main id="contenido">
 <?= $content ?>
 </main>
 
-<footer class="site-footer">
-  <div class="wrap site-footer__grid">
-    <div class="site-footer__about">
-      <p class="site-footer__name"><?= e(site_name()) ?></p>
-      <p><?= e(setting('tagline', 'Historial de precios y reseñas para comprar en el mejor momento.')) ?></p>
+<footer class="foot">
+  <div class="wrap foot__grid">
+    <div class="foot__about">
+      <?php partial('logo'); ?>
+      <p><?= e(setting('tagline', 'Historial de precios y guías para comprar en el mejor momento.')) ?></p>
       <?php if ($telegram): ?><p><a href="<?= e($telegram) ?>" rel="noopener">Canal de Telegram</a></p><?php endif; ?>
       <?php if ($whatsapp): ?><p><a href="<?= e($whatsapp) ?>" rel="noopener">Canal de WhatsApp</a></p><?php endif; ?>
     </div>
     <div>
-      <p class="site-footer__title">Categorías</p>
+      <p class="foot__title">Categorías</p>
       <ul><?php foreach ($niches as $n): ?><li><a href="<?= e(niche_url($n)) ?>"><?= e($n['name']) ?></a></li><?php endforeach; ?></ul>
     </div>
     <div>
-      <p class="site-footer__title">Secciones</p>
+      <p class="foot__title">Secciones</p>
       <ul>
-        <?php if (site_counts()['priced']): ?><li><a href="<?= e(url('ofertas')) ?>">Ofertas</a></li><?php endif; ?>
-        <?php if (site_counts()['reviews']): ?><li><a href="<?= e(url('resenas')) ?>">Reseñas</a></li><?php endif; ?>
-        <?php if (site_counts()['comparisons']): ?><li><a href="<?= e(url('comparativas')) ?>">Comparativas</a></li><?php endif; ?>
-        <li><a href="<?= e(url('blog')) ?>">Guías de compra</a></li>
         <li><a href="<?= e(url('seguir')) ?>">Seguir un precio</a></li>
+        <?php foreach ($links as [$href, $label]): ?><li><a href="<?= e(url($href)) ?>"><?= e($label === 'Guías' ? 'Guías de compra' : $label) ?></a></li><?php endforeach; ?>
         <li><a href="<?= e(url('legal/afiliacion')) ?>">Cómo nos financiamos</a></li>
       </ul>
     </div>
     <div>
-      <p class="site-footer__title">Legal</p>
+      <p class="foot__title">Legal</p>
       <ul>
         <li><a href="<?= e(url('legal/aviso-legal')) ?>">Aviso legal</a></li>
         <li><a href="<?= e(url('legal/privacidad')) ?>">Privacidad</a></li>
@@ -108,7 +116,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
       </ul>
     </div>
   </div>
-  <div class="wrap site-footer__note">
+  <div class="wrap foot__note">
     <p>Como afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables. Los precios de Amazon se muestran con la fecha y hora de la última comprobación y pueden haber cambiado. Amazon y el logotipo de Amazon son marcas registradas de Amazon.com, Inc. o sus filiales.</p>
     <p>&copy; <?= date('Y') ?> <?= e(setting('legal_owner', site_name())) ?></p>
   </div>

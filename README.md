@@ -12,7 +12,7 @@ Web de historial de precios, reseñas y guías de compra, monetizada con enlaces
 - **Panel de administración** para nichos, productos, precios manuales de otras tiendas, artículos, ajustes y datos legales. Cuenta los clics a cada tienda.
 - **Recolector de precios** de Amazon con su API oficial (Creators API) y publicación automática de mínimos en tu canal de Telegram.
 - **Páginas legales** (aviso legal, privacidad, cookies y afiliación), sitemap.xml, robots.txt y datos estructurados para Google.
-- Sin cookies de terceros ni analítica: no hace falta banner de cookies. La gráfica usa una librería alojada en tu servidor y la letra es la del sistema de cada dispositivo.
+- Sin cookies de terceros ni analítica: no hace falta banner de cookies. La gráfica, la tipografía (Red Hat, licencia OFL) y los iconos (Phosphor, licencia MIT) están alojados en tu servidor.
 
 ## Requisitos
 

@@ -7,10 +7,12 @@ $email = setting('legal_email', '[correo de contacto]');
 $site = site_name();
 $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
 ?>
+<div class="page-head">
+  <div class="wrap"><h1><?= e($title) ?></h1></div>
+</div>
 <div class="wrap page">
-  <article class="art">
-  <header class="art__head"><h1><?= e($title) ?></h1></header>
-  <div class="art__body prose">
+  <article class="art--narrow">
+  <div class="prose">
 <?php if ($slug === 'aviso-legal'): ?>
     <p>En cumplimiento del artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico (LSSI), se informa de los datos del titular de <?= e($domain) ?>.</p>
     <ul>

@@ -7,13 +7,13 @@ $intro = match ($kind) {
     default => 'Consejos para elegir bien y no pagar de más.',
 };
 ?>
-<div class="wrap page">
-  <div class="list-head">
-    <div>
-      <h1><?= e($title) ?></h1>
-      <p><?= e($intro) ?></p>
-    </div>
+<div class="page-head">
+  <div class="wrap">
+    <h1><?= e($title) ?></h1>
+    <p><?= e($intro) ?></p>
   </div>
+</div>
+<div class="wrap page">
   <nav class="chips" aria-label="Categoría">
     <a href="<?= e(url($base)) ?>"<?= !$niche ? ' aria-current="page"' : '' ?>>Todas</a>
     <?php foreach (all_niches() as $n): ?>
@@ -21,12 +21,12 @@ $intro = match ($kind) {
     <?php endforeach; ?>
   </nav>
   <?php if ($posts): ?>
-    <div class="acards"><?php foreach ($posts as $post): partial('acard', ['post' => $post]); endforeach; ?></div>
+    <div class="acards<?= $page === 1 && count($posts) > 3 ? ' acards--lead' : '' ?>"><?php foreach ($posts as $post): partial('acard', ['post' => $post]); endforeach; ?></div>
   <?php else: ?>
-    <div class="panel"><p class="empty">Aún no hay nada publicado aquí.</p></div>
+    <p class="empty">Aún no hay nada publicado aquí.</p>
   <?php endif; ?>
   <?php if ($pages > 1): $q = $niche ? '&nicho=' . $niche['slug'] : ''; ?>
-    <nav class="pager panel" aria-label="Páginas" style="margin-top:16px">
+    <nav class="pager" aria-label="Páginas">
       <?php if ($page > 1): ?><a href="<?= e(url($base) . '?pagina=' . ($page - 1) . $q) ?>">Anterior</a><?php else: ?><span></span><?php endif; ?>
       <span>Página <?= $page ?> de <?= $pages ?></span>
       <?php if ($page < $pages): ?><a href="<?= e(url($base) . '?pagina=' . ($page + 1) . $q) ?>">Siguiente</a><?php else: ?><span></span><?php endif; ?>

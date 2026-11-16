@@ -1,19 +1,19 @@
 <?php
 /** @var string $q @var array $products @var array $posts @var ?string $follow @var bool $isLink */
 ?>
-<div class="wrap page">
-  <div class="list-head">
-    <div>
-      <h1><?= $q ? 'Resultados para «' . e($q) . '»' : 'Buscar' ?></h1>
-      <form class="search-page" action="<?= e(url('buscar')) ?>" method="get" role="search">
-        <label class="visually-hidden" for="sq">Buscar</label>
-        <input id="sq" name="q" type="search" value="<?= e($q) ?>" placeholder="Nombre del producto o enlace de Amazon">
-        <button type="submit">Buscar</button>
-      </form>
-    </div>
+<div class="page-head">
+  <div class="wrap">
+    <h1><?= $q ? 'Resultados para «' . e($q) . '»' : 'Buscar' ?></h1>
+    <form class="search-page" action="<?= e(url('buscar')) ?>" method="get" role="search">
+      <label class="visually-hidden" for="sq">Buscar</label>
+      <input class="field" id="sq" name="q" type="search" value="<?= e($q) ?>" placeholder="Nombre del producto o enlace de Amazon">
+      <button class="btn btn--blue" type="submit">Buscar</button>
+    </form>
   </div>
+</div>
+<div class="wrap page">
   <?php if ($follow): ?>
-    <div class="panel panel__body follow__done">
+    <div class="notice">
       <h2>Todavía no seguimos este producto</h2>
       <p>Si quieres, empezamos a seguir su precio ahora.</p>
       <form method="post" action="<?= e(url('seguir')) ?>">
@@ -23,17 +23,21 @@
       </form>
     </div>
   <?php elseif ($isLink): ?>
-    <div class="panel"><p class="empty">No encontramos un producto de Amazon en ese enlace. Prueba con el enlace de la página del producto.</p></div>
+    <p class="empty">No encontramos un producto de Amazon en ese enlace. Prueba con el enlace de la página del producto.</p>
   <?php endif; ?>
   <?php if ($q && !$products && !$posts && !$isLink): ?>
-    <div class="panel"><p class="empty">No hay resultados para «<?= e($q) ?>». Prueba con una palabra más general, como «luces» o «perfume».</p></div>
+    <p class="empty">No hay resultados para «<?= e($q) ?>». Prueba con una palabra más general, como «luces» o «perfume».</p>
   <?php endif; ?>
   <?php if ($products): ?>
-    <div class="section-title"><h2>Productos</h2></div>
-    <div class="grid" style="margin-bottom: 24px"><?php foreach ($products as $p): partial('pcard', ['p' => $p]); endforeach; ?></div>
+  <section class="block">
+    <h2>Productos</h2>
+    <div class="grid"><?php foreach ($products as $p): partial('pcard', ['p' => $p]); endforeach; ?></div>
+  </section>
   <?php endif; ?>
   <?php if ($posts): ?>
-    <div class="section-title"><h2>Reseñas y guías</h2></div>
+  <section class="block">
+    <h2>Guías y comparativas</h2>
     <div class="acards"><?php foreach ($posts as $post): partial('acard', ['post' => $post]); endforeach; ?></div>
+  </section>
   <?php endif; ?>
 </div>

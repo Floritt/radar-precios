@@ -357,3 +357,27 @@ small, .muted { color: var(--muted); }
 .toc a { color: var(--link); text-decoration: none; }
 .toc a:hover { text-decoration: underline; }
 .prose h2 { scroll-margin-top: 90px; }
+
+/* ---------- Seguir un producto y avisos ---------- */
+.follow { max-width: 760px; }
+.follow h1 { font-size: 30px; }
+.follow__lead { font-size: 17px; color: #3C4350; max-width: 62ch; }
+.follow__form label { display: block; font-weight: 700; margin-bottom: 6px; }
+.follow__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.follow__row input { flex: 1; min-width: 220px; font: inherit; padding: 11px 12px; border: 1px solid var(--border); border-radius: var(--radius); }
+.follow__row input[aria-invalid="true"] { border-color: var(--off-text); }
+.form-error { color: var(--off-text); font-weight: 600; margin: 8px 0 0; }
+.follow__done { border-left: 4px solid var(--low-text); }
+.follow__done h2 { font-size: 20px; }
+.follow__steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
+.follow__steps p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+@media (max-width: 640px) { .follow__steps { grid-template-columns: 1fr; } }
+.alert-box { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+.alert-box label { display: block; margin-bottom: 8px; }
+.alert-box__row { display: flex; align-items: center; gap: 8px; }
+.alert-box__row input { width: 120px; font: inherit; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius); text-align: right; }
+.header-follow { font-weight: 700; }
+.hook { border-left: 4px solid var(--brand); }
+.hook h1 { font-size: 28px; margin-bottom: 6px; }
+.hook p { color: #3C4350; max-width: 62ch; }
+.hook .follow__row { max-width: 720px; }

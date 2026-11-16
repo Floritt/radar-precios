@@ -100,7 +100,7 @@ function page_product(string $slug): void
          FROM products p LEFT JOIN niches n ON n.id = p.niche_id WHERE p.slug = ?',
         [$slug]
     );
-    if (!$p || ($p['status'] !== 'published' && !current_user())) {
+    if (!$p || (!in_array($p['status'], ['published', 'unlisted'], true) && !current_user())) {
         not_found();
     }
     $offers = product_offers($p);
@@ -244,20 +244,32 @@ function page_post(string $slug): void
 
 function page_search(): void
 {
-    $q = mb_substr((string) input('q', ''), 0, 80);
+    $raw = mb_substr(trim((string) input('q', '')), 0, 2000);
+    $isLink = (bool) preg_match('~(amazon\.[a-z.]+/|amzn\.(eu|to)/|a\.co/)~i', $raw);
+    $q = $isLink ? $raw : mb_substr($raw, 0, 80);
     $products = [];
     $posts = [];
+    $follow = null;
     if (mb_strlen($q) >= 2) {
-        $asin = extract_asin($q);
+        $asin = $isLink ? resolve_amazon_input($raw) : extract_asin($q);
+        if ($asin) {
+            $known = row("SELECT slug FROM products WHERE asin = ? AND status IN ('published', 'unlisted') ORDER BY status = 'published' DESC LIMIT 1", [$asin]);
+            if ($known) {
+                redirect('producto/' . $known['slug']);
+            }
+            $follow = $asin;
+        }
         $like = '%' . $q . '%';
         $products = $asin
             ? product_list('p.asin = ?', [$asin], 'p.name', 24)
             : product_list('(p.name LIKE ? OR p.brand LIKE ? OR n.name LIKE ?)', [$like, $like, $like], 'p.name', 24);
-        $posts = published_posts('(po.title LIKE ? OR po.excerpt LIKE ?)', [$like, $like], 12);
+        $posts = $isLink ? [] : published_posts('(po.title LIKE ? OR po.excerpt LIKE ?)', [$like, $like], 12);
     }
     render('search', [
-        'meta' => meta(['title' => $q ? 'Resultados para «' . $q . '»' : 'Buscar', 'noindex' => true]),
-        'q' => $q,
+        'meta' => meta(['title' => $isLink ? 'Seguir un producto' : ($q ? 'Resultados para «' . $q . '»' : 'Buscar'), 'noindex' => true]),
+        'q' => $isLink ? '' : $q,
+        'follow' => $follow,
+        'isLink' => $isLink,
         'products' => $products,
         'posts' => $posts,
     ]);
@@ -342,4 +354,91 @@ function task_prices(): void
     header('Content-Type: text/plain; charset=utf-8');
     header('X-Robots-Tag: noindex');
     echo run_price_update();
+}
+
+
+/** "Pega un enlace de Amazon y lo seguimos". */
+function page_follow(): void
+{
+    $result = null;
+    $error = null;
+    $value = '';
+    if (is_post()) {
+        csrf_check();
+        $value = mb_substr(trim((string) input('enlace', '')), 0, 2000);
+        $asin = resolve_amazon_input($value);
+        if (!$asin) {
+            $error = 'No encontramos un producto de Amazon en ese enlace. Copia el enlace de la página del producto, o el que te da el botón Compartir de la app de Amazon.';
+        } elseif (rate_limited('follow', 15, 3600)) {
+            $error = 'Has añadido muchos productos seguidos. Espera un rato y vuelve a intentarlo.';
+        } else {
+            $result = request_tracking($asin);
+            if ($result['product']) {
+                redirect('producto/' . $result['product']['slug']);
+            }
+            if ($result['status'] === 'error') {
+                $error = $result['message'];
+                $result = null;
+            }
+        }
+    }
+    header('X-Robots-Tag: noindex');
+    render('follow', [
+        'meta' => meta(['title' => 'Seguir el precio de un producto de Amazon', 'description' => 'Pega el enlace de cualquier producto de Amazon.es y te enseñamos cómo cambia su precio. Te avisamos por Telegram cuando baje.', 'noindex' => true]),
+        'result' => $result,
+        'error' => $error,
+        'value' => $value,
+    ]);
+}
+
+/** Crea un aviso de precio y manda al visitante a Telegram para activarlo. */
+function action_alert(): void
+{
+    csrf_check();
+    if (!alerts_enabled()) {
+        not_found();
+    }
+    $p = row("SELECT * FROM products WHERE id = ? AND status IN ('published', 'unlisted')", [(int) input('producto', '0')]);
+    if (!$p) {
+        not_found();
+    }
+    $raw = str_replace([' ', '€'], '', (string) input('precio', ''));
+    $raw = str_contains($raw, ',') ? str_replace(['.', ','], ['', '.'], $raw) : $raw;
+    $target = is_numeric($raw) ? (float) $raw : 0.0;
+    $error = null;
+    if ($target <= 0 || $target > 100000) {
+        $error = 'Escribe el precio al que quieres comprarlo, por ejemplo 24,99.';
+    } elseif (rate_limited('alert', 20, 86400)) {
+        $error = 'Has creado muchos avisos hoy. Vuelve a intentarlo mañana.';
+    }
+    $code = $error ? null : create_alert((int) $p['id'], $target);
+    header('X-Robots-Tag: noindex');
+    render('alert-created', [
+        'meta' => meta(['title' => 'Activa tu aviso de precio', 'noindex' => true]),
+        'p' => $p,
+        'target' => $target,
+        'error' => $error,
+        'startUrl' => $code ? alert_start_url($code) : null,
+    ]);
+}
+
+/** Mensajes que Telegram envía al bot. */
+function telegram_webhook(string $secret): void
+{
+    $expected = setting('telegram_webhook_secret');
+    $header = (string) ($_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '');
+    if ($expected === '' || !hash_equals($expected, $secret) || !hash_equals($expected, $header)) {
+        http_response_code(403);
+        exit;
+    }
+    $update = json_decode((string) file_get_contents('php://input'), true);
+    if (is_array($update)) {
+        try {
+            handle_telegram_update($update);
+        } catch (Throwable $e) {
+            log_line('telegram', 'Webhook: ' . $e->getMessage());
+        }
+    }
+    header('Content-Type: text/plain');
+    echo 'ok';
 }

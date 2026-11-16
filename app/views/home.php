@@ -5,15 +5,21 @@ $telegram = setting('telegram_url');
 $hasProducts = (bool) $deals;
 ?>
 <div class="wrap page">
+  <section class="panel hook">
+    <div class="panel__body">
+      <h1>Sigue el precio de cualquier producto de Amazon</h1>
+      <p>Pega el enlace y te enseñamos cómo cambia su precio. Si quieres, te avisamos por Telegram cuando baje al precio que tú digas.</p>
+      <form class="follow__row" method="post" action="<?= e(url('seguir')) ?>">
+        <?= csrf_field() ?>
+        <label class="visually-hidden" for="hook-link">Enlace de Amazon</label>
+        <input id="hook-link" name="enlace" type="url" inputmode="url" required placeholder="https://www.amazon.es/dp/... o https://amzn.eu/d/..." autocomplete="off">
+        <button class="btn btn--buy" type="submit">Seguir precio</button>
+      </form>
+    </div>
+  </section>
   <div class="layout">
     <div>
       <?php if (!$hasProducts): ?>
-      <section class="panel intro-panel">
-        <div class="panel__body">
-          <h1>Guías y comparativas para acertar con los regalos de Navidad</h1>
-          <p class="muted">Qué mirar antes de comprar cada tipo de regalo, en qué se diferencian los productos parecidos y cómo saber si una oferta es de verdad.</p>
-        </div>
-      </section>
       <?php if ($popular): ?>
         <div class="section-title"><h2>Regalos que seguimos</h2></div>
         <div class="grid" style="margin-bottom: 24px"><?php foreach ($popular as $p): partial('pcard', ['p' => $p]); endforeach; ?></div>
@@ -25,7 +31,7 @@ $hasProducts = (bool) $deals;
       <?php else: ?>
       <section class="panel" aria-labelledby="h-deals">
         <div class="panel__head">
-          <h1 id="h-deals">Bajadas de precio de hoy</h1>
+          <h2 id="h-deals">Bajadas de precio de hoy</h2>
           <nav class="tabs" aria-label="Filtrar ofertas">
             <a href="<?= e(url('ofertas')) ?>">Todas</a>
             <a href="<?= e(url('ofertas?tipo=minimos')) ?>">Mínimos históricos</a>

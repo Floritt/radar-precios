@@ -98,6 +98,13 @@ function admin_dashboard(): void
         'amazonOn' => amazon_enabled(),
         'telegramOn' => telegram_enabled(),
         'pendingAsin' => (int) val("SELECT COUNT(*) FROM products WHERE asin IS NOT NULL AND asin <> '' AND amazon_checked_at IS NULL"),
+        'alertsOn' => alerts_enabled(),
+        'alertCounts' => [
+            'active' => (int) val("SELECT COUNT(*) FROM alerts WHERE status = 'active'"),
+            'sent' => (int) val("SELECT COUNT(*) FROM alerts WHERE status = 'sent' AND sent_at > ?", [$since]),
+        ],
+        'requests' => rows("SELECT * FROM track_requests WHERE status IN ('pending', 'error') ORDER BY requests DESC, created_at DESC LIMIT 15"),
+        'unlisted' => rows("SELECT id, name, slug, asin, created_at FROM products WHERE status = 'unlisted' ORDER BY created_at DESC LIMIT 15"),
     ]);
 }
 
@@ -233,7 +240,7 @@ function admin_product_edit(string $id): void
             'other_name' => mb_substr((string) input('other_name'), 0, 80) ?: null,
             'other_url' => clean_url((string) input('other_url')),
             'track' => input('track') ? 1 : 0,
-            'status' => input('status') === 'published' ? 'published' : 'draft',
+            'status' => in_array(input('status'), ['published', 'unlisted'], true) ? (string) input('status') : 'draft',
             'updated_at' => now(),
         ];
         if ($data['name'] === '') {
@@ -471,6 +478,7 @@ const SETTING_FIELDS = [
     'default_author' => 'Autor por defecto de los artículos',
     'amazon_tag' => 'ID de seguimiento de Amazon Afiliados',
     'telegram_url' => 'Enlace a tu canal de Telegram',
+    'telegram_channel' => 'Canal donde el bot publica los mínimos',
     'whatsapp_url' => 'Enlace a tu canal de WhatsApp',
     'legal_owner' => 'Titular (nombre y apellidos o razón social)',
     'legal_nif' => 'NIF',
@@ -490,6 +498,18 @@ function admin_settings(): void
         }
         foreach (array_keys(SETTING_FIELDS) as $k) {
             save_setting($k, mb_substr(trim((string) input($k)), 0, 600));
+        }
+        // El token del bot solo se cambia si se escribe uno nuevo; nunca se vuelve a mostrar.
+        $token = trim((string) ($_POST['telegram_bot_token'] ?? ''));
+        if ($token !== '') {
+            if (!preg_match('/^\d{5,15}:[A-Za-z0-9_-]{30,60}$/', $token)) {
+                flash('El token del bot no tiene el formato que da BotFather (números, dos puntos y letras). El resto de ajustes sí se ha guardado.', 'error');
+                redirect('admin/ajustes');
+            }
+            save_setting('telegram_bot_token', $token);
+            save_setting('telegram_bot_username', '');
+            flash('Ajustes guardados. Ahora pulsa "Conectar el bot" para activar los avisos.');
+            redirect('admin/ajustes');
         }
         flash('Ajustes guardados.');
         redirect('admin/ajustes');
@@ -521,4 +541,22 @@ function admin_account(): void
         }
     }
     admin_render('account', ['errors' => $errors]);
+}
+
+
+function admin_telegram_connect(): void
+{
+    require_login();
+    csrf_check();
+    if (telegram_bot_token() === '') {
+        flash('Primero pega el token del bot en Ajustes y guarda.', 'error');
+        redirect('admin/ajustes');
+    }
+    try {
+        $username = telegram_connect_bot();
+        flash('Bot @' . $username . ' conectado. Los avisos de precio ya aparecen en las fichas.');
+    } catch (Throwable $e) {
+        flash('Telegram no ha aceptado la conexión: ' . $e->getMessage(), 'error');
+    }
+    redirect('admin/ajustes');
 }

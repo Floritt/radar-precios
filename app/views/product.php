@@ -9,7 +9,8 @@ $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp_
     <a href="<?= e(url('')) ?>">Inicio</a>
     <?php if ($p['niche_name']): ?> / <a href="<?= e(url('nicho/' . $p['niche_slug'])) ?>"><?= e($p['niche_name']) ?></a><?php endif; ?>
   </nav>
-  <?php if ($p['status'] !== 'published'): ?><p class="draft-note">Borrador: solo lo ves tú porque has entrado en el panel.</p><?php endif; ?>
+  <?php if ($p['status'] === 'unlisted'): ?><p class="draft-note">Producto añadido por un visitante. Seguimos su precio, aunque todavía no aparece en las categorías.</p>
+  <?php elseif ($p['status'] !== 'published'): ?><p class="draft-note">Borrador: solo lo ves tú porque has entrado en el panel.</p><?php endif; ?>
 
   <div class="pp">
     <div class="panel pp__gallery"><?php partial('thumb', ['p' => $p]); ?></div>
@@ -61,6 +62,19 @@ $verdictClass = in_array($verdict['key'], ['low', 'good', 'high'], true) ? ' pp_
         </p>
       <?php else: ?>
         <p class="empty">Aún no hay tiendas enlazadas para este producto.</p>
+      <?php endif; ?>
+
+      <?php if (alerts_enabled()): $suggest = $best ? floor($best['price'] * 0.9) : null; ?>
+        <form class="alert-box" method="post" action="<?= e(url('aviso')) ?>">
+          <?= csrf_field() ?>
+          <input type="hidden" name="producto" value="<?= (int) $p['id'] ?>">
+          <label for="aviso-precio"><strong>Avísame por Telegram</strong> cuando baje de</label>
+          <div class="alert-box__row">
+            <input id="aviso-precio" name="precio" inputmode="decimal" required placeholder="<?= $suggest ? e(number_format($suggest, 2, ',', '')) : '25,00' ?>" autocomplete="off">
+            <span>€</span>
+            <button class="btn" type="submit">Crear aviso</button>
+          </div>
+        </form>
       <?php endif; ?>
     </div>
   </div>

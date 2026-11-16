@@ -24,7 +24,8 @@ function require_login(): array
 
 function client_ip_hash(): string
 {
-    return hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . '|rp');
+    // HMAC con la clave secreta de la instalación: el código es público y una sal fija se podría revertir.
+    return hash_hmac('sha256', (string) ($_SERVER['REMOTE_ADDR'] ?? ''), (string) config('cron_key', 'rp'));
 }
 
 function too_many_attempts(): bool

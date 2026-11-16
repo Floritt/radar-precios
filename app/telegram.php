@@ -3,15 +3,22 @@ declare(strict_types=1);
 
 function telegram_enabled(): bool
 {
-    return (bool) config('telegram.enabled') && config('telegram.bot_token') && config('telegram.chat_id');
+    return telegram_bot_token() !== '' && telegram_channel() !== ''
+        && (setting('telegram_channel') !== '' || (bool) config('telegram.enabled'));
+}
+
+/** Canal donde se publican los mínimos: el de Ajustes del panel o, si está vacío, el de config.php. */
+function telegram_channel(): string
+{
+    return setting('telegram_channel') ?: (string) config('telegram.chat_id', '');
 }
 
 function telegram_send(string $html): bool
 {
-    $url = 'https://api.telegram.org/bot' . config('telegram.bot_token') . '/sendMessage';
+    $url = 'https://api.telegram.org/bot' . telegram_bot_token() . '/sendMessage';
     try {
         $res = http_json($url, [], [
-            'chat_id' => config('telegram.chat_id'),
+            'chat_id' => telegram_channel(),
             'text' => $html,
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => false,

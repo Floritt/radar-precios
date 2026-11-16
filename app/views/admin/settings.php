@@ -20,6 +20,13 @@
     <p class="muted">Los enlaces de Temu, Shein y otras tiendas se pegan ya con tu código de afiliado en cada producto.</p>
   </section>
   <section class="card">
+    <h2>Bot de Telegram: avisos de precio</h2>
+    <p class="muted">Con el bot, los visitantes pueden pedir que les avises cuando un producto baje de un precio. Crea el bot hablando con <strong>@BotFather</strong> en Telegram (comando /newbot) y pega aquí el token que te da.</p>
+    <label>Token del bot <small><?= telegram_bot_token() !== '' ? 'Ya hay un token guardado. Déjalo vacío para mantenerlo.' : 'Todavía no hay ningún token guardado.' ?></small><input type="password" name="telegram_bot_token" autocomplete="off" placeholder="<?= telegram_bot_token() !== '' ? '••••••••' : '123456789:AA...' ?>"></label>
+    <p><?= telegram_bot_username() !== '' ? 'Bot conectado: <strong>@' . e(telegram_bot_username()) . '</strong>' : 'Bot sin conectar.' ?></p>
+    <label><?= e(SETTING_FIELDS['telegram_channel']) ?> <small>Opcional. El @nombre de tu canal, con el bot añadido como administrador.</small><input name="telegram_channel" value="<?= e($values['telegram_channel']) ?>" placeholder="@tucanal"></label>
+  </section>
+  <section class="card">
     <h2>Canales</h2>
     <p class="muted">Si los rellenas, aparecen en la portada y en el pie.</p>
     <?php foreach (['telegram_url', 'whatsapp_url'] as $k): ?>
@@ -35,6 +42,13 @@
   </section>
   <div class="actions"><button class="btn btn--primary" type="submit">Guardar ajustes</button></div>
 </form>
+<?php if (telegram_bot_token() !== ''): ?>
+<section class="card">
+  <h2>Conectar el bot</h2>
+  <p>Pulsa después de guardar un token nuevo. Le dice a Telegram que envíe a esta web los mensajes del bot.</p>
+  <form method="post" action="<?= e(url('admin/telegram/conectar')) ?>"><?= csrf_field() ?><button class="btn" type="submit">Conectar el bot</button></form>
+</section>
+<?php endif; ?>
 <section class="card">
   <h2>Claves y conexiones</h2>
   <p>Las claves de Amazon, Telegram y la base de datos están en el archivo <code>config.php</code> del servidor, no aquí, para que nunca se vean desde el navegador. El README explica cada una.</p>

@@ -234,7 +234,8 @@ function csrf_check(): void
 {
     start_session();
     $sent = (string) ($_POST['_csrf'] ?? '');
-    if (!hash_equals($_SESSION['csrf'] ?? '', $sent)) {
+    $expected = (string) ($_SESSION['csrf'] ?? '');
+    if ($expected === '' || $sent === '' || !hash_equals($expected, $sent)) {
         http_response_code(419);
         exit('La sesión ha caducado. Vuelve atrás, recarga la página y repite la acción.');
     }

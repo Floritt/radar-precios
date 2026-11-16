@@ -47,5 +47,8 @@ require APP . '/auth.php';
 require APP . '/prices.php';
 require APP . '/amazon.php';
 require APP . '/telegram.php';
+require APP . '/alerts.php';
+require APP . '/tracking.php';
+require APP . '/migrate.php';
 require APP . '/markdown.php';
 require APP . '/seo.php';

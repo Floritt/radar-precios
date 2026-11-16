@@ -20,6 +20,9 @@ function run_price_update(int $maxProducts = 0): string
     $announced = 0;
     $problems = [];
 
+    ensure_schema();
+    $fromQueue = process_track_requests();
+
     if (amazon_enabled()) {
         $limit = $maxProducts ?: (int) config('amazon.max_per_run', 600);
         $products = rows(
@@ -69,9 +72,11 @@ function run_price_update(int $maxProducts = 0): string
         refresh_product_stats((int) $r['id']);
     }
 
+    $alertsSent = check_alerts();
+
     $summary = amazon_enabled()
-        ? sprintf('%d productos consultados en Amazon, %d con precio, %d publicados en Telegram.', $checked, $withPrice, $announced)
-        : 'Conexión con Amazon desactivada: solo se han recalculado los resúmenes.';
+        ? sprintf('%d productos consultados en Amazon, %d con precio, %d publicados en Telegram, %d fichas nuevas pedidas por visitantes, %d avisos enviados.', $checked, $withPrice, $announced, $fromQueue, $alertsSent)
+        : sprintf('Conexión con Amazon desactivada: solo se han recalculado los resúmenes. %d avisos enviados.', $alertsSent);
     if ($problems) {
         $summary .= ' Avisos: ' . excerpt(implode(' | ', array_unique($problems)), 300);
     }

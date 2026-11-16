@@ -42,7 +42,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     </a>
     <form class="header-search" action="<?= e(url('buscar')) ?>" method="get" role="search">
       <label class="visually-hidden" for="hq">Buscar</label>
-      <input id="hq" name="q" type="search" value="<?= e($q) ?>" placeholder="Buscar productos o pegar un enlace de Amazon" autocomplete="off">
+      <input id="hq" name="q" type="search" value="<?= e($q) ?>" placeholder="Busca un producto o pega un enlace de Amazon" autocomplete="off">
       <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     </form>
     <nav class="header-links" aria-label="Secciones">
@@ -50,6 +50,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
       <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>"<?= str_starts_with($path, '/resenas') ? ' aria-current="page"' : '' ?>>Reseñas</a><?php endif; ?>
       <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>"<?= str_starts_with($path, '/comparativas') ? ' aria-current="page"' : '' ?>>Comparativas</a><?php endif; ?>
       <a href="<?= e(url('blog')) ?>"<?= str_starts_with($path, '/blog') ? ' aria-current="page"' : '' ?>>Guías</a>
+      <a class="header-follow" href="<?= e(url('seguir')) ?>"<?= $path === '/seguir' ? ' aria-current="page"' : '' ?>>Seguir un precio</a>
       <?php if ($telegram): ?><a class="btn-channel" href="<?= e($telegram) ?>" rel="noopener">Telegram</a><?php endif; ?>
     </nav>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menú</button>
@@ -59,6 +60,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
     <?php if (site_counts()['reviews']): ?><a href="<?= e(url('resenas')) ?>">Reseñas</a><?php endif; ?>
     <?php if (site_counts()['comparisons']): ?><a href="<?= e(url('comparativas')) ?>">Comparativas</a><?php endif; ?>
     <a href="<?= e(url('blog')) ?>">Guías de compra</a>
+    <a href="<?= e(url('seguir')) ?>">Seguir el precio de un producto</a>
     <?php if ($telegram): ?><a href="<?= e($telegram) ?>" rel="noopener">Canal de Telegram</a><?php endif; ?>
   </nav>
   <nav class="cat-bar" aria-label="Categorías">
@@ -93,6 +95,7 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
         <?php if (site_counts()['reviews']): ?><li><a href="<?= e(url('resenas')) ?>">Reseñas</a></li><?php endif; ?>
         <?php if (site_counts()['comparisons']): ?><li><a href="<?= e(url('comparativas')) ?>">Comparativas</a></li><?php endif; ?>
         <li><a href="<?= e(url('blog')) ?>">Guías de compra</a></li>
+        <li><a href="<?= e(url('seguir')) ?>">Seguir un precio</a></li>
         <li><a href="<?= e(url('legal/afiliacion')) ?>">Cómo nos financiamos</a></li>
       </ul>
     </div>

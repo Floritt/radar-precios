@@ -45,6 +45,10 @@ $domain = parse_url((string) config('base_url'), PHP_URL_HOST) ?: 'esta web';
     <p>El interés legítimo en mantener la web segura (registros técnicos) y tu consentimiento cuando nos escribes.</p>
     <h2>Tiendas enlazadas</h2>
     <p>Al pulsar un enlace a Amazon, Temu, Shein u otra tienda, sales de esta web. A partir de ahí se aplica la política de privacidad de esa tienda.</p>
+    <h2>Avisos de precio por Telegram</h2>
+    <p>Si creas un aviso de precio, guardamos el producto, el precio que has elegido y el identificador de tu chat de Telegram, solo para poder enviarte ese aviso. La base legal es tu consentimiento, que das al activar el aviso en nuestro bot. Puedes retirarlo cuando quieras escribiendo /parar al bot, y tus avisos se cancelan. Los avisos sin activar se borran a los 7 días.</p>
+    <h2>Productos que nos pides seguir</h2>
+    <p>Cuando pegas un enlace de Amazon para que sigamos su precio, guardamos el código del producto. No lo asociamos a ti. Para evitar abusos, guardamos durante 48 horas una huella cifrada de tu dirección IP que no permite identificarte.</p>
     <h2>Tus derechos</h2>
     <p>Puedes pedir acceso, rectificación, supresión, oposición, limitación o portabilidad de tus datos escribiendo a <?= e($email) ?>. Si crees que no hemos atendido bien tu solicitud, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
 

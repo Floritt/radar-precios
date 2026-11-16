@@ -55,7 +55,8 @@
   <section class="card">
     <h2>Publicación</h2>
     <label class="check"><input type="checkbox" name="track" value="1"<?= $p['track'] ? ' checked' : '' ?>> Seguir el precio de Amazon cada día</label>
-    <label class="check"><input type="radio" name="status" value="draft"<?= $p['status'] !== 'published' ? ' checked' : '' ?>> Borrador: solo lo ves tú</label>
+    <label class="check"><input type="radio" name="status" value="draft"<?= !in_array($p['status'], ['published', 'unlisted'], true) ? ' checked' : '' ?>> Borrador: solo lo ves tú</label>
+    <label class="check"><input type="radio" name="status" value="unlisted"<?= $p['status'] === 'unlisted' ? ' checked' : '' ?>> Oculto: se ve con el enlace, pero no en categorías ni en Google</label>
     <label class="check"><input type="radio" name="status" value="published"<?= $p['status'] === 'published' ? ' checked' : '' ?>> Publicado en la web</label>
   </section>
 

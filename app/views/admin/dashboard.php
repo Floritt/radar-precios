@@ -1,4 +1,4 @@
-<?php /** @var array $counts @var array $topClicks @var array $lows @var string $lastCron @var string $lastCronResult @var bool $demo @var bool $amazonOn @var bool $telegramOn @var int $pendingAsin */ ?>
+<?php /** @var array $counts @var array $topClicks @var array $lows @var string $lastCron @var string $lastCronResult @var bool $demo @var bool $amazonOn @var bool $telegramOn @var int $pendingAsin @var bool $alertsOn @var array $alertCounts @var array $requests @var array $unlisted */ ?>
 <h1>Escritorio</h1>
 
 <?php if ($demo): ?>
@@ -28,6 +28,9 @@
         <?php if ($amazonOn && $pendingAsin): ?><?= $pendingAsin ?> productos esperan su primera consulta.<?php endif; ?>
       </li>
       <li class="<?= $telegramOn ? 'ok' : 'off' ?>"><strong>Canal de Telegram:</strong> <?= $telegramOn ? 'activado' : 'desactivado' ?>.</li>
+      <li class="<?= $alertsOn ? 'ok' : 'off' ?>"><strong>Avisos de precio:</strong>
+        <?= $alertsOn ? $alertCounts['active'] . ' avisos activos, ' . $alertCounts['sent'] . ' enviados en 30 días.' : 'desactivados. Pega el token de tu bot en Ajustes y pulsa Conectar.' ?>
+      </li>
       <li class="<?= $lastCron ? 'ok' : 'off' ?>"><strong>Recolector de precios:</strong>
         <?= $lastCron ? 'última ejecución el ' . e(date_short($lastCron)) . '. ' . e($lastCronResult) : 'todavía no se ha ejecutado. Programa la tarea cron (lo explica el README).' ?>
       </li>
@@ -66,3 +69,30 @@
     <li><a href="<?= e(url('admin/ajustes')) ?>">Completar tus datos legales</a></li>
   </ul>
 </section>
+
+<?php if ($requests || $unlisted): ?>
+<div class="cols">
+  <?php if ($unlisted): ?>
+  <section class="card">
+    <h2>Añadidos por visitantes</h2>
+    <p class="muted">Fichas creadas al pegar un enlace. Se ven y se siguen, pero no salen en categorías. Ábrelas, ponles categoría y publícalas si te interesan.</p>
+    <table class="table"><thead><tr><th>Producto</th><th>Añadido</th></tr></thead><tbody>
+      <?php foreach ($unlisted as $u): ?>
+        <tr><td><a href="<?= e(url('admin/productos/' . $u['id'])) ?>"><?= e($u['name']) ?></a></td><td><?= e(date_short($u['created_at'])) ?></td></tr>
+      <?php endforeach; ?>
+    </tbody></table>
+  </section>
+  <?php endif; ?>
+  <?php if ($requests): ?>
+  <section class="card">
+    <h2>Peticiones en espera</h2>
+    <p class="muted">Enlaces pegados por visitantes mientras la API de Amazon no está activa. Se convierten en fichas solas cuando la actives.</p>
+    <table class="table"><thead><tr><th>ASIN</th><th class="r">Veces</th><th>Estado</th></tr></thead><tbody>
+      <?php foreach ($requests as $r): ?>
+        <tr><td><a href="https://www.amazon.es/dp/<?= e($r['asin']) ?>" rel="noopener" target="_blank"><?= e($r['asin']) ?></a></td><td class="r"><?= (int) $r['requests'] ?></td><td><?= $r['status'] === 'error' ? e($r['error'] ?: 'Error') : 'Pendiente' ?></td></tr>
+      <?php endforeach; ?>
+    </tbody></table>
+  </section>
+  <?php endif; ?>
+</div>
+<?php endif; ?>

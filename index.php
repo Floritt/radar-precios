@@ -6,6 +6,11 @@ require APP . '/controllers/public.php';
 require APP . '/controllers/admin.php';
 
 send_security_headers();
+try {
+    ensure_schema();
+} catch (Throwable $e) {
+    log_line('db', 'Migración: ' . $e->getMessage());
+}
 
 $routes = [
     // Público
@@ -20,6 +25,9 @@ $routes = [
     ['GET', '#^/resenas$#', 'page_reviews'],
     ['GET', '#^/resenas/([a-z0-9\-]+)$#', 'page_post'],
     ['GET', '#^/buscar$#', 'page_search'],
+    ['GET|POST', '#^/seguir$#', 'page_follow'],
+    ['POST', '#^/aviso$#', 'action_alert'],
+    ['POST', '#^/telegram/([a-f0-9]{32})$#', 'telegram_webhook'],
     ['GET', '#^/legal/([a-z\-]+)$#', 'page_legal'],
     ['GET', '#^/sitemap\.xml$#', 'page_sitemap'],
     ['GET', '#^/robots\.txt$#', 'page_robots'],
@@ -44,6 +52,7 @@ $routes = [
     ['GET|POST', '#^/admin/articulos/(nuevo|\d+)$#', 'admin_post_edit'],
     ['POST', '#^/admin/articulos/(\d+)/borrar$#', 'admin_post_delete'],
     ['GET|POST', '#^/admin/ajustes$#', 'admin_settings'],
+    ['POST', '#^/admin/telegram/conectar$#', 'admin_telegram_connect'],
     ['GET|POST', '#^/admin/cuenta$#', 'admin_account'],
     ['POST', '#^/admin/ejemplo/borrar$#', 'admin_demo_delete'],
 ];

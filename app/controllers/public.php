@@ -384,14 +384,14 @@ function page_follow(): void
     }
     header('X-Robots-Tag: noindex');
     render('follow', [
-        'meta' => meta(['title' => 'Seguir el precio de un producto de Amazon', 'description' => 'Pega el enlace de cualquier producto de Amazon.es y te enseñamos cómo cambia su precio. Te avisamos por Telegram cuando baje.', 'noindex' => true]),
+        'meta' => meta(['title' => 'Seguir el precio de un producto de Amazon', 'description' => 'Pega el enlace de cualquier producto de Amazon.es y te enseñamos cómo cambia su precio. ', 'noindex' => true]),
         'result' => $result,
         'error' => $error,
         'value' => $value,
     ]);
 }
 
-/** Crea un aviso de precio y manda al visitante a Telegram para activarlo. */
+/** Crea un aviso de precio. Por correo hay que confirmarlo desde un enlace; por Telegram se activa en el bot. */
 function action_alert(): void
 {
     csrf_check();
@@ -402,23 +402,81 @@ function action_alert(): void
     if (!$p) {
         not_found();
     }
+    $byMail = mail_enabled() && (input('canal', 'correo') !== 'telegram' || !telegram_alerts_enabled());
     $raw = str_replace([' ', '€'], '', (string) input('precio', ''));
     $raw = str_contains($raw, ',') ? str_replace(['.', ','], ['', '.'], $raw) : $raw;
     $target = is_numeric($raw) ? (float) $raw : 0.0;
+    $email = mb_strtolower(trim(mb_substr((string) input('correo', ''), 0, 190)));
     $error = null;
+    $startUrl = null;
+    $needsConfirm = true;
     if ($target <= 0 || $target > 100000) {
         $error = 'Escribe el precio al que quieres comprarlo, por ejemplo 24,99.';
+    } elseif ($byMail && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Escribe un correo válido para poder avisarte.';
     } elseif (rate_limited('alert', 20, 86400)) {
         $error = 'Has creado muchos avisos hoy. Vuelve a intentarlo mañana.';
+    } elseif ($byMail) {
+        $made = create_email_alert((int) $p['id'], $target, $email);
+        if (!$made) {
+            $error = 'Ese correo ya tiene muchos avisos activos. Borra alguno desde el enlace que hay en nuestros correos.';
+        } else {
+            [$code, $needsConfirm] = $made;
+            if ($needsConfirm && !send_alert_confirmation($p, $target, $email, $code)) {
+                q('DELETE FROM alerts WHERE code = ? AND status = ?', [$code, 'pending']);
+                $error = 'No hemos podido enviarte el correo de confirmación. Vuelve a intentarlo en unos minutos.';
+            }
+        }
+    } else {
+        $startUrl = alert_start_url(create_alert((int) $p['id'], $target));
     }
-    $code = $error ? null : create_alert((int) $p['id'], $target);
     header('X-Robots-Tag: noindex');
     render('alert-created', [
-        'meta' => meta(['title' => 'Activa tu aviso de precio', 'noindex' => true]),
+        'meta' => meta(['title' => 'Tu aviso de precio', 'noindex' => true]),
         'p' => $p,
         'target' => $target,
         'error' => $error,
-        'startUrl' => $code ? alert_start_url($code) : null,
+        'startUrl' => $startUrl,
+        'email' => $byMail ? $email : null,
+        'needsConfirm' => $needsConfirm,
+    ]);
+}
+
+/** Enlace del correo de confirmación: activa el aviso. */
+function alert_confirm(string $code): void
+{
+    $a = row('SELECT a.*, p.name, p.slug FROM alerts a JOIN products p ON p.id = a.product_id WHERE a.code = ? AND a.email IS NOT NULL', [$code]);
+    if ($a && $a['status'] === 'pending') {
+        update('alerts', ['status' => 'active', 'activated_at' => now()], (int) $a['id']);
+        $a['status'] = 'active';
+    }
+    header('X-Robots-Tag: noindex');
+    render('alert-status', [
+        'meta' => meta(['title' => 'Aviso de precio', 'noindex' => true]),
+        'state' => $a && $a['status'] === 'active' ? 'confirmed' : 'gone',
+        'alert' => $a,
+    ]);
+}
+
+/** Enlace de baja de los correos: pregunta primero y borra al pulsar el botón, para que no lo active un lector de correo. */
+function alert_unsubscribe(string $code): void
+{
+    $a = row('SELECT a.*, p.name, p.slug FROM alerts a JOIN products p ON p.id = a.product_id WHERE a.code = ? AND a.email IS NOT NULL', [$code]);
+    $state = $a ? 'ask' : 'gone';
+    if ($a && is_post()) {
+        csrf_check();
+        if (input('todos', '') === '1') {
+            q('DELETE FROM alerts WHERE email = ?', [$a['email']]);
+        } else {
+            q('DELETE FROM alerts WHERE id = ?', [(int) $a['id']]);
+        }
+        $state = 'removed';
+    }
+    header('X-Robots-Tag: noindex');
+    render('alert-status', [
+        'meta' => meta(['title' => 'Borrar aviso de precio', 'noindex' => true]),
+        'state' => $state,
+        'alert' => $a,
     ]);
 }
 

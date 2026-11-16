@@ -84,6 +84,10 @@ Pendiente de confirmar con el soporte de Afiliados: si guardar los precios para 
 
 No tienen API abierta de precios. En la ficha del producto (panel) pega tu enlace de afiliado y apunta el precio y el día en "Precios de otras tiendas". Esos puntos forman su línea en la gráfica. Un precio manual de hace más de 30 días ya no cuenta como mejor precio.
 
+## Avisos por correo
+
+Los visitantes pueden pedir un aviso por correo desde la ficha de un producto. El aviso se confirma desde un enlace, cada correo lleva un enlace de baja y siempre enlaza a la ficha de la web, nunca a la tienda. El envío usa la API de correo de Hostinger: crea una clave para el buzón y guárdala en el servidor con `php cron/ops.php --correo=ID_DEL_BUZON:CLAVE`.
+
 ## Canal de Telegram
 
 1. Crea un canal y un bot con @BotFather (te da el `bot_token`).

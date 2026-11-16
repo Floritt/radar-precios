@@ -35,6 +35,8 @@ $routes = [
     ['GET', '#^/buscar$#', 'page_search'],
     ['GET|POST', '#^/seguir$#', 'page_follow'],
     ['POST', '#^/aviso$#', 'action_alert'],
+    ['GET', '#^/aviso/confirmar/([a-f0-9]{32})$#', 'alert_confirm'],
+    ['GET|POST', '#^/aviso/baja/([a-f0-9]{32})$#', 'alert_unsubscribe'],
     ['POST', '#^/telegram/([a-f0-9]{32})$#', 'telegram_webhook'],
     ['GET', '#^/legal/([a-z\-]+)$#', 'page_legal'],
     ['GET', '#^/sitemap\.xml$#', 'page_sitemap'],

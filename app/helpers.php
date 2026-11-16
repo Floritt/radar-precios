@@ -170,7 +170,7 @@ function lines(?string $text): array
 
 function setting(string $name, string $default = ''): string
 {
-    static $cache = null;
+    $cache = &$GLOBALS['settings_cache'];
     if ($cache === null) {
         $cache = [];
         try {
@@ -190,6 +190,9 @@ function save_setting(string $name, string $value): void
         q('UPDATE settings SET value = ? WHERE name = ?', [$value, $name]);
     } else {
         q('INSERT INTO settings (name, value) VALUES (?, ?)', [$name, $value]);
+    }
+    if (isset($GLOBALS['settings_cache'])) {
+        $GLOBALS['settings_cache'][$name] = $value;
     }
 }
 

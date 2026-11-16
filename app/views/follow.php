@@ -5,7 +5,7 @@ $alerts = alerts_enabled();
 <section class="hero hero--plain">
   <div class="wrap">
     <h1>Sigue el precio de cualquier producto de Amazon</h1>
-    <p class="hero__lead">Pega el enlace del producto y te enseñamos cómo ha cambiado su precio.<?= $alerts ? ' Si quieres, te avisamos por Telegram cuando baje al precio que tú digas.' : '' ?></p>
+    <p class="hero__lead">Pega el enlace del producto y te enseñamos cómo ha cambiado su precio.<?= $alerts ? ' Si quieres, te avisamos ' . e(alert_channels_text()) . ' cuando baje al precio que tú digas.' : '' ?></p>
     <form class="paste" method="post" action="<?= e(url('seguir')) ?>">
       <?= csrf_field() ?>
       <label class="visually-hidden" for="enlace">Enlace de Amazon</label>
@@ -27,7 +27,7 @@ $alerts = alerts_enabled();
     <li><strong>Pega el enlace</strong><p>De la web o de la app de Amazon.es.</p></li>
     <li><strong>Mira el historial</strong><p>Precio de hoy, media de 90 días y mínimo de los últimos meses.</p></li>
     <?php if ($alerts): ?>
-      <li><strong>Pon tu precio</strong><p>Te escribimos por Telegram cuando baje de esa cifra.</p></li>
+      <li><strong>Pon tu precio</strong><p>Te escribimos <?= e(alert_channels_text()) ?> cuando baje de esa cifra.</p></li>
     <?php else: ?>
       <li><strong>Decide cuándo comprar</strong><p>Si está por debajo de su media, es buen momento. Si no, quizá convenga esperar.</p></li>
     <?php endif; ?>

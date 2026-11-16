@@ -73,16 +73,23 @@ $out = fn(array $o, string $from) => 'href="' . e($o['url']) . '" rel="sponsored
     <?php if ($hasSide): ?>
     <aside class="pp__side">
       <?php if ($img): ?><div class="pp__img"><img src="<?= e($img) ?>" alt="<?= e($p['name']) ?>"></div><?php endif; ?>
-      <?php if ($showAlert): $suggest = $best ? floor($best['price'] * 0.9) : null; ?>
+      <?php if ($showAlert): $suggest = $best ? floor($best['price'] * 0.9) : null; $byMail = mail_enabled(); $byTg = telegram_alerts_enabled(); ?>
         <form class="alert-box" method="post" action="<?= e(url('aviso')) ?>">
           <?= csrf_field() ?>
           <input type="hidden" name="producto" value="<?= (int) $p['id'] ?>">
-          <label for="aviso-precio"><strong>Avísame por Telegram</strong> cuando baje de</label>
+          <p class="alert-box__title"><?= icon('bell') ?> Avísame cuando baje</p>
+          <label for="aviso-precio">Precio al que lo comprarías</label>
           <div class="alert-box__row">
             <input class="field" id="aviso-precio" name="precio" inputmode="decimal" required placeholder="<?= $suggest ? e(number_format($suggest, 2, ',', '')) : '25,00' ?>" autocomplete="off">
             <span>€</span>
-            <button class="btn btn--blue" type="submit">Crear aviso</button>
           </div>
+          <?php if ($byMail): ?>
+            <label for="aviso-correo">Tu correo</label>
+            <input class="field" id="aviso-correo" name="correo" type="email" required placeholder="nombre@correo.com" autocomplete="email">
+            <button class="btn btn--blue" type="submit" name="canal" value="correo">Avisarme por correo</button>
+          <?php endif; ?>
+          <?php if ($byTg): ?><button class="btn<?= $byMail ? '' : ' btn--blue' ?>" type="submit" name="canal" value="telegram"<?= $byMail ? ' formnovalidate' : '' ?>>Avisarme por Telegram</button><?php endif; ?>
+          <p class="fineprint"><?= $best ? '' : 'Todavía no tenemos el precio de este producto. Te avisaremos cuando empecemos a seguirlo y esté por debajo de esa cifra. ' ?><?= $byMail ? 'Usamos tu correo solo para este aviso. ' : '' ?><a href="<?= e(url('legal/privacidad')) ?>">Privacidad</a></p>
         </form>
       <?php endif; ?>
       <?php if ($best): ?>

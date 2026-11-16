@@ -26,6 +26,29 @@ if ((int) val('SELECT COUNT(*) FROM users') === 0) {
 }
 
 ensure_schema();
+// php cron/ops.php --correo=IDENTIFICADOR_DEL_BUZON:CLAVE  guarda el acceso a la API de correo (o --correo=quitar)
+foreach ($argv as $arg) {
+    if (str_starts_with($arg, '--correo=')) {
+        $v = substr($arg, 9);
+        if ($v === 'quitar') {
+            save_setting('mail_mailbox_id', '');
+            save_setting('mail_token', '');
+        } elseif (preg_match('/^([A-Za-z0-9]{8,64}):(\S{3,})$/', $v, $m)) {
+            save_setting('mail_mailbox_id', $m[1]);
+            save_setting('mail_token', $m[2]);
+        }
+    }
+}
+echo 'Correo: ', mail_enabled() ? 'activado' : 'sin configurar', "\n";
+if (mail_enabled() && setting('mail_token') !== 'log') {
+    // Comprueba la clave y el buzón sin enviar ningún correo.
+    $ch = curl_init('https://api.mail.hostinger.com/api/v1/me');
+    curl_setopt_array($ch, [CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . setting('mail_token')], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 12]);
+    $body = (string) curl_exec($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+    echo 'API de correo: ', $code, str_contains($body, (string) setting('mail_mailbox_id')) ? ' | buzon reconocido' : ' | buzon NO reconocido', "\n";
+}
 echo 'Esquema v', setting('schema_version'), ' | avisos activos ', val("SELECT COUNT(*) FROM alerts WHERE status = 'active'"), ' | peticiones en cola ', val("SELECT COUNT(*) FROM track_requests WHERE status = 'pending'"), "\n";
 echo 'PHP ', PHP_VERSION, ' | productos ', val('SELECT COUNT(*) FROM products'), ' | nichos ', val('SELECT COUNT(*) FROM niches'),
     ' | ultima tarea de precios: ', setting('cron_last_run', 'nunca'), "\n";

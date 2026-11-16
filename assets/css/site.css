@@ -338,10 +338,14 @@ small, .muted { color: var(--gris); }
 @media (max-width: 560px) { .offers thead { display: none; } }
 
 .alert-box { border: 1.5px solid var(--azul); border-radius: 14px; padding: 18px 20px; }
-.alert-box label { display: block; margin-bottom: 10px; font-size: 16px; }
-.alert-box label strong { font-family: var(--display); font-weight: 800; }
-.alert-box__row { display: flex; align-items: center; gap: 8px; }
-.alert-box__row .field { width: 110px; text-align: right; }
+.alert-box__title { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 19px; letter-spacing: -0.015em; margin: 0 0 14px; }
+.alert-box__title .icon { color: var(--azul); width: 22px; height: 22px; }
+.alert-box label { display: block; margin: 0 0 6px; font-size: 14.5px; font-weight: 600; }
+.alert-box__row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.alert-box__row .field { width: 120px; text-align: right; }
+.alert-box input[type="email"] { width: 100%; margin-bottom: 14px; }
+.alert-box .btn { width: 100%; }
+.alert-box .btn + .btn { margin-top: 8px; }
 .pp__main .alert-box { margin-top: 26px; max-width: 460px; }
 @media (max-width: 980px) { .pp { grid-template-columns: 1fr; gap: 28px; } .pp__side { max-width: 460px; } .pp__img { max-width: 300px; } }
 

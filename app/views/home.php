@@ -8,7 +8,7 @@ $lead = $guides ? array_shift($guides) : null;
   <div class="wrap hero__grid">
     <div>
       <h1>Sigue el precio de cualquier producto de Amazon</h1>
-      <p class="hero__lead">Pega el enlace y te enseñamos cómo ha cambiado su precio, para que sepas si hoy es buen momento o conviene esperar.<?= alerts_enabled() ? ' Si quieres, te avisamos por Telegram cuando baje.' : '' ?></p>
+      <p class="hero__lead">Pega el enlace y te enseñamos cómo ha cambiado su precio, para que sepas si hoy es buen momento o conviene esperar.<?= alerts_enabled() ? ' Si quieres, te avisamos ' . e(alert_channels_text()) . ' cuando baje.' : '' ?></p>
       <form class="paste" method="post" action="<?= e(url('seguir')) ?>">
         <?= csrf_field() ?>
         <label class="visually-hidden" for="hook-link">Enlace de Amazon</label>

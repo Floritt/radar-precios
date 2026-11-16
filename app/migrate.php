@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 function ensure_schema(): void
 {
@@ -29,7 +29,7 @@ function ensure_schema(): void
             created_at DATETIME NOT NULL,
             updated_at DATETIME NOT NULL
         )$tail",
-        // Avisos de precio por Telegram.
+        // Avisos de precio por Telegram o por correo.
         "CREATE TABLE IF NOT EXISTS alerts (
             id $id,
             product_id INT NOT NULL,
@@ -60,6 +60,13 @@ function ensure_schema(): void
     foreach ($statements as $sql) {
         db()->exec($sql);
     }
+    // v3: avisos por correo.
+    try {
+        db()->exec('ALTER TABLE alerts ADD COLUMN email VARCHAR(190) NULL');
+    } catch (Throwable $e) {
+        // La columna ya existe.
+    }
+    $indexes[] = ['idx_alert_email', 'alerts', 'email', false];
     foreach ($indexes as [$name, $table, $cols, $unique]) {
         try {
             db()->exec(($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ') . ($mysql ? '' : 'IF NOT EXISTS ') . "$name ON $table ($cols)");

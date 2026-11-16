@@ -20,9 +20,22 @@ function telegram_bot_username(): string
     return setting('telegram_bot_username');
 }
 
-function alerts_enabled(): bool
+function telegram_alerts_enabled(): bool
 {
     return telegram_bot_token() !== '' && telegram_bot_username() !== '';
+}
+
+/** Hay algún canal para avisar: correo o Telegram. */
+function alerts_enabled(): bool
+{
+    return mail_enabled() || telegram_alerts_enabled();
+}
+
+/** Cómo se lo decimos al visitante: "por correo", "por Telegram" o los dos. */
+function alert_channels_text(): string
+{
+    $c = array_filter([mail_enabled() ? 'por correo' : '', telegram_alerts_enabled() ? 'por Telegram' : '']);
+    return implode(' o ', $c);
 }
 
 /** Llama a un método de la API de bots de Telegram. Devuelve el campo result o lanza una excepción. */
@@ -80,6 +93,71 @@ function create_alert(int $productId, float $target): string
     return $code;
 }
 
+/**
+ * Aviso por correo. Queda pendiente hasta que la persona pulsa el enlace de confirmación que le enviamos.
+ * Si ya tenía un aviso para ese producto, se actualiza el precio en vez de crear otro.
+ * Devuelve [código, hay que confirmar] o null si esa dirección ya tiene demasiados avisos.
+ */
+function create_email_alert(int $productId, float $target, string $email): ?array
+{
+    $email = mb_strtolower(trim($email));
+    $old = row("SELECT * FROM alerts WHERE product_id = ? AND email = ? AND status IN ('pending', 'active')", [$productId, $email]);
+    if ($old) {
+        update('alerts', ['target_price' => round($target, 2)], (int) $old['id']);
+        return [$old['code'], $old['status'] === 'pending'];
+    }
+    if ((int) val("SELECT COUNT(*) FROM alerts WHERE email = ? AND status IN ('pending', 'active')", [$email]) >= 40) {
+        return null;
+    }
+    $code = bin2hex(random_bytes(16));
+    insert('alerts', ['product_id' => $productId, 'target_price' => round($target, 2), 'code' => $code, 'email' => $email, 'status' => 'pending', 'created_at' => now()]);
+    return [$code, true];
+}
+
+function alert_unsubscribe_url(string $code): string
+{
+    return absolute_url('aviso/baja/' . $code);
+}
+
+/** Correo para confirmar que la dirección es de quien ha pedido el aviso. */
+function send_alert_confirmation(array $p, float $target, string $email, string $code): bool
+{
+    $url = absolute_url('aviso/confirmar/' . $code);
+    $text = "Hola:\n\nHas pedido que te avisemos cuando «{$p['name']}» baje de " . money($target) . ".\n\n"
+        . "Confirma el aviso en este enlace:\n$url\n\n"
+        . "Si no has sido tú, no hagas nada: el aviso se borra solo a los 7 días.\n\n" . site_name();
+    $html = mail_html(
+        'Confirma tu aviso de precio',
+        '<p style="margin:0 0 12px">Has pedido que te avisemos cuando <strong>' . e($p['name']) . '</strong> baje de <strong>' . e(money($target)) . '</strong>.</p>'
+            . '<p style="margin:0">Pulsa el botón para confirmar que este correo es tuyo.</p>',
+        'Confirmar aviso',
+        $url,
+        'Si no has sido tú, no hagas nada: el aviso se borra solo a los 7 días.'
+    );
+    return send_mail($email, 'Confirma tu aviso de precio: ' . $p['name'], $text, $html);
+}
+
+/** Correo del aviso. Enlaza a la ficha de la web, nunca a la tienda, y no incluye precios de Amazon. */
+function send_alert_mail(array $p, array $alert): bool
+{
+    $url = absolute_url('producto/' . $p['slug']);
+    $off = alert_unsubscribe_url((string) $alert['code']);
+    $target = money((float) $alert['target_price']);
+    $text = "«{$p['name']}» ha bajado del precio que marcaste ($target).\n\n"
+        . "Mira el precio de ahora y su historial:\n$url\n\n"
+        . "Los precios cambian a menudo: el válido es el que veas en la tienda al comprar.\n"
+        . "Este aviso no se repetirá. Para borrar tus avisos: $off\n\n" . site_name();
+    $html = mail_html(
+        'Ha bajado de precio',
+        '<p style="margin:0 0 12px"><strong>' . e($p['name']) . '</strong> ha bajado del precio que marcaste (' . e($target) . ').</p>'
+            . '<p style="margin:0">Los precios cambian a menudo: el válido es el que veas en la tienda al comprar.</p>',
+        'Ver el precio de ahora',
+        $url,
+        'Este aviso no se repetirá. <a href="' . e($off) . '" style="color:#1F3FD8">Borrar mis avisos</a>.'
+    );
+    return send_mail((string) $alert['email'], 'Ha bajado de precio: ' . $p['name'], $text, $html);
+}
+
 function alert_start_url(string $code): string
 {
     return 'https://t.me/' . rawurlencode(telegram_bot_username()) . '?start=' . rawurlencode($code);
@@ -133,6 +211,7 @@ function check_alerts(): int
         return 0;
     }
     q("DELETE FROM alerts WHERE status = 'pending' AND created_at < ?", [date('Y-m-d H:i:s', time() - 7 * 86400)]);
+    q("DELETE FROM alerts WHERE status = 'sent' AND sent_at < ?", [date('Y-m-d H:i:s', time() - 30 * 86400)]);
     $due = rows(
         "SELECT a.*, p.slug, p.name, p.best_price, p.best_store, p.amazon_price_at, p.updated_at AS product_updated
          FROM alerts a JOIN products p ON p.id = a.product_id
@@ -150,7 +229,8 @@ function check_alerts(): int
             . '<i>Precio a ' . e(date_short($best['at'])) . ". Puede haber cambiado; el válido es el que veas en la tienda.</i>\n\n"
             . '<a href="' . e(absolute_url('producto/' . $p['slug'])) . '">Ver el producto y su historial</a>' . "\n\n"
             . 'Este aviso ya no se repetirá. Puedes crear otro desde la ficha.';
-        if (telegram_message((string) $a['chat_id'], $text)) {
+        $ok = !empty($a['email']) ? send_alert_mail($p, $a) : ($a['chat_id'] ? telegram_message((string) $a['chat_id'], $text) : false);
+        if ($ok) {
             update('alerts', ['status' => 'sent', 'sent_at' => now(), 'sent_price' => $best['price']], (int) $a['id']);
             $sent++;
         }

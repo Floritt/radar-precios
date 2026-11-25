@@ -9,3 +9,4 @@
 !/uploads/.gitkeep
 /storage/setup_token.txt
 storage/gasolina.lock
+storage/gasolina-historial.lock

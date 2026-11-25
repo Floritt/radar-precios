@@ -70,6 +70,21 @@
     });
   }
 
+  // Aviso por zona: el campo de código postal solo se ve si se elige «Un código postal».
+  document.querySelectorAll('[data-zone-select]').forEach(function (sel) {
+    var box = sel.parentNode.querySelector('[data-zone-cp]');
+    if (!box) { return; }
+    var input = box.querySelector('input');
+    var sync = function (focus) {
+      var on = sel.value === 'cp';
+      box.hidden = !on;
+      input.required = on;
+      if (on && focus) { input.focus(); }
+    };
+    sync(false);
+    sel.addEventListener('change', function () { sync(true); });
+  });
+
   // Aviso de gasolina: al elegir carburante se propone un precio 3 céntimos por debajo del de hoy.
   var fuelSelect = document.querySelector('[data-fuel-select]');
   var fuelPrice = document.querySelector('[data-fuel-price]');

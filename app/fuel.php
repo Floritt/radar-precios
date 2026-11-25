@@ -200,8 +200,8 @@ function fuel_area_stats(string $where, array $params, string $fuel): array
     return ['avg' => $r && $r['n'] ? (float) $r['avg'] : null, 'min' => $r['min'] ?? null, 'max' => $r['max'] ?? null, 'n' => (int) ($r['n'] ?? 0)];
 }
 
-/** Serie diaria de la media (España si $province = 0) para el gráfico. */
-function fuel_series(int $province, int $days = 180): array
+/** Serie diaria de la media (España si $province = 0) para el gráfico: por defecto, desde el 1 de enero del año pasado como mucho un año. */
+function fuel_series(int $province, int $days = 366): array
 {
     $from = date('Y-m-d', time() - $days * 86400);
     $out = ['labels' => [], 'series' => []];
@@ -351,7 +351,7 @@ function fuel_check_alerts(): int
 const ZONE_STEPS = [0.01, 0.02, 0.03, 0.05];
 
 /**
- * Zona a partir de su clave: «es» (España), «p8» (provincia) o «m123» (municipio).
+ * Zona a partir de su clave: «es» (España), «p8» (provincia), «m123» (municipio) o «c08201» (código postal).
  * Devuelve nombre, frase «en …», ruta de su página y el filtro SQL de sus gasolineras, o null si no existe.
  */
 function fuel_zone(string $key): ?array
@@ -362,6 +362,13 @@ function fuel_zone(string $key): ?array
     if (preg_match('/^p(\d{1,2})$/', $key, $m) && isset(FUEL_PROVINCES[(int) $m[1]])) {
         $id = (int) $m[1];
         return ['key' => $key, 'name' => FUEL_PROVINCES[$id], 'in' => 'en la provincia de ' . FUEL_PROVINCES[$id], 'path' => 'gasolina/' . fuel_province_slug($id), 'where' => 's.province_id = ?', 'params' => [$id]];
+    }
+    if (preg_match('/^c(\d{5})$/', $key, $m)) {
+        $mu = row('SELECT m.* FROM fuel_stations s JOIN fuel_munis m ON m.id = s.muni_id WHERE s.cp = ? AND s.active = 1 ORDER BY s.id LIMIT 1', [$m[1]]);
+        if (!$mu) {
+            return null;
+        }
+        return ['key' => $key, 'name' => 'CP ' . $m[1], 'in' => 'en el código postal ' . $m[1] . ' (' . $mu['name'] . ')', 'path' => fuel_muni_path($mu), 'where' => 's.cp = ?', 'params' => [$m[1]]];
     }
     if (preg_match('/^m(\d{1,9})$/', $key, $m) && ($mu = row('SELECT * FROM fuel_munis WHERE id = ?', [(int) $m[1]]))) {
         return ['key' => $key, 'name' => $mu['name'], 'in' => 'en ' . $mu['name'], 'path' => fuel_muni_path($mu), 'where' => 's.muni_id = ?', 'params' => [(int) $mu['id']]];
@@ -398,6 +405,9 @@ function fuel_zone_avgs(): array
     }
     foreach (rows("SELECT muni_id AS k, $cols FROM fuel_stations WHERE active = 1 GROUP BY muni_id") as $r) {
         $out['m' . $r['k']] = $r;
+    }
+    foreach (rows("SELECT cp AS k, $cols FROM fuel_stations WHERE active = 1 AND cp <> '' GROUP BY cp") as $r) {
+        $out['c' . $r['k']] = $r;
     }
     return $out;
 }
@@ -516,4 +526,53 @@ function fuel_check_zone_alerts(int $max = 300): int
         }
     }
     return $sent;
+}
+
+/**
+ * Precio del día de cada gasolinera y medias por provincia y de España a partir de un listado del Ministerio.
+ * Devuelve [filas de fuel_daily, filas de fuel_stats]. Solo venta al público y precios con sentido.
+ */
+function fuel_build_day(array $list, string $day): array
+{
+    $num = function ($v): ?float {
+        $v = trim((string) $v);
+        if ($v === '') {
+            return null;
+        }
+        $f = (float) str_replace(',', '.', $v);
+        return $f > 0.3 && $f < 5 ? round($f, 3) : null;
+    };
+    $daily = [];
+    $acc = [];
+    foreach ($list as $r) {
+        if (($r['Tipo Venta'] ?? 'P') !== 'P') {
+            continue;
+        }
+        $id = (int) ($r['IDEESS'] ?? 0);
+        $prov = (int) ($r['IDProvincia'] ?? 0);
+        if ($id <= 0 || !isset(FUEL_PROVINCES[$prov])) {
+            continue;
+        }
+        $row = ['station_id' => $id, 'day' => $day];
+        foreach (FUELS_MAIN as $f) {
+            $row[$f] = $num($r[FUELS[$f][1]] ?? '');
+            if ($row[$f] !== null) {
+                foreach ([0, $prov] as $p) {
+                    $acc[$f][$p]['sum'] = ($acc[$f][$p]['sum'] ?? 0) + $row[$f];
+                    $acc[$f][$p]['n'] = ($acc[$f][$p]['n'] ?? 0) + 1;
+                    $acc[$f][$p]['min'] = min($acc[$f][$p]['min'] ?? 99, $row[$f]);
+                }
+            }
+        }
+        if ($row['g95'] !== null || $row['diesel'] !== null || $row['g98'] !== null) {
+            $daily[$id] = $row;
+        }
+    }
+    $stats = [];
+    foreach ($acc as $f => $byProv) {
+        foreach ($byProv as $p => $a) {
+            $stats[] = ['day' => $day, 'province_id' => $p, 'fuel' => $f, 'avg' => round($a['sum'] / $a['n'], 3), 'min' => $a['min'], 'stations' => $a['n']];
+        }
+    }
+    return [array_values($daily), $stats];
 }

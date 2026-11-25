@@ -4,10 +4,16 @@
  * céntimos y el correo. Se envía siempre a /gasolina/avisos.
  * @var array $zones clave => nombre @var array $form @var string $idp @var string $variant card|band
  */
-$form = ($form ?? []) + ['zone' => 'es', 'fuel' => '', 'down' => true, 'up' => true, 'step' => '0.02', 'email' => ''];
+$form = ($form ?? []) + ['zone' => 'es', 'cp' => '', 'fuel' => '', 'down' => true, 'up' => true, 'step' => '0.02', 'email' => ''];
 $idp = $idp ?? 'za';
 $variant = $variant ?? 'card';
 $single = count($zones) === 1;
+// «Un código postal» va segundo en las listas largas (portada, avisos) y al final en las cortas (provincia, municipio).
+if (!$single) {
+    $cpOpt = ['cp' => 'Un código postal'];
+    $zones = count($zones) > 3 ? array_slice($zones, 0, 1, true) + $cpOpt + array_slice($zones, 1, null, true) : $zones + $cpOpt;
+}
+$isCp = $form['zone'] === 'cp';
 ?>
 <form class="zone-form zone-form--<?= e($variant) ?>" method="post" action="<?= e(url('gasolina/avisos')) ?>">
   <?= csrf_field() ?>
@@ -17,9 +23,13 @@ $single = count($zones) === 1;
       <input type="hidden" name="zona" value="<?= e($k) ?>">
       <p class="zone-form__fixed" id="<?= e($idp) ?>-zone"><?= e($zones[$k]) ?></p>
     <?php else: ?>
-      <select class="field" id="<?= e($idp) ?>-zone" name="zona" required>
+      <select class="field" id="<?= e($idp) ?>-zone" name="zona" required data-zone-select>
         <?php foreach ($zones as $k => $label): ?><option value="<?= e($k) ?>"<?= $k === $form['zone'] ? ' selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
       </select>
+      <div class="zone-form__cp" data-zone-cp<?= $isCp ? '' : ' data-start-hidden' ?>>
+        <label for="<?= e($idp) ?>-cp">Código postal</label>
+        <input class="field" id="<?= e($idp) ?>-cp" name="cp" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="08201" value="<?= e($form['cp']) ?>">
+      </div>
     <?php endif; ?>
   </div>
   <div class="zone-form__f zone-form__fuel">

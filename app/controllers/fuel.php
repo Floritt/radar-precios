@@ -136,7 +136,7 @@ function fuel_station(string $id): void
     }
     $history = ['labels' => [], 'series' => []];
     $vals = [];
-    foreach (rows('SELECT day, g95, diesel, g98 FROM fuel_daily WHERE station_id = ? AND day >= ? ORDER BY day', [(int) $s['id'], date('Y-m-d', time() - 180 * 86400)]) as $r) {
+    foreach (rows('SELECT day, g95, diesel, g98 FROM fuel_daily WHERE station_id = ? AND day >= ? ORDER BY day', [(int) $s['id'], date('Y-m-d', time() - 366 * 86400)]) as $r) {
         $history['labels'][] = substr((string) $r['day'], 0, 10);
         foreach (FUELS_MAIN as $f) {
             $vals[$f][] = $r[$f] === null ? null : (float) $r[$f];
@@ -347,7 +347,10 @@ function fuel_zone_choices(array $first = []): array
 function fuel_zone_alerts_page(): void
 {
     fuel_require();
-    $form = ['zone' => (string) input('zona', 'es'), 'fuel' => (string) input('c', ''), 'down' => true, 'up' => true, 'step' => '0.02', 'email' => ''];
+    $form = ['zone' => (string) input('zona', 'es'), 'cp' => preg_replace('/\D/', '', (string) input('cp', '')), 'fuel' => (string) input('c', ''), 'down' => true, 'up' => true, 'step' => '0.02', 'email' => ''];
+    if ($form['cp'] !== '' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $form['zone'] = 'cp';
+    }
     $first = [];
     if (preg_match('/^m\d+$/', $form['zone']) && ($z = row('SELECT province_id FROM fuel_munis WHERE id = ?', [(int) substr($form['zone'], 1)]))) {
         $first = [$form['zone'], 'p' . (int) $z['province_id']];
@@ -361,12 +364,14 @@ function fuel_zone_alerts_page(): void
         $form['up'] = (bool) input('sube', '');
         $form['step'] = (string) input('paso', '0.02');
         $form['email'] = mb_strtolower(trim(mb_substr((string) input('correo', ''), 0, 190)));
-        $zone = fuel_zone($form['zone']);
+        $zone = $form['zone'] === 'cp' ? (preg_match('/^\d{5}$/', $form['cp']) ? fuel_zone('c' . $form['cp']) : null) : fuel_zone($form['zone']);
         $fuel = $form['fuel'];
         $step = (float) $form['step'];
         $avg = $zone && in_array($fuel, FUELS_MAIN, true) ? fuel_zone_avg($zone, $fuel) : null;
         if (!mail_enabled()) {
             $error = 'Los avisos por correo no están disponibles ahora mismo. Vuelve a intentarlo más tarde.';
+        } elseif (!$zone && $form['zone'] === 'cp') {
+            $error = preg_match('/^\d{5}$/', $form['cp']) ? 'No hay gasolineras con el código postal ' . $form['cp'] . '. Prueba con tu municipio o tu provincia.' : 'Escribe el código postal con sus 5 cifras, por ejemplo 08201.';
         } elseif (!$zone) {
             $error = 'Elige la zona del aviso.';
         } elseif (!in_array($fuel, FUELS_MAIN, true)) {
@@ -395,7 +400,7 @@ function fuel_zone_alerts_page(): void
                 $error = 'No hemos podido enviarte el correo de confirmación. Vuelve a intentarlo en unos minutos.';
             }
         }
-        if ($zone && !isset(fuel_zone_options()[$zone['key']]) && !$first) {
+        if ($zone && !isset(fuel_zone_options()[$zone['key']]) && !$first && !str_starts_with($zone['key'], 'c')) {
             $first = [$zone['key']];
         }
     }

@@ -38,7 +38,7 @@
     <aside class="zone-page__side">
       <h2>Cómo funciona</h2>
       <ol class="zone-steps">
-        <li><strong>Eliges zona y carburante.</strong> Toda España, una provincia o tu municipio.</li>
+        <li><strong>Eliges zona y carburante.</strong> Toda España, una provincia, tu municipio o tu código postal.</li>
         <li><strong>Miramos los precios cada hora.</strong> Con los datos oficiales que las gasolineras envían al Ministerio.</li>
         <li><strong>Te escribimos cuando la media cambia</strong> los céntimos que has elegido, con las más baratas de ese momento. Como mucho un correo al día.</li>
       </ol>

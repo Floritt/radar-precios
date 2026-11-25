@@ -146,6 +146,14 @@ Sección en `/gasolina` con los precios de todas las gasolineras de España, a p
 
 Solo se muestran las gasolineras de venta al público. «Cerca de mí» usa la posición del navegador para esa búsqueda y no la guarda.
 
+### Historial anterior
+
+`cron/gasolina-historial.php` rellena los días que faltan con el histórico del Ministerio (`EstacionesTerrestresHist/dd-mm-aaaa`), desde el 1 de enero del año en curso por defecto. Cada pasada hace unos pocos días y recuerda por dónde va, así que se programa cada pocos minutos hasta que dice «Historial completo» y luego se borra la tarea:
+
+    */2 * * * * /usr/bin/php /ruta/public_html/cron/gasolina-historial.php --dias=3
+
+Los días que ya tienen medias (los que guardó la importación de cada hora) se saltan. Los gráficos muestran hasta un año.
+
 ### Avisos de gasolina
 
 - **Por gasolinera** (ficha de cada gasolinera): un correo cuando el carburante elegido baja del precio que pone el visitante. Se envía una vez.

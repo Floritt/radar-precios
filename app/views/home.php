@@ -103,7 +103,7 @@ $spark = function (array $series, string $key, int $w, int $h, float $lo, float 
     <div class="zone-band">
       <div class="zone-band__head">
         <h2 id="h-aviso">Te avisamos cuando cambie el precio en tu zona</h2>
-        <p>Un correo cuando la media sube o baja los céntimos que elijas, con las tres gasolineras más baratas de ese momento. Para toda España, tu provincia o tu código postal.</p>
+        <p>Cuando la media sube o baja, cuando alguna gasolinera baja de tu precio o un resumen cada lunes. Siempre con las más baratas de ese momento, en toda España, tu provincia o tu código postal.</p>
       </div>
       <?php partial('fuel-zone-form', ['zones' => $zones, 'form' => ['zone' => 'es', 'fuel' => ''], 'idp' => 'zh', 'variant' => 'band']); ?>
     </div>

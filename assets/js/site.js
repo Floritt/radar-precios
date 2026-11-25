@@ -85,6 +85,22 @@
     sel.addEventListener('change', function () { sync(true); });
   });
 
+  // Aviso por zona: solo se ven los datos del tipo de aviso elegido.
+  document.querySelectorAll('.zone-form').forEach(function (form) {
+    var radios = form.querySelectorAll('[data-mode]');
+    if (!radios.length) { return; }
+    var panels = form.querySelectorAll('[data-mode-panel]');
+    var price = form.querySelector('input[name="precio"]');
+    var sync = function () {
+      var cur = form.querySelector('[data-mode]:checked');
+      var v = cur ? cur.value : 'change';
+      panels.forEach(function (p) { p.hidden = p.getAttribute('data-mode-panel') !== v; });
+      if (price) { price.required = v === 'below'; }
+    };
+    sync();
+    radios.forEach(function (r) { r.addEventListener('change', sync); });
+  });
+
   // Aviso de gasolina: al elegir carburante se propone un precio 3 céntimos por debajo del de hoy.
   var fuelSelect = document.querySelector('[data-fuel-select]');
   var fuelPrice = document.querySelector('[data-fuel-price]');

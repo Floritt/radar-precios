@@ -214,9 +214,8 @@ function admin_stats(): void
     foreach (rows("SELECT a.created_at, a.status, a.target_price, a.email, a.fuel, s.name, s.id AS sid, m.name AS muni_name FROM fuel_alerts a LEFT JOIN fuel_stations s ON s.id = a.station_id LEFT JOIN fuel_munis m ON m.id = s.muni_id ORDER BY a.created_at DESC LIMIT 15") as $r) {
         $signups[] = ['at' => $r['created_at'], 'type' => 'Gasolina', 'what' => fuel_name((string) $r['fuel']) . ' en ' . $r['name'] . ' (' . $r['muni_name'] . ')', 'url' => null, 'target' => fuel_money((float) $r['target_price']), 'who' => mask_email((string) $r['email']), 'status' => $r['status']];
     }
-    foreach (rows('SELECT created_at, status, zone, fuel, dir, step, email FROM zone_alerts ORDER BY created_at DESC LIMIT 15') as $r) {
-        $z = fuel_zone((string) $r['zone']);
-        $signups[] = ['at' => $r['created_at'], 'type' => 'Zona', 'what' => fuel_name((string) $r['fuel']) . ' ' . ($z['in'] ?? $r['zone']) . ', ' . (['down' => 'si baja', 'up' => 'si sube'][$r['dir']] ?? 'si baja o sube'), 'url' => null, 'target' => fuel_step_text((float) $r['step']), 'who' => mask_email((string) $r['email']), 'status' => $r['status']];
+    foreach (rows('SELECT * FROM zone_alerts ORDER BY created_at DESC LIMIT 15') as $r) {
+        $signups[] = ['at' => $r['created_at'], 'type' => 'Zona', 'what' => fuel_zone_summary($r, fuel_zone((string) $r['zone'])), 'url' => null, 'target' => '', 'who' => mask_email((string) $r['email']), 'status' => $r['status']];
     }
     usort($signups, fn ($a, $b) => strcmp((string) $b['at'], (string) $a['at']));
 

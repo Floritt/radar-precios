@@ -4,7 +4,7 @@ if (!mail_enabled()) { return; } ?>
   <div class="zone-band">
     <div class="zone-band__head">
       <h2 id="h-aviso"><?= e($title) ?></h2>
-      <p>Un correo cuando la media sube o baja los céntimos que elijas, con las tres gasolineras más baratas de ese momento. Como mucho uno al día.</p>
+      <p>Cuando la media sube o baja, cuando alguna gasolinera baja de tu precio o un resumen cada lunes. Siempre con las más baratas de ese momento y como mucho un correo al día.</p>
     </div>
     <?php partial('fuel-zone-form', ['zones' => $zones, 'form' => ['zone' => array_key_first($zones), 'fuel' => $fuel ?? ''], 'idp' => 'zb', 'variant' => 'band']); ?>
   </div>

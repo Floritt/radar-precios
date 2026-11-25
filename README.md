@@ -157,9 +157,13 @@ Los días que ya tienen medias (los que guardó la importación de cada hora) se
 ### Avisos de gasolina
 
 - **Por gasolinera** (ficha de cada gasolinera): un correo cuando el carburante elegido baja del precio que pone el visitante. Se envía una vez.
-- **Por zona** (`/gasolina/avisos`, la portada y las páginas de provincia y municipio): un correo cuando el precio medio de España, una provincia o un municipio baja o sube 1, 2, 3 o 5 céntimos, con las tres gasolineras más baratas de ese momento. Como mucho uno al día por aviso y 300 por pasada. En los avisos solo de bajada, la referencia sube con el precio (avisa de la bajada desde el último máximo); en los de subida, baja con él.
+- **Por zona** (`/gasolina/avisos`, la portada y las páginas de provincia y municipio), para España, una provincia, un municipio o un código postal, de tres tipos:
+  - *Si la media cambia*: cuando el precio medio baja o sube 1, 2, 3 o 5 céntimos. En los avisos solo de bajada, la referencia sube con el precio (avisa de la bajada desde el último máximo); en los de subida, baja con él.
+  - *Si alguna baja de un precio*: cuando la más barata de la zona llega al precio; se vuelve a armar cuando sube medio céntimo por encima.
+  - *Resumen cada lunes*: media, cambio en la semana y las 3 más baratas, los lunes desde las 7:00.
+  Como mucho un correo al día por aviso y 300 por pasada.
 
-Los dos piden confirmar el correo, se borran si no se confirman en 7 días y cada correo lleva un enlace de baja. Las altas y envíos se ven en Estadísticas.
+La primera vez se confirma el correo; después (tabla `subscribers`) los avisos nuevos de ese correo se activan solos. Cada correo lleva «Gestionar mis avisos» (`/gasolina/mis-avisos/{token}`), una página privada para cambiar, borrar o añadir avisos sin confirmar, y un enlace para borrar ese aviso. Los pendientes se borran a los 7 días. Las altas y envíos se ven en Estadísticas.
 
 La portada se centra en la gasolina; los accesorios de coche (`content/nichos/accesorios-de-coche.md`) aparecen en la portada y al pie de las páginas de gasolina.
 

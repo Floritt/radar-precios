@@ -266,8 +266,11 @@ function fuel_alert_create(): void
     } else {
         q("DELETE FROM fuel_alerts WHERE station_id = ? AND fuel = ? AND email = ? AND status IN ('pending', 'active')", [(int) $s['id'], $fuel, $email]);
         $code = bin2hex(random_bytes(16));
-        insert('fuel_alerts', ['station_id' => (int) $s['id'], 'fuel' => $fuel, 'target_price' => round($target, 3), 'email' => $email, 'code' => $code, 'status' => 'pending', 'created_at' => now()]);
-        if (!fuel_alert_mail_confirm($s, $fuel, $target, $email, $code)) {
+        // Un correo ya comprobado no tiene que volver a confirmar.
+        $verified = fuel_subscriber_verified($email);
+        fuel_subscriber($email);
+        insert('fuel_alerts', ['station_id' => (int) $s['id'], 'fuel' => $fuel, 'target_price' => round($target, 3), 'email' => $email, 'code' => $code, 'status' => $verified ? 'active' : 'pending', 'created_at' => now(), 'activated_at' => $verified ? now() : null]);
+        if (!$verified && !fuel_alert_mail_confirm($s, $fuel, $target, $email, $code)) {
             q('DELETE FROM fuel_alerts WHERE code = ?', [$code]);
             $error = 'No hemos podido enviarte el correo de confirmación. Vuelve a intentarlo en unos minutos.';
         }
@@ -275,7 +278,7 @@ function fuel_alert_create(): void
     header('X-Robots-Tag: noindex');
     render('fuel-alert', [
         'meta' => meta(['title' => 'Tu aviso de gasolina', 'noindex' => true]),
-        'state' => $error ? 'error' : 'created',
+        'state' => $error ? 'error' : (!empty($verified) ? 'confirmed' : 'created'),
         'error' => $error,
         's' => $s,
         'fuel' => $fuel,
@@ -290,8 +293,12 @@ function fuel_alert_confirm(string $code): void
     if ($a && $a['status'] === 'pending') {
         update('fuel_alerts', ['status' => 'active', 'activated_at' => now()], (int) $a['id']);
     }
+    if ($a) {
+        fuel_subscriber_verify((string) $a['email']);
+    }
     header('X-Robots-Tag: noindex');
     render('fuel-alert', [
+        'manage' => $a ? fuel_manage_url((string) $a['email']) : null,
         'meta' => meta(['title' => 'Aviso de gasolina', 'noindex' => true]),
         'state' => $a ? 'confirmed' : 'gone',
         'error' => null,
@@ -336,6 +343,9 @@ function fuel_zone_choices(array $first = []): array
 {
     $out = [];
     foreach ($first as $key) {
+        if (str_starts_with($key, 'c')) {
+            continue; // El código postal va en su propia casilla.
+        }
         if ($z = fuel_zone($key)) {
             $out[$key] = str_starts_with($key, 'p') ? 'Provincia de ' . $z['name'] : ($key === 'es' ? 'Toda España' : $z['name']);
         }
@@ -343,11 +353,95 @@ function fuel_zone_choices(array $first = []): array
     return $out + fuel_zone_options();
 }
 
+function fuel_zone_form_defaults(): array
+{
+    return ['zone' => 'es', 'cp' => '', 'fuel' => '', 'mode' => 'change', 'down' => true, 'up' => true, 'step' => '0.02', 'target' => '', 'email' => ''];
+}
+
+/** El formulario relleno con un aviso guardado, para cambiarlo. */
+function fuel_zone_form_from_alert(array $a): array
+{
+    $zone = (string) $a['zone'];
+    return [
+        'zone' => str_starts_with($zone, 'c') ? 'cp' : $zone,
+        'cp' => str_starts_with($zone, 'c') ? substr($zone, 1) : '',
+        'fuel' => fuel_key((string) $a['fuel']),
+        'mode' => (string) ($a['mode'] ?: 'change'),
+        'down' => $a['dir'] !== 'up',
+        'up' => $a['dir'] !== 'down',
+        'step' => number_format((float) $a['step'], 2, '.', ''),
+        'target' => $a['target'] !== null ? number_format((float) $a['target'], 3, ',', '') : '',
+        'email' => (string) $a['email'],
+    ];
+}
+
+/**
+ * Lee y comprueba el formulario de aviso por zona. Devuelve [error o null, formulario, datos del aviso, zona].
+ * Sin $needEmail (página de gestión) el correo es el del enlace privado.
+ */
+function fuel_zone_read_form(bool $needEmail, string $email = ''): array
+{
+    $f = fuel_zone_form_defaults();
+    $f['zone'] = (string) input('zona', 'es');
+    $f['cp'] = (string) preg_replace('/\D/', '', (string) input('cp', ''));
+    $f['fuel'] = (string) input('c', '');
+    $f['mode'] = array_key_exists((string) input('modo', 'change'), ZONE_MODES) ? (string) input('modo', 'change') : 'change';
+    $f['down'] = (bool) input('baja', '');
+    $f['up'] = (bool) input('sube', '');
+    $f['step'] = (string) input('paso', '0.02');
+    $f['target'] = trim((string) input('precio', ''));
+    $f['email'] = $needEmail ? mb_strtolower(trim(mb_substr((string) input('correo', ''), 0, 190))) : $email;
+    $zone = $f['zone'] === 'cp' ? (preg_match('/^\d{5}$/', $f['cp']) ? fuel_zone('c' . $f['cp']) : null) : fuel_zone($f['zone']);
+    $fuel = $f['fuel'];
+    $step = round((float) $f['step'], 3);
+    $t = str_replace(',', '.', $f['target']);
+    $target = is_numeric($t) ? round((float) $t, 3) : null;
+    $avg = $zone && in_array($fuel, FUELS_MAIN, true) ? fuel_zone_avg($zone, $fuel) : null;
+    $error = null;
+    if (!mail_enabled()) {
+        $error = 'Los avisos por correo no están disponibles ahora mismo. Vuelve a intentarlo más tarde.';
+    } elseif (!$zone && $f['zone'] === 'cp') {
+        $error = preg_match('/^\d{5}$/', $f['cp']) ? 'No hay gasolineras con el código postal ' . $f['cp'] . '. Prueba con tu municipio o tu provincia.' : 'Escribe el código postal con sus 5 cifras, por ejemplo 08201.';
+    } elseif (!$zone) {
+        $error = 'Elige la zona del aviso.';
+    } elseif (!in_array($fuel, FUELS_MAIN, true)) {
+        $error = 'Elige el carburante del aviso: gasolina 95, diésel o gasolina 98.';
+    } elseif ($avg === null) {
+        $error = 'Ahora mismo no hay gasolineras con ' . mb_strtolower(fuel_name($fuel)) . ' ' . $zone['in'] . '. Elige otro carburante u otra zona.';
+    } elseif ($f['mode'] === 'change' && !$f['down'] && !$f['up']) {
+        $error = 'Marca si quieres el aviso cuando baje, cuando suba o en los dos casos.';
+    } elseif ($f['mode'] === 'change' && !in_array($step, ZONE_STEPS, false)) {
+        $error = 'Elige cuántos céntimos tiene que cambiar el precio.';
+    } elseif ($f['mode'] === 'below' && ($target === null || $target < 0.5 || $target > 3)) {
+        $error = 'Escribe el precio en euros por litro, por ejemplo 1,45.';
+    } elseif ($needEmail && !filter_var($f['email'], FILTER_VALIDATE_EMAIL)) {
+        $error = 'Escribe un correo válido para poder avisarte.';
+    }
+    $data = null;
+    if (!$error) {
+        $data = [
+            'zone' => $zone['key'],
+            'fuel' => $fuel,
+            'mode' => $f['mode'],
+            'dir' => $f['mode'] !== 'change' ? 'both' : ($f['down'] && $f['up'] ? 'both' : ($f['down'] ? 'down' : 'up')),
+            'step' => in_array($step, ZONE_STEPS, false) ? $step : 0.02,
+            'target' => $f['mode'] === 'below' ? $target : null,
+            'ref_price' => $avg,
+            'ref_at' => now(),
+            'armed' => 1,
+        ];
+    }
+    return [$error, $f, $data, $zone];
+}
+
 /** Página de avisos por zona: explica cómo funcionan, muestra el formulario y lo recibe. */
 function fuel_zone_alerts_page(): void
 {
     fuel_require();
-    $form = ['zone' => (string) input('zona', 'es'), 'cp' => preg_replace('/\D/', '', (string) input('cp', '')), 'fuel' => (string) input('c', ''), 'down' => true, 'up' => true, 'step' => '0.02', 'email' => ''];
+    $form = fuel_zone_form_defaults();
+    $form['zone'] = (string) input('zona', 'es');
+    $form['cp'] = (string) preg_replace('/\D/', '', (string) input('cp', ''));
+    $form['fuel'] = (string) input('c', '');
     if ($form['cp'] !== '' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
         $form['zone'] = 'cp';
     }
@@ -360,47 +454,30 @@ function fuel_zone_alerts_page(): void
     $zone = null;
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         csrf_check();
-        $form['down'] = (bool) input('baja', '');
-        $form['up'] = (bool) input('sube', '');
-        $form['step'] = (string) input('paso', '0.02');
-        $form['email'] = mb_strtolower(trim(mb_substr((string) input('correo', ''), 0, 190)));
-        $zone = $form['zone'] === 'cp' ? (preg_match('/^\d{5}$/', $form['cp']) ? fuel_zone('c' . $form['cp']) : null) : fuel_zone($form['zone']);
-        $fuel = $form['fuel'];
-        $step = (float) $form['step'];
-        $avg = $zone && in_array($fuel, FUELS_MAIN, true) ? fuel_zone_avg($zone, $fuel) : null;
-        if (!mail_enabled()) {
-            $error = 'Los avisos por correo no están disponibles ahora mismo. Vuelve a intentarlo más tarde.';
-        } elseif (!$zone && $form['zone'] === 'cp') {
-            $error = preg_match('/^\d{5}$/', $form['cp']) ? 'No hay gasolineras con el código postal ' . $form['cp'] . '. Prueba con tu municipio o tu provincia.' : 'Escribe el código postal con sus 5 cifras, por ejemplo 08201.';
-        } elseif (!$zone) {
-            $error = 'Elige la zona del aviso.';
-        } elseif (!in_array($fuel, FUELS_MAIN, true)) {
-            $error = 'Elige el carburante del aviso: gasolina 95, diésel o gasolina 98.';
-        } elseif ($avg === null) {
-            $error = 'Ahora mismo no hay gasolineras con ' . mb_strtolower(fuel_name($fuel)) . ' ' . $zone['in'] . '. Elige otro carburante u otra zona.';
-        } elseif (!$form['down'] && !$form['up']) {
-            $error = 'Marca si quieres el aviso cuando baje, cuando suba o en los dos casos.';
-        } elseif (!in_array(round($step, 3), ZONE_STEPS, false)) {
-            $error = 'Elige cuántos céntimos tiene que cambiar el precio.';
-        } elseif (!filter_var($form['email'], FILTER_VALIDATE_EMAIL)) {
-            $error = 'Escribe un correo válido para poder avisarte.';
-        } elseif (rate_limited('zonealert', 20, 86400)) {
+        [$error, $form, $data, $zone] = fuel_zone_read_form(true);
+        if (!$error && rate_limited('zonealert', 20, 86400)) {
             $error = 'Has creado muchos avisos hoy. Vuelve a intentarlo mañana.';
-        } elseif ((int) val("SELECT COUNT(*) FROM zone_alerts WHERE email = ? AND status IN ('pending', 'active')", [$form['email']]) >= 10) {
-            $error = 'Ese correo ya tiene 10 avisos por zona. Borra alguno desde el enlace de nuestros correos.';
-        } else {
-            $dir = $form['down'] && $form['up'] ? 'both' : ($form['down'] ? 'down' : 'up');
-            q("DELETE FROM zone_alerts WHERE zone = ? AND fuel = ? AND email = ? AND status IN ('pending', 'active')", [$zone['key'], $fuel, $form['email']]);
-            $code = bin2hex(random_bytes(16));
-            insert('zone_alerts', ['zone' => $zone['key'], 'fuel' => $fuel, 'dir' => $dir, 'step' => round($step, 3), 'ref_price' => $avg, 'ref_at' => now(), 'email' => $form['email'], 'code' => $code, 'status' => 'pending', 'created_at' => now(), 'sent_count' => 0]);
-            if (fuel_zone_alert_mail_confirm($zone, $fuel, $dir, $step, $form['email'], $code)) {
+        }
+        if (!$error && (int) val("SELECT COUNT(*) FROM zone_alerts WHERE email = ? AND status IN ('pending', 'active')", [$form['email']]) >= 10) {
+            $error = 'Ese correo ya tiene 10 avisos por zona. Borra alguno con el enlace «Gestionar mis avisos» de nuestros correos.';
+        }
+        if (!$error) {
+            q("DELETE FROM zone_alerts WHERE zone = ? AND fuel = ? AND mode = ? AND email = ? AND status IN ('pending', 'active')", [$data['zone'], $data['fuel'], $data['mode'], $form['email']]);
+            $verified = fuel_subscriber_verified($form['email']);
+            fuel_subscriber($form['email']);
+            $a = $data + ['email' => $form['email'], 'code' => bin2hex(random_bytes(16)), 'status' => $verified ? 'active' : 'pending', 'created_at' => now(), 'activated_at' => $verified ? now() : null, 'sent_count' => 0];
+            insert('zone_alerts', $a);
+            if ($verified) {
+                fuel_zone_alert_mail_created($a, $zone);
+                $state = 'active';
+            } elseif (fuel_zone_alert_mail_confirm($a, $zone)) {
                 $state = 'created';
             } else {
-                q('DELETE FROM zone_alerts WHERE code = ?', [$code]);
+                q('DELETE FROM zone_alerts WHERE code = ?', [$a['code']]);
                 $error = 'No hemos podido enviarte el correo de confirmación. Vuelve a intentarlo en unos minutos.';
             }
         }
-        if ($zone && !isset(fuel_zone_options()[$zone['key']]) && !$first && !str_starts_with($zone['key'], 'c')) {
+        if ($zone && str_starts_with($zone['key'], 'm') && !$first) {
             $first = [$zone['key']];
         }
     }
@@ -408,9 +485,9 @@ function fuel_zone_alerts_page(): void
     render('fuel-avisos', [
         'meta' => meta([
             'title' => 'Avisos de precio de la gasolina por zona',
-            'description' => 'Te avisamos por correo cuando la gasolina o el diésel bajen o suban en tu municipio, tu provincia o toda España, con las gasolineras más baratas de ese momento. Gratis.',
+            'description' => 'Te avisamos por correo cuando la gasolina o el diésel bajen o suban en tu código postal, tu municipio, tu provincia o toda España, cuando alguna gasolinera baje de tu precio o cada lunes con un resumen. Gratis.',
             'canonical' => absolute_url('gasolina/avisos'),
-            'noindex' => $_SERVER['REQUEST_METHOD'] === 'POST' || $first !== [],
+            'noindex' => $_SERVER['REQUEST_METHOD'] === 'POST' || $first !== [] || $form['cp'] !== '',
             'jsonld' => [jsonld_breadcrumbs([['Inicio', ''], ['Gasolina', 'gasolina'], ['Avisos', 'gasolina/avisos']])],
         ]),
         'state' => $state,
@@ -431,6 +508,9 @@ function fuel_zone_alert_confirm(string $code): void
         update('zone_alerts', ['status' => 'active', 'activated_at' => now(), 'ref_price' => $avg ?? $a['ref_price'], 'ref_at' => now()], (int) $a['id']);
         $a['ref_price'] = $avg ?? $a['ref_price'];
     }
+    if ($a) {
+        fuel_subscriber_verify((string) $a['email']);
+    }
     header('X-Robots-Tag: noindex');
     render('fuel-zone-alert', [
         'meta' => meta(['title' => 'Aviso de gasolina', 'noindex' => true]),
@@ -438,6 +518,7 @@ function fuel_zone_alert_confirm(string $code): void
         'a' => $a,
         'zone' => $zone,
         'code' => $code,
+        'manage' => $a ? fuel_manage_url((string) $a['email']) : null,
     ]);
 }
 
@@ -462,5 +543,104 @@ function fuel_zone_alert_unsubscribe(string $code): void
         'a' => $a,
         'zone' => $a ? fuel_zone((string) $a['zone']) : null,
         'code' => $code,
+        'manage' => $a ? fuel_manage_url((string) $a['email']) : null,
+    ]);
+}
+
+/**
+ * «Mis avisos»: el enlace privado de cada correo. Lista sus avisos por zona y por gasolinera y permite cambiarlos,
+ * borrarlos o añadir otros sin volver a confirmar (el enlace solo llega a ese buzón).
+ */
+function fuel_manage(string $token): void
+{
+    fuel_require();
+    header('X-Robots-Tag: noindex');
+    $sub = row('SELECT * FROM subscribers WHERE token = ?', [$token]);
+    $meta = meta(['title' => 'Mis avisos de gasolina', 'noindex' => true]);
+    if (!$sub) {
+        http_response_code(404);
+        render('fuel-manage', ['meta' => $meta, 'sub' => null]);
+        return;
+    }
+    $email = (string) $sub['email'];
+    $self = 'gasolina/mis-avisos/' . $token;
+    if (!$sub['verified_at']) {
+        fuel_subscriber_verify($email);
+    }
+    // Quien abre el enlace privado demuestra que el correo es suyo: los avisos pendientes quedan activos.
+    q("UPDATE zone_alerts SET status = 'active', activated_at = ? WHERE email = ? AND status = 'pending'", [now(), $email]);
+    q("UPDATE fuel_alerts SET status = 'active', activated_at = ? WHERE email = ? AND status = 'pending'", [now(), $email]);
+
+    $error = null;
+    $form = fuel_zone_form_defaults();
+    $editId = 0;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        csrf_check();
+        $action = (string) input('accion', '');
+        $id = (int) input('id', 0);
+        if ($action === 'borrar-zona') {
+            q('DELETE FROM zone_alerts WHERE id = ? AND email = ?', [$id, $email]);
+            flash('Aviso borrado.');
+            redirect($self);
+        }
+        if ($action === 'borrar-gasolinera') {
+            q('DELETE FROM fuel_alerts WHERE id = ? AND email = ?', [$id, $email]);
+            flash('Aviso borrado.');
+            redirect($self);
+        }
+        if ($action === 'borrar-todo') {
+            q('DELETE FROM zone_alerts WHERE email = ?', [$email]);
+            q('DELETE FROM fuel_alerts WHERE email = ?', [$email]);
+            flash('Hemos borrado todos tus avisos de gasolina. No te enviaremos más correos.');
+            redirect($self);
+        }
+        if ($action === 'precio-gasolinera') {
+            $t = str_replace(',', '.', trim((string) input('precio', '')));
+            if (is_numeric($t) && (float) $t >= 0.5 && (float) $t <= 3 && row('SELECT id FROM fuel_alerts WHERE id = ? AND email = ?', [$id, $email])) {
+                update('fuel_alerts', ['target_price' => round((float) $t, 3), 'status' => 'active', 'sent_at' => null], $id);
+                flash('Aviso cambiado: te escribiremos cuando baje de ' . fuel_money(round((float) $t, 3)) . '.');
+                redirect($self);
+            }
+            $error = 'Escribe el precio en euros por litro, por ejemplo 1,45.';
+        }
+        if ($action === 'nuevo' || $action === 'cambiar') {
+            [$error, $form, $data, $zone] = fuel_zone_read_form(false, $email);
+            $old = $action === 'cambiar' ? row('SELECT * FROM zone_alerts WHERE id = ? AND email = ?', [$id, $email]) : null;
+            if (!$error && $action === 'nuevo' && (int) val("SELECT COUNT(*) FROM zone_alerts WHERE email = ? AND status IN ('pending', 'active')", [$email]) >= 10) {
+                $error = 'Ya tienes 10 avisos por zona. Borra alguno para crear otro.';
+            }
+            if (!$error && $action === 'cambiar' && !$old) {
+                $error = 'Ese aviso ya no existe.';
+            }
+            if (!$error) {
+                if ($old) {
+                    update('zone_alerts', $data + ['status' => 'active', 'sent_at' => null], (int) $old['id']);
+                    flash('Aviso cambiado: te escribiremos ' . fuel_zone_rule($data, $zone) . '.');
+                } else {
+                    insert('zone_alerts', $data + ['email' => $email, 'code' => bin2hex(random_bytes(16)), 'status' => 'active', 'created_at' => now(), 'activated_at' => now(), 'sent_count' => 0]);
+                    flash('Aviso creado: te escribiremos ' . fuel_zone_rule($data, $zone) . '.');
+                }
+                redirect($self);
+            }
+            $editId = $action === 'cambiar' ? $id : -1;
+        }
+    }
+    $zoneAlerts = rows('SELECT * FROM zone_alerts WHERE email = ? ORDER BY created_at', [$email]);
+    foreach ($zoneAlerts as &$za) {
+        $za['zoneInfo'] = fuel_zone((string) $za['zone']);
+    }
+    unset($za);
+    $stationAlerts = rows('SELECT a.*, s.name, s.address, s.g95, s.diesel, s.g98, s.id AS sid, m.name AS muni_name FROM fuel_alerts a
+        JOIN fuel_stations s ON s.id = a.station_id LEFT JOIN fuel_munis m ON m.id = s.muni_id WHERE a.email = ? ORDER BY a.created_at', [$email]);
+    render('fuel-manage', [
+        'meta' => $meta,
+        'sub' => $sub,
+        'self' => $self,
+        'flash' => flash(),
+        'error' => $error,
+        'form' => $form,
+        'editId' => $editId,
+        'zoneAlerts' => $zoneAlerts,
+        'stationAlerts' => $stationAlerts,
     ]);
 }

@@ -1,4 +1,4 @@
-<?php /** @var string $state @var ?string $error @var ?array $s @var string $fuel @var float $target @var ?string $email @var string $code */
+<?php /** @var string $state @var ?string $error @var ?array $s @var string $fuel @var float $target @var ?string $email @var string $code @var ?string $manage */
 $titles = ['created' => 'Revisa tu correo', 'error' => 'No hemos podido crear el aviso', 'confirmed' => 'Aviso activado', 'gone' => 'Este aviso ya no existe', 'ask' => '¿Borrar el aviso?', 'removed' => 'Aviso borrado'];
 ?>
 <div class="wrap page narrow">
@@ -10,6 +10,7 @@ $titles = ['created' => 'Revisa tu correo', 'error' => 'No hemos podido crear el
     <p><?= e($error) ?></p>
   <?php elseif ($state === 'confirmed'): ?>
     <p>Te escribiremos cuando <?= e(fuel_the($fuel)) ?> en <?= e($s['name']) ?> (<?= e($s['muni_name']) ?>) baje de <?= e(fuel_money($target)) ?>. Revisamos los precios cada hora.</p>
+    <?php if (!empty($manage)): ?><p><a class="btn btn--blue" href="<?= e($manage) ?>">Gestionar mis avisos</a></p><p class="fineprint">Desde ahí puedes cambiar o borrar tus avisos y añadir otros sin volver a confirmar. El mismo enlace va al pie de cada correo.</p><?php endif; ?>
   <?php elseif ($state === 'gone'): ?>
     <p>Puede que ya se enviara o que se borrara. Puedes crear otro desde la ficha de cualquier gasolinera.</p>
   <?php elseif ($state === 'ask'): ?>

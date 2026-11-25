@@ -24,6 +24,13 @@
           <p class="fineprint">Si no lo ves, mira en la carpeta de correo no deseado. Sin confirmar, el aviso se borra a los 7 días.</p>
           <p><a href="<?= e(url($zone['path'])) ?>">Ver las gasolineras <?= e($zone['in']) ?></a></p>
         </div>
+      <?php elseif ($state === 'active'): ?>
+        <div class="notice notice--ok" role="status">
+          <h2>Aviso activado</h2>
+          <p>Ese correo ya estaba confirmado, así que el aviso funciona desde ya: te escribiremos <?= e(fuel_zone_rule(['fuel' => $form['fuel'], 'mode' => $form['mode'], 'dir' => $form['mode'] !== 'change' ? 'both' : ($form['down'] && $form['up'] ? 'both' : ($form['down'] ? 'down' : 'up')), 'step' => (float) $form['step'], 'target' => str_replace(',', '.', $form['target'])], $zone)) ?>.</p>
+          <p class="fineprint">Te hemos enviado un correo con el enlace para gestionar tus avisos.</p>
+          <p><a href="<?= e(url($zone['path'])) ?>">Ver las gasolineras <?= e($zone['in']) ?></a></p>
+        </div>
       <?php elseif (!$mailOn): ?>
         <p class="notice">Los avisos por correo no están disponibles ahora mismo. Vuelve a intentarlo más tarde.</p>
       <?php else: ?>
@@ -40,8 +47,10 @@
       <ol class="zone-steps">
         <li><strong>Eliges zona y carburante.</strong> Toda España, una provincia, tu municipio o tu código postal.</li>
         <li><strong>Miramos los precios cada hora.</strong> Con los datos oficiales que las gasolineras envían al Ministerio.</li>
-        <li><strong>Te escribimos cuando la media cambia</strong> los céntimos que has elegido, con las más baratas de ese momento. Como mucho un correo al día.</li>
+        <li><strong>Eliges el tipo de aviso:</strong> cuando la media baje o suba los céntimos que digas, cuando alguna gasolinera baje de tu precio o un resumen cada lunes. Siempre con las más baratas de ese momento y como mucho un correo al día.</li>
       </ol>
+      <h2>¿Hay que confirmar?</h2>
+      <p>Solo la primera vez, para comprobar que el correo es tuyo. Después, cada correo trae el enlace «Gestionar mis avisos» para cambiarlos, borrarlos o añadir otros sin confirmar de nuevo.</p>
       <h2>¿Para tu municipio?</h2>
       <p>Busca tu municipio y crea el aviso desde su página. Allí también puedes crear un aviso para una gasolinera concreta, con el precio que quieras.</p>
       <?php partial('fuel-tools', ['fuel' => 'g95']); ?>

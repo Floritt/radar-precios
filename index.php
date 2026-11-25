@@ -49,6 +49,7 @@ $routes = [
     ['GET', '#^/gasolina/aviso/confirmar/([a-f0-9]{32})$#', 'fuel_alert_confirm'],
     ['GET|POST', '#^/gasolina/aviso/baja/([a-f0-9]{32})$#', 'fuel_alert_unsubscribe'],
     ['GET|POST', '#^/gasolina/avisos$#', 'fuel_zone_alerts_page'],
+    ['GET|POST', '#^/gasolina/mis-avisos/([a-f0-9]{32})$#', 'fuel_manage'],
     ['GET', '#^/gasolina/avisos/confirmar/([a-f0-9]{32})$#', 'fuel_zone_alert_confirm'],
     ['GET|POST', '#^/gasolina/avisos/baja/([a-f0-9]{32})$#', 'fuel_zone_alert_unsubscribe'],
     ['GET', '#^/gasolina/gasolinera/(\d+)(?:-[a-z0-9\-]*)?$#', 'fuel_station'],

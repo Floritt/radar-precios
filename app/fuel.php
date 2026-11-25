@@ -328,14 +328,14 @@ function fuel_check_alerts(): int
         $what = fuel_the($fuel) . ' en ' . $a['name'] . ' (' . $a['muni_name'] . ')';
         $text = mb_strtoupper(mb_substr($what, 0, 1)) . mb_substr($what, 1) . " está a " . fuel_money($now) . ", por debajo de tu aviso (" . fuel_money($a['target_price']) . ").\n\n"
             . "Mira los precios de ahora:\n$url\n\nEl precio puede cambiar durante el día: el válido es el del surtidor.\n"
-            . "Este aviso no se repetirá. Para borrarlo: $off\n\n" . site_name();
+            . fuel_mail_foot((string) $a['email'], $off, 'Este aviso no se repetirá.')[0] . "\n\n" . site_name();
         $html = mail_html(
             'Ha bajado la gasolina',
             '<p style="margin:0 0 12px"><strong>' . e(mb_strtoupper(mb_substr($what, 0, 1)) . mb_substr($what, 1)) . '</strong> está a <strong>' . e(fuel_money($now)) . '</strong>, por debajo de tu aviso (' . e(fuel_money($a['target_price'])) . ').</p>'
                 . '<p style="margin:0">El precio puede cambiar durante el día: el válido es el del surtidor.</p>',
             'Ver los precios de ahora',
             $url,
-            'Este aviso no se repetirá. <a href="' . e($off) . '" style="color:#1F3FD8">Borrar el aviso</a>.'
+            fuel_mail_foot((string) $a['email'], $off, 'Este aviso no se repetirá.')[1]
         );
         if (send_mail((string) $a['email'], 'Ha bajado: ' . fuel_name($fuel) . ' a ' . fuel_money($now), $text, $html)) {
             update('fuel_alerts', ['status' => 'sent', 'sent_at' => now(), 'sent_price' => $now], (int) $a['id']);
@@ -345,10 +345,13 @@ function fuel_check_alerts(): int
     return $sent;
 }
 
-/* ---------- Avisos por zona: cuando la media de un municipio, una provincia o España baja o sube ---------- */
+/* ---------- Avisos por zona: cuando la media de una zona cambia, cuando alguna gasolinera baja de un precio, o un resumen semanal ---------- */
 
 /** Cambio mínimo de la media, en euros por litro, que dispara un aviso. */
 const ZONE_STEPS = [0.01, 0.02, 0.03, 0.05];
+
+/** Tipos de aviso por zona. */
+const ZONE_MODES = ['change' => 'Si la media cambia', 'below' => 'Si alguna baja de un precio', 'weekly' => 'Resumen cada lunes'];
 
 /**
  * Zona a partir de su clave: «es» (España), «p8» (provincia), «m123» (municipio) o «c08201» (código postal).
@@ -388,17 +391,25 @@ function fuel_zone_options(): array
     return $out;
 }
 
-/** Media de ahora de un carburante en una zona, con los precios de cada gasolinera. */
+/** Media de ahora de un carburante en una zona. */
 function fuel_zone_avg(array $zone, string $fuel): ?float
 {
     $avg = fuel_area_stats($zone['where'], $zone['params'], $fuel)['avg'];
     return $avg === null ? null : round($avg, 3);
 }
 
-/** Medias de ahora de todas las zonas de golpe: ['es' => [...], 'p8' => [...], 'm123' => [...]]. */
+/** Media de un carburante en una zona un día concreto, con el historial de cada gasolinera. */
+function fuel_zone_avg_on(array $zone, string $fuel, string $day): ?float
+{
+    $fuel = fuel_key($fuel);
+    $v = val("SELECT AVG(d.$fuel) FROM fuel_daily d JOIN fuel_stations s ON s.id = d.station_id WHERE {$zone['where']} AND d.day = ?", array_merge($zone['params'], [$day]));
+    return $v === null || $v === false ? null : round((float) $v, 3);
+}
+
+/** Medias y mínimos de ahora de todas las zonas de golpe: ['es' => [...], 'p8' => [...], 'm123' => [...], 'c08201' => [...]]. */
 function fuel_zone_avgs(): array
 {
-    $cols = 'AVG(g95) AS g95, AVG(diesel) AS diesel, AVG(g98) AS g98';
+    $cols = 'AVG(g95) AS g95, AVG(diesel) AS diesel, AVG(g98) AS g98, MIN(g95) AS g95_min, MIN(diesel) AS diesel_min, MIN(g98) AS g98_min';
     $out = ['es' => row("SELECT $cols FROM fuel_stations WHERE active = 1") ?: []];
     foreach (rows("SELECT province_id AS k, $cols FROM fuel_stations WHERE active = 1 GROUP BY province_id") as $r) {
         $out['p' . $r['k']] = $r;
@@ -418,68 +429,177 @@ function fuel_zone_verb(string $dir): string
     return ['down' => 'baje', 'up' => 'suba'][$dir] ?? 'baje o suba';
 }
 
-/** «el precio medio del diésel en Sabadell baje 2 céntimos o más». */
-function fuel_zone_rule(string $fuel, array $zone, string $dir, float $step): string
+/**
+ * Qué hace un aviso, para completar «Te avisaremos …»:
+ * «cuando el precio medio del diésel en Sabadell baje 2 céntimos o más», «cuando alguna gasolinera en Sabadell
+ * ponga el diésel a 1,450 €/l o menos» o «cada lunes con un resumen del diésel en Sabadell».
+ */
+function fuel_zone_rule(array $a, array $zone): string
 {
-    return 'el precio medio ' . fuel_of($fuel) . ' ' . $zone['in'] . ' ' . fuel_zone_verb($dir) . ' ' . fuel_step_text($step) . ' o más';
+    $fuel = fuel_key((string) $a['fuel']);
+    $mode = (string) ($a['mode'] ?? 'change');
+    if ($mode === 'below') {
+        return 'cuando alguna gasolinera ' . $zone['in'] . ' ponga ' . fuel_the($fuel) . ' a ' . fuel_money($a['target']) . ' o menos';
+    }
+    if ($mode === 'weekly') {
+        return 'cada lunes con un resumen ' . fuel_of($fuel) . ' ' . $zone['in'];
+    }
+    return 'cuando el precio medio ' . fuel_of($fuel) . ' ' . $zone['in'] . ' ' . fuel_zone_verb((string) $a['dir']) . ' ' . fuel_step_text((float) $a['step']) . ' o más';
 }
 
-function fuel_zone_alert_mail_confirm(array $zone, string $fuel, string $dir, float $step, string $email, string $code): bool
+/** Resumen corto de un aviso para listas: «Diésel en Sabadell: si baja o sube 2 céntimos». */
+function fuel_zone_summary(array $a, ?array $zone): string
 {
-    $url = absolute_url('gasolina/avisos/confirmar/' . $code);
-    $rule = fuel_zone_rule($fuel, $zone, $dir, $step);
-    $text = "Hola:\n\nHas pedido que te avisemos cuando $rule.\n\nConfirma el aviso en este enlace:\n$url\n\n"
+    $fuel = fuel_key((string) $a['fuel']);
+    $where = $zone ? $zone['in'] : '';
+    $mode = (string) ($a['mode'] ?? 'change');
+    $what = $mode === 'below' ? 'si alguna baja de ' . fuel_money($a['target']) : ($mode === 'weekly' ? 'resumen cada lunes' : ['down' => 'si baja', 'up' => 'si sube'][$a['dir']] ?? 'si baja o sube');
+    $what .= $mode === 'change' ? ' ' . fuel_step_text((float) $a['step']) : '';
+    return fuel_name($fuel) . ' ' . $where . ': ' . $what;
+}
+
+/* ---------- Suscriptores: un enlace privado por correo para ver, cambiar, añadir o borrar sus avisos ---------- */
+
+/** Ficha del correo (se crea si no existe). */
+function fuel_subscriber(string $email): array
+{
+    $email = mb_strtolower(trim($email));
+    $s = row('SELECT * FROM subscribers WHERE email = ?', [$email]);
+    if (!$s) {
+        insert('subscribers', ['email' => $email, 'token' => bin2hex(random_bytes(16)), 'created_at' => now()]);
+        $s = row('SELECT * FROM subscribers WHERE email = ?', [$email]);
+    }
+    return $s;
+}
+
+/** Marca el correo como comprobado: ha pulsado un enlace que solo llega a ese buzón. */
+function fuel_subscriber_verify(string $email): array
+{
+    $s = fuel_subscriber($email);
+    if (!$s['verified_at']) {
+        update('subscribers', ['verified_at' => now()], (int) $s['id']);
+        $s['verified_at'] = now();
+    }
+    return $s;
+}
+
+function fuel_subscriber_verified(string $email): bool
+{
+    return (bool) val('SELECT verified_at FROM subscribers WHERE email = ?', [mb_strtolower(trim($email))]);
+}
+
+function fuel_manage_url(string $email): string
+{
+    return absolute_url('gasolina/mis-avisos/' . fuel_subscriber($email)['token']);
+}
+
+/** Pie común de los correos de avisos: gestionar y borrar. */
+function fuel_mail_foot(string $email, string $off, string $first = ''): array
+{
+    $manage = fuel_manage_url($email);
+    $text = ($first !== '' ? "$first\n" : '') . "Gestionar tus avisos (cambiar, añadir o borrar): $manage\nBorrar este aviso: $off";
+    $html = ($first !== '' ? e($first) . '<br>' : '')
+        . '<a href="' . e($manage) . '" style="color:#1F3FD8">Gestionar mis avisos</a> (cambiar, añadir o borrar) · <a href="' . e($off) . '" style="color:#1F3FD8">Borrar este aviso</a>';
+    return [$text, $html];
+}
+
+/* ---------- Correos de avisos por zona ---------- */
+
+function fuel_zone_alert_mail_confirm(array $a, array $zone): bool
+{
+    $url = absolute_url('gasolina/avisos/confirmar/' . $a['code']);
+    $rule = fuel_zone_rule($a, $zone);
+    $text = "Hola:\n\nHas pedido que te avisemos $rule.\n\nConfirma el aviso en este enlace:\n$url\n\n"
+        . "Solo hay que confirmar la primera vez: los siguientes avisos de este correo se activan solos.\n"
         . "Si no has sido tú, no hagas nada: el aviso se borra solo a los 7 días.\n\n" . site_name();
     $html = mail_html(
         'Confirma tu aviso de gasolina',
-        '<p style="margin:0 0 12px">Has pedido que te avisemos cuando <strong>' . e($rule) . '</strong>.</p>'
-            . '<p style="margin:0">Pulsa el botón para confirmar que este correo es tuyo.</p>',
+        '<p style="margin:0 0 12px">Has pedido que te avisemos <strong>' . e($rule) . '</strong>.</p>'
+            . '<p style="margin:0">Pulsa el botón para confirmar que este correo es tuyo. Solo hace falta la primera vez.</p>',
         'Confirmar aviso',
         $url,
         'Si no has sido tú, no hagas nada: el aviso se borra solo a los 7 días.'
     );
-    return send_mail($email, 'Confirma tu aviso: ' . fuel_name($fuel) . ' ' . $zone['in'], $text, $html);
+    return send_mail((string) $a['email'], 'Confirma tu aviso: ' . fuel_name(fuel_key((string) $a['fuel'])) . ' ' . $zone['in'], $text, $html);
 }
 
-/** Correo de «ha bajado» o «ha subido», con las tres gasolineras más baratas de la zona. */
-function fuel_zone_alert_mail(array $a, array $zone, float $now, float $ref, bool $up): bool
+/** Correo de «aviso creado» para un correo ya comprobado (no hace falta confirmar). */
+function fuel_zone_alert_mail_created(array $a, array $zone): bool
 {
-    $fuel = fuel_key((string) $a['fuel']);
-    $since = substr((string) $a['ref_at'], 0, 10) === date('Y-m-d') ? 'las ' . date('H:i', strtotime((string) $a['ref_at'])) . ' de hoy' : 'el ' . fuel_day_text((string) $a['ref_at']);
-    $diff = fuel_cents($now - $ref);
-    $page = absolute_url($zone['path'] . ($fuel === 'g95' ? '' : '?c=' . $fuel));
-    $off = absolute_url('gasolina/avisos/baja/' . $a['code']);
-    $best = fuel_stations($zone['where'], $zone['params'], $fuel, 3);
-    $title = ($up ? 'Sube ' : 'Baja ') . fuel_the($fuel) . ' ' . $zone['in'];
-    $intro = 'El precio medio ' . fuel_of($fuel) . " {$zone['in']} está a " . fuel_money($now) . ", $diff desde $since (" . fuel_money($ref) . ').';
-    $tip = $up ? 'Si tienes que repostar pronto, estas son las más baratas ahora:' : 'Las más baratas ahora:';
+    $rule = fuel_zone_rule($a, $zone);
+    [$footText, $footHtml] = fuel_mail_foot((string) $a['email'], absolute_url('gasolina/avisos/baja/' . $a['code']), 'Si no has sido tú, borra el aviso con el enlace.');
+    $text = "Hola:\n\nHemos activado tu aviso: te escribiremos $rule.\n\n$footText\n\n" . site_name();
+    $html = mail_html('Aviso de gasolina activado', '<p style="margin:0">Te escribiremos <strong>' . e($rule) . '</strong>.</p>', 'Ver mis avisos', fuel_manage_url((string) $a['email']), $footHtml);
+    return send_mail((string) $a['email'], 'Aviso activado: ' . fuel_name(fuel_key((string) $a['fuel'])) . ' ' . $zone['in'], $text, $html);
+}
+
+/** Lista de gasolineras para un correo: [texto, html]. */
+function fuel_mail_station_list(array $stations, string $fuel): array
+{
     $lines = [];
-    $rowsHtml = '';
-    foreach ($best as $s) {
+    $html = '';
+    foreach ($stations as $s) {
         $lines[] = '- ' . $s['name'] . ', ' . $s['address'] . ' (' . $s['muni_name'] . '): ' . fuel_money($s[$fuel]);
-        $rowsHtml .= '<tr><td style="padding:8px 0;border-top:1px solid #DDE2F1"><a href="' . e(absolute_url(fuel_station_path($s))) . '" style="color:#10162F;font-weight:bold;text-decoration:none">' . e($s['name']) . '</a>'
+        $html .= '<tr><td style="padding:8px 0;border-top:1px solid #DDE2F1"><a href="' . e(absolute_url(fuel_station_path($s))) . '" style="color:#10162F;font-weight:bold;text-decoration:none">' . e($s['name']) . '</a>'
             . '<br><span style="color:#535B7C;font-size:14px">' . e($s['address'] . ', ' . $s['muni_name']) . '</span></td>'
             . '<td style="padding:8px 0 8px 12px;border-top:1px solid #DDE2F1;text-align:right;font-weight:bold;white-space:nowrap">' . e(fuel_money($s[$fuel])) . '</td></tr>';
     }
-    $foot = 'Te avisamos cuando la media ' . fuel_zone_verb((string) $a['dir']) . ' ' . fuel_step_text((float) $a['step']) . ' o más, como mucho una vez al día.';
-    $text = "$intro\n\n$tip\n" . implode("\n", $lines) . "\n\nTodas las gasolineras:\n$page\n\n"
-        . "El precio puede cambiar durante el día: el válido es el del surtidor.\n$foot\nPara borrar el aviso: $off\n\n" . site_name();
-    $html = mail_html(
-        $title,
-        '<p style="margin:0 0 14px">' . e($intro) . '</p>'
-            . ($rowsHtml ? '<p style="margin:0 0 6px;font-weight:bold">' . e($tip) . '</p><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4">' . $rowsHtml . '</table>' : '')
-            . '<p style="margin:14px 0 0;font-size:14px;color:#535B7C">El precio puede cambiar durante el día: el válido es el del surtidor.</p>',
-        'Ver todas las gasolineras',
-        $page,
-        e($foot) . ' <a href="' . e($off) . '" style="color:#1F3FD8">Borrar el aviso</a>.'
-    );
-    return send_mail((string) $a['email'], $title . ': ' . fuel_money($now) . ' (' . $diff . ')', $text, $html);
+    return [implode("\n", $lines), $html ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.4">' . $html . '</table>' : ''];
 }
 
 /**
- * Revisa los avisos por zona después de cada importación. Para un aviso de bajada, la referencia sube con el
- * precio (así avisa de la bajada desde el último máximo); para uno de subida, baja con él. Como mucho un
- * correo al día por aviso y $max correos por pasada. Devuelve cuántos ha enviado.
+ * Correo de un aviso por zona. $kind: 'down' o 'up' (cambio de la media), 'below' (alguna por debajo del precio)
+ * o 'weekly' (resumen). $now = media de ahora; $ref = media de referencia (cambio o hace 7 días).
+ */
+function fuel_zone_alert_mail(array $a, array $zone, string $kind, ?float $now, ?float $ref): bool
+{
+    $fuel = fuel_key((string) $a['fuel']);
+    $page = absolute_url($zone['path'] . ($fuel === 'g95' ? '' : '?c=' . $fuel));
+    $off = absolute_url('gasolina/avisos/baja/' . $a['code']);
+    $The = mb_strtoupper(mb_substr(fuel_the($fuel), 0, 1)) . mb_substr(fuel_the($fuel), 1);
+    if ($kind === 'below') {
+        $target = (float) $a['target'];
+        $best = array_values(array_filter(fuel_stations($zone['where'], $zone['params'], $fuel, 5), fn ($s) => (float) $s[$fuel] <= $target + 0.0005));
+        $title = $The . ' ya está a ' . fuel_money($target) . ' o menos ' . $zone['in'];
+        $intro = count($best) === 1 ? 'Hay una gasolinera ' . $zone['in'] . ' por debajo de tu precio:' : 'Estas gasolineras ' . $zone['in'] . ' están por debajo de tu precio:';
+        $subject = $title;
+        $foot1 = 'Te volveremos a avisar si sube por encima y vuelve a bajar.';
+    } elseif ($kind === 'weekly') {
+        $best = fuel_stations($zone['where'], $zone['params'], $fuel, 3);
+        $title = 'Tu resumen semanal ' . fuel_of($fuel) . ' ' . $zone['in'];
+        $intro = 'El precio medio está a ' . fuel_money($now) . ($ref !== null ? ', ' . fuel_cents($now - $ref) . ' respecto al lunes pasado (' . fuel_money($ref) . ')' : '') . '. Las más baratas ahora:';
+        $subject = 'Resumen semanal: ' . fuel_name($fuel) . ' ' . $zone['in'] . ' a ' . fuel_money($now);
+        $foot1 = 'Te enviamos este resumen cada lunes.';
+    } else {
+        $up = $kind === 'up';
+        $since = substr((string) $a['ref_at'], 0, 10) === date('Y-m-d') ? 'las ' . date('H:i', strtotime((string) $a['ref_at'])) . ' de hoy' : 'el ' . fuel_day_text((string) $a['ref_at']);
+        $best = fuel_stations($zone['where'], $zone['params'], $fuel, 3);
+        $title = ($up ? 'Sube ' : 'Baja ') . fuel_the($fuel) . ' ' . $zone['in'];
+        $intro = 'El precio medio ' . fuel_of($fuel) . " {$zone['in']} está a " . fuel_money($now) . ', ' . fuel_cents($now - $ref) . " desde $since (" . fuel_money($ref) . '). '
+            . ($up ? 'Si tienes que repostar pronto, estas son las más baratas ahora:' : 'Las más baratas ahora:');
+        $subject = $title . ': ' . fuel_money($now) . ' (' . fuel_cents($now - $ref) . ')';
+        $foot1 = 'Te avisamos cuando la media ' . fuel_zone_verb((string) $a['dir']) . ' ' . fuel_step_text((float) $a['step']) . ' o más, como mucho una vez al día.';
+    }
+    [$listText, $listHtml] = fuel_mail_station_list($best, $fuel);
+    [$footText, $footHtml] = fuel_mail_foot((string) $a['email'], $off, $foot1);
+    $text = "$intro\n$listText\n\nTodas las gasolineras:\n$page\n\nEl precio puede cambiar durante el día: el válido es el del surtidor.\n\n$footText\n\n" . site_name();
+    $html = mail_html(
+        $title,
+        '<p style="margin:0 0 10px">' . e($intro) . '</p>' . $listHtml
+            . '<p style="margin:14px 0 0;font-size:14px;color:#535B7C">El precio puede cambiar durante el día: el válido es el del surtidor.</p>',
+        'Ver todas las gasolineras',
+        $page,
+        $footHtml
+    );
+    return send_mail((string) $a['email'], $subject, $text, $html);
+}
+
+/**
+ * Revisa los avisos por zona después de cada importación.
+ * - change: para un aviso de bajada, la referencia sube con el precio (avisa de la bajada desde el último máximo); para uno de subida, baja con él.
+ * - below: avisa cuando la más barata de la zona llega al precio, y se vuelve a armar cuando sube medio céntimo por encima.
+ * - weekly: los lunes desde las 7:00, una vez por semana.
+ * Como mucho un correo al día por aviso y $max correos por pasada. Devuelve cuántos ha enviado.
  */
 function fuel_check_zone_alerts(int $max = 300): int
 {
@@ -493,15 +613,51 @@ function fuel_check_zone_alerts(int $max = 300): int
     }
     $avgs = fuel_zone_avgs();
     $recent = date('Y-m-d H:i:s', time() - 20 * 3600);
+    $weekDue = date('N') === '1' && (int) date('G') >= 7;
     $zones = [];
     $sent = 0;
     foreach ($alerts as $a) {
         $fuel = fuel_key((string) $a['fuel']);
+        $mode = (string) ($a['mode'] ?: 'change');
         $now = $avgs[$a['zone']][$fuel] ?? null;
+        $min = $avgs[$a['zone']][$fuel . '_min'] ?? null;
         if ($now === null) {
             continue;
         }
         $now = round((float) $now, 3);
+        $tooSoon = (string) $a['sent_at'] > $recent;
+        if ($mode === 'weekly') {
+            if (!$weekDue || (string) $a['sent_at'] > date('Y-m-d H:i:s', time() - 6 * 86400) || $sent >= $max) {
+                continue;
+            }
+            $zone = $zones[$a['zone']] ??= fuel_zone((string) $a['zone']);
+            if ($zone && fuel_zone_alert_mail($a, $zone, 'weekly', $now, fuel_zone_avg_on($zone, $fuel, date('Y-m-d', strtotime('-7 days'))))) {
+                update('zone_alerts', ['sent_at' => now(), 'sent_price' => $now, 'sent_count' => (int) $a['sent_count'] + 1], (int) $a['id']);
+                $sent++;
+            }
+            continue;
+        }
+        if ($mode === 'below') {
+            $target = (float) $a['target'];
+            if ($min === null) {
+                continue;
+            }
+            $min = (float) $min;
+            if (!(int) $a['armed']) {
+                if ($min > $target + 0.005) {
+                    update('zone_alerts', ['armed' => 1], (int) $a['id']);
+                }
+                continue;
+            }
+            if ($min <= $target + 0.0005 && !$tooSoon && $sent < $max) {
+                $zone = $zones[$a['zone']] ??= fuel_zone((string) $a['zone']);
+                if ($zone && fuel_zone_alert_mail($a, $zone, 'below', $now, null)) {
+                    update('zone_alerts', ['armed' => 0, 'sent_at' => now(), 'sent_price' => $min, 'sent_count' => (int) $a['sent_count'] + 1], (int) $a['id']);
+                    $sent++;
+                }
+            }
+            continue;
+        }
         if ($a['ref_price'] === null) {
             update('zone_alerts', ['ref_price' => $now, 'ref_at' => now()], (int) $a['id']);
             continue;
@@ -511,11 +667,11 @@ function fuel_check_zone_alerts(int $max = 300): int
         $down = $a['dir'] !== 'up' && $now - $ref <= -$step;
         $up = $a['dir'] !== 'down' && $now - $ref >= $step;
         if ($down || $up) {
-            if ((string) $a['sent_at'] > $recent || $sent >= $max) {
+            if ($tooSoon || $sent >= $max) {
                 continue;
             }
             $zone = $zones[$a['zone']] ??= fuel_zone((string) $a['zone']);
-            if ($zone && fuel_zone_alert_mail($a, $zone, $now, $ref, $up)) {
+            if ($zone && fuel_zone_alert_mail($a, $zone, $up ? 'up' : 'down', $now, $ref)) {
                 update('zone_alerts', ['ref_price' => $now, 'ref_at' => now(), 'sent_at' => now(), 'sent_price' => $now, 'sent_count' => (int) $a['sent_count'] + 1], (int) $a['id']);
                 $sent++;
             }

@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 8;
+const SCHEMA_VERSION = 9;
 
 function ensure_schema(): void
 {
@@ -153,6 +153,14 @@ function ensure_schema(): void
             sent_price DECIMAL(6,3) NULL,
             sent_count INT NOT NULL DEFAULT 0
         )$tail",
+        // v9: un enlace privado por correo para gestionar sus avisos.
+        "CREATE TABLE IF NOT EXISTS subscribers (
+            id $id,
+            email VARCHAR(190) NOT NULL,
+            token VARCHAR(32) NOT NULL,
+            created_at DATETIME NOT NULL,
+            verified_at DATETIME NULL
+        )$tail",
     ];
     $indexes = [
         ['uq_track_asin', 'track_requests', 'asin', true],
@@ -185,6 +193,16 @@ function ensure_schema(): void
             // La columna ya existe.
         }
     }
+    // v9: tipos de aviso por zona (cambio de la media, precio máximo o resumen semanal).
+    foreach (["mode VARCHAR(8) NOT NULL DEFAULT 'change'", 'target DECIMAL(6,3) NULL', 'armed TINYINT NOT NULL DEFAULT 1'] as $col) {
+        try {
+            db()->exec('ALTER TABLE zone_alerts ADD COLUMN ' . $col);
+        } catch (Throwable $e) {
+            // La columna ya existe.
+        }
+    }
+    $indexes[] = ['uq_subscribers_email', 'subscribers', 'email', true];
+    $indexes[] = ['uq_subscribers_token', 'subscribers', 'token', true];
     $indexes[] = ['uq_visits', 'visits', 'day, kind, ref_id', true];
     $indexes[] = ['idx_fuel_muni', 'fuel_stations', 'muni_id, active', false];
     $indexes[] = ['idx_fuel_prov', 'fuel_stations', 'province_id, active', false];

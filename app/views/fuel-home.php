@@ -68,7 +68,7 @@
     <h3>¿Cuándo es más barato repostar?</h3>
     <p>Depende de cada gasolinera. Por eso guardamos el precio de cada una cada día: en la ficha de cualquier gasolinera ves cómo ha cambiado y si hoy está por encima o por debajo de lo normal.</p>
     <h3>¿Cómo funcionan los avisos?</h3>
-    <p>Eliges una zona (tu municipio, tu provincia o toda España), un carburante y cuántos céntimos tiene que cambiar el precio medio. Te escribimos cuando baja o sube esa cantidad, con las tres gasolineras más baratas de ese momento, y como mucho una vez al día. También puedes crear un aviso para una gasolinera concreta desde su ficha.</p>
+    <p>Eliges una zona (tu código postal, tu municipio, tu provincia o toda España), un carburante y el tipo de aviso: cuando el precio medio baje o suba los céntimos que digas, cuando alguna gasolinera baje de tu precio o un resumen cada lunes. Te escribimos con las gasolineras más baratas de ese momento y como mucho una vez al día. Solo hay que confirmar el correo la primera vez, y cada correo trae un enlace para cambiar, añadir o borrar tus avisos. También puedes crear un aviso para una gasolinera concreta desde su ficha.</p>
     <h3>¿Por qué el precio del surtidor no coincide?</h3>
     <p>Las gasolineras pueden cambiar el precio varias veces al día. El válido es siempre el que marca el surtidor.</p>
   </section>

@@ -483,9 +483,13 @@ function fuel_subscriber_verify(string $email): array
     return $s;
 }
 
+/** Si el correo ya está comprobado: por su ficha o porque tiene algún aviso activo (que en su día confirmó). */
 function fuel_subscriber_verified(string $email): bool
 {
-    return (bool) val('SELECT verified_at FROM subscribers WHERE email = ?', [mb_strtolower(trim($email))]);
+    $email = mb_strtolower(trim($email));
+    return (bool) val('SELECT verified_at FROM subscribers WHERE email = ?', [$email])
+        || (bool) val("SELECT 1 FROM zone_alerts WHERE email = ? AND status = 'active' LIMIT 1", [$email])
+        || (bool) val("SELECT 1 FROM fuel_alerts WHERE email = ? AND status IN ('active', 'sent') LIMIT 1", [$email]);
 }
 
 function fuel_manage_url(string $email): string

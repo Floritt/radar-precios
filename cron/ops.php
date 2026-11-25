@@ -46,12 +46,17 @@ foreach ($argv as $arg) {
     if (str_starts_with($arg, '--titular=') && ($t = base64_decode(substr($arg, 10), true)) !== false && trim($t) !== '') {
         save_setting('legal_owner', mb_substr(trim($t), 0, 120));
     }
+    // --lema=BASE64 cambia la frase que sale bajo el logo en el pie de página.
+    if (str_starts_with($arg, '--lema=') && ($t = base64_decode(substr($arg, 7), true)) !== false && trim($t) !== '') {
+        save_setting('tagline', mb_substr(trim($t), 0, 160));
+    }
     if ($arg === '--sin-nif') {
         save_setting('legal_nif', '');
     }
 }
 echo 'ID de afiliado: ', amazon_tag() ?: 'sin poner', "\n";
 echo 'Aviso legal: titular ', setting('legal_owner') ?: 'sin poner', ' | NIF ', setting('legal_nif') !== '' ? 'visible' : 'quitado', "\n";
+echo 'Lema: ', setting('tagline') ?: 'sin poner', "\n";
 echo 'Correo: ', mail_enabled() ? 'activado' : 'sin configurar', "\n";
 if (mail_enabled() && setting('mail_token') !== 'log') {
     // Comprueba la clave y el buzón sin enviar ningún correo.
@@ -62,12 +67,12 @@ if (mail_enabled() && setting('mail_token') !== 'log') {
     curl_close($ch);
     echo 'API de correo: ', $code, str_contains($body, (string) setting('mail_mailbox_id')) ? ' | buzon reconocido' : ' | buzon NO reconocido', "\n";
 }
-echo 'Esquema v', setting('schema_version'), ' | avisos activos ', val("SELECT COUNT(*) FROM alerts WHERE status = 'active'"), ' | peticiones en cola ', val("SELECT COUNT(*) FROM track_requests WHERE status = 'pending'"), "\n";
+echo 'Esquema v', setting('schema_version'), ' | avisos activos ', val("SELECT COUNT(*) FROM alerts WHERE status = 'active'"), ' | avisos por zona activos ', val("SELECT COUNT(*) FROM zone_alerts WHERE status = 'active'"), ' | peticiones en cola ', val("SELECT COUNT(*) FROM track_requests WHERE status = 'pending'"), "\n";
 echo 'PHP ', PHP_VERSION, ' | productos ', val('SELECT COUNT(*) FROM products'), ' | nichos ', val('SELECT COUNT(*) FROM niches'),
     ' | ultima tarea de precios: ', setting('cron_last_run', 'nunca'), "\n";
 
 $base = rtrim((string) config('base_url'), '/');
-foreach (['/', '/seguir', '/producto/dixit', '/blog', '/comparativas', '/admin/entrar', '/config.php', '/storage/install.lock', '/install/cli.php', '/.git/config'] as $u) {
+foreach (['/', '/gasolina', '/gasolina/avisos', '/nicho/accesorios-de-coche', '/producto/baliza-v16-conectada', '/seguir', '/blog', '/comparativas', '/admin/entrar', '/config.php', '/storage/install.lock', '/install/cli.php', '/.git/config'] as $u) {
     $h = @get_headers($base . $u);
     echo $u, ' ', $h ? $h[0] : 'sin respuesta', "\n";
 }

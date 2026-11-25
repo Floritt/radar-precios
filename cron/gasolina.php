@@ -170,7 +170,8 @@ try {
 }
 
 $sent = fuel_check_alerts();
-$result = count($stations) . ' gasolineras, ' . count($munis) . ' municipios, avisos enviados: ' . $sent;
+$sentZone = fuel_check_zone_alerts();
+$result = count($stations) . ' gasolineras, ' . count($munis) . ' municipios, avisos enviados: ' . $sent . ' de gasolinera y ' . $sentZone . ' de zona';
 save_setting('fuel_last_run', now());
 save_setting('fuel_last_result', $result);
 echo "Día $day: $result\n";

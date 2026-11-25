@@ -33,8 +33,13 @@
 
   <?php if ($products): ?>
   <section class="block">
+    <?php if (($niche['slug'] ?? '') === CAR_NICHE): usort($products, fn ($a, $b) => ($b['slug'] === 'baliza-v16-conectada') <=> ($a['slug'] === 'baliza-v16-conectada')); ?>
+    <h2>Accesorios</h2>
+    <div class="car-grid car-grid--strip"><?php foreach ($products as $p): partial('car-card', ['p' => $p]); endforeach; ?></div>
+    <?php else: ?>
     <h2>Productos que seguimos</h2>
     <div class="grid"><?php foreach ($products as $p): partial('pcard', ['p' => $p]); endforeach; ?></div>
+    <?php endif; ?>
   </section>
   <?php elseif (!$posts): ?>
     <p class="empty">Todavía no hay nada en esta categoría.</p>

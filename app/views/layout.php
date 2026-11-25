@@ -8,12 +8,25 @@ $q = $path === '/buscar' ? (string) input('q', '') : '';
 $counts = site_counts();
 $isHome = $path === '/';
 $showCats = !$isHome && !preg_match('#^/(blog|comparativas|resenas|ofertas|buscar|seguir)$|^/gasolina#', $path);
+$fuelOn = fuel_enabled();
+$carNiche = car_niche();
+$alertCta = $fuelOn && mail_enabled();
 $links = [];
-if ($counts['priced']) { $links[] = ['ofertas', 'Ofertas']; }
+if ($fuelOn) { $links[] = ['gasolina', 'Gasolina']; }
+if ($alertCta) { $links[] = ['gasolina/avisos', 'Avisos']; }
+if ($carNiche) { $links[] = ['nicho/' . $carNiche['slug'], 'Para tu coche']; }
 $links[] = ['blog', 'Guías'];
 if ($counts['comparisons']) { $links[] = ['comparativas', 'Comparativas']; }
-if ($counts['reviews']) { $links[] = ['resenas', 'Reseñas']; }
-if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
+if ($counts['priced']) { $links[] = ['ofertas', 'Ofertas']; }
+// Enlace activo: el más largo que coincide con la dirección («Avisos» y no «Gasolina» en /gasolina/avisos).
+$current = '';
+foreach ($links as [$href]) {
+    if (($path === '/' . $href || str_starts_with($path, '/' . $href . '/')) && strlen($href) > strlen($current)) {
+        $current = $href;
+    }
+}
+$footLinks = $links;
+if ($counts['reviews']) { $footLinks[] = ['resenas', 'Reseñas']; }
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
@@ -50,7 +63,7 @@ if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
     <?php partial('logo'); ?>
     <nav class="top__nav" aria-label="Secciones">
       <?php foreach ($links as [$href, $label]): ?>
-        <a href="<?= e(url($href)) ?>"<?= str_starts_with($path, '/' . $href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+        <a href="<?= e(url($href)) ?>"<?= $href === $current ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
       <?php endforeach; ?>
       <?php if ($telegram): ?><a href="<?= e($telegram) ?>" rel="noopener">Telegram</a><?php endif; ?>
     </nav>
@@ -59,7 +72,8 @@ if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
       <input id="hq" name="q" type="search" value="<?= e($q) ?>" placeholder="Busca o pega un enlace" autocomplete="off">
       <button type="submit" aria-label="Buscar"><?= icon('magnifying-glass') ?></button>
     </form>
-    <?php if ($path !== '/seguir'): ?><a class="btn btn--buy btn--sm top__cta" href="<?= e(url('seguir')) ?>">Seguir un precio</a><?php endif; ?>
+    <?php if ($alertCta && $path !== '/gasolina/avisos'): ?><a class="btn btn--buy btn--sm top__cta" href="<?= e(url('gasolina/avisos')) ?>"><?= icon('bell') ?> Crear aviso</a>
+    <?php elseif (!$alertCta && $path !== '/seguir'): ?><a class="btn btn--buy btn--sm top__cta" href="<?= e(url('seguir')) ?>">Seguir un precio</a><?php endif; ?>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Menú</button>
   </div>
   <nav class="mobile-menu" id="mobile-menu" aria-label="Menú">
@@ -68,8 +82,8 @@ if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
       <input class="field" id="mq" name="q" type="search" placeholder="Busca o pega un enlace de Amazon" autocomplete="off">
       <button class="btn btn--buy" type="submit">Buscar</button>
     </form>
+    <?php foreach ($links as [$href, $label]): ?><a href="<?= e(url($href)) ?>"><?= e(['Guías' => 'Guías de compra', 'Avisos' => 'Avisos de gasolina', 'Gasolina' => 'Precio de la gasolina'][$label] ?? $label) ?></a><?php endforeach; ?>
     <a href="<?= e(url('seguir')) ?>">Seguir el precio de un producto</a>
-    <?php foreach ($links as [$href, $label]): ?><a href="<?= e(url($href)) ?>"><?= e($label === 'Guías' ? 'Guías de compra' : $label) ?></a><?php endforeach; ?>
     <?php foreach ($niches as $n): ?><a href="<?= e(niche_url($n)) ?>"><?= e($n['name']) ?></a><?php endforeach; ?>
     <?php if ($telegram): ?><a href="<?= e($telegram) ?>" rel="noopener">Canal de Telegram</a><?php endif; ?>
   </nav>
@@ -104,8 +118,8 @@ if (fuel_enabled()) { $links[] = ['gasolina', 'Gasolina']; }
     <div>
       <p class="foot__title">Secciones</p>
       <ul>
-        <li><a href="<?= e(url('seguir')) ?>">Seguir un precio</a></li>
-        <?php foreach ($links as [$href, $label]): ?><li><a href="<?= e(url($href)) ?>"><?= e($label === 'Guías' ? 'Guías de compra' : $label) ?></a></li><?php endforeach; ?>
+        <?php foreach ($footLinks as [$href, $label]): ?><li><a href="<?= e(url($href)) ?>"><?= e(['Guías' => 'Guías de compra', 'Avisos' => 'Avisos de gasolina', 'Gasolina' => 'Precio de la gasolina'][$label] ?? $label) ?></a></li><?php endforeach; ?>
+        <li><a href="<?= e(url('seguir')) ?>">Seguir un precio de Amazon</a></li>
         <li><a href="<?= e(url('legal/afiliacion')) ?>">Cómo nos financiamos</a></li>
       </ul>
     </div>

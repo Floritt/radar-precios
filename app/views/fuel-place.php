@@ -16,6 +16,7 @@ $natAvg = $national[$fuel]['avg'];
       <?php if ($updated): ?>Actualizado el <?= e(date_short($updated)) ?>.<?php endif; ?>
     </p>
     <?php partial('fuel-tools', ['fuel' => $fuel]); ?>
+    <?php if (mail_enabled()): ?><p class="fuel-head__alert"><a href="#aviso"><?= icon('bell') ?> Avísame cuando baje o suba en <?= e($placeName) ?></a></p><?php endif; ?>
   </div>
 </div>
 
@@ -32,6 +33,11 @@ $natAvg = $national[$fuel]['avg'];
       <p class="empty">Ninguna gasolinera de aquí tiene <?= e(mb_strtolower(fuel_name($fuel))) ?> ahora mismo.</p>
     <?php endif; ?>
   </section>
+
+  <?php
+  $zoneKeys = $kind === 'muni' ? ['m' . (int) $muni['id'] => $muni['name'], 'p' . $pid => 'Provincia de ' . FUEL_PROVINCES[$pid]] : ['p' . $pid => 'Provincia de ' . FUEL_PROVINCES[$pid], 'es' => 'Toda España'];
+  partial('zone-band', ['zones' => $zoneKeys, 'title' => 'Avísame cuando cambie el precio en ' . $placeName, 'fuel' => $fuel === 'g95' && empty($_GET['c']) ? '' : $fuel]);
+  ?>
 
   <?php if ($chart && count($chart['labels']) > 1): ?>
   <section class="chart-card" aria-labelledby="h-fuel-chart">
@@ -53,5 +59,6 @@ $natAvg = $national[$fuel]['avg'];
   <?php if ($kind === 'muni'): ?>
     <p><a href="<?= e(fuel_province_url($pid)) ?>">Ver las más baratas de toda la provincia de <?= e(FUEL_PROVINCES[$pid]) ?></a></p>
   <?php endif; ?>
+  <?php partial('car-strip'); ?>
   <p class="fineprint">Fuente: Ministerio para la Transición Ecológica y el Reto Demográfico. Solo gasolineras de venta al público. El precio válido es el del surtidor.</p>
 </div>

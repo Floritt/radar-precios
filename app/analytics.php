@@ -19,6 +19,7 @@ const VISIT_KINDS = [
     'fstat' => 'Gasolina: gasolineras',
     'fnear' => 'Gasolina: cerca de mí',
     'fsearch' => 'Gasolina: búsquedas',
+    'falert' => 'Gasolina: avisos',
 ];
 
 /** Suma 1 a un contador (tabla con clave compuesta), sin carreras si dos visitas llegan a la vez. */

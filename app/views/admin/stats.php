@@ -3,7 +3,7 @@
  * @var int $days @var array $totals @var array $series @var array $hours @var array $weekdays @var array $countries @var array $areas
  * @var array $sources @var array $devices @var array $browsers @var array $oses @var array $langs @var array $kinds
  * @var array $fuelProv @var array $fuelMuni @var array $fuelStation @var array $fuelTerms @var array $webTerms
- * @var array $alertsProduct @var array $alertsFuel @var array $signups @var array $products @var array $posts @var array $links
+ * @var array $alertsProduct @var array $alertsFuel @var array $alertsZone @var array $signups @var array $products @var array $posts @var array $links
  */
 $pct = fn (int $part, int $whole): string => $whole > 0 ? str_replace('.', ',', (string) round($part * 100 / $whole, 1)) . ' %' : '';
 $max = max(1, ...array_map(fn ($d) => max($d['views'], $d['clicks']), array_values($series)));
@@ -63,7 +63,7 @@ $statusNames = ['pending' => 'Sin confirmar', 'active' => 'Activo', 'sent' => 'E
   <div class="kpi"><b><?= $totals['clicks'] ?></b><span>clics a Amazon</span></div>
   <div class="kpi"><b><?= e($pct($totals['clicks'], $totals['views']) ?: '0 %') ?></b><span>de las visitas acaban en clic</span></div>
   <div class="kpi"><b><?= $totals['fuel'] ?></b><span>páginas vistas de Gasolina</span></div>
-  <div class="kpi"><b><?= $alertsProduct['new'] + $alertsFuel['new'] ?></b><span>avisos nuevos</span></div>
+  <div class="kpi"><b><?= $alertsProduct['new'] + $alertsFuel['new'] + $alertsZone['new'] ?></b><span>avisos nuevos</span></div>
   <div class="kpi"><b><?= $countryTotal ? e($pct($spain, $countryTotal)) : '–' ?></b><span>de las visitas desde España</span></div>
 </div>
 
@@ -117,7 +117,7 @@ $statusNames = ['pending' => 'Sin confirmar', 'active' => 'Activo', 'sent' => 'E
   <div class="table-wrap"><table class="table">
     <thead><tr><th></th><th class="r">Nuevos</th><th class="r">Confirmados</th><th class="r">Enviados</th><th class="r">Activos ahora</th><th class="r">Sin confirmar</th></tr></thead>
     <tbody>
-      <?php foreach (['Productos' => $alertsProduct, 'Gasolina' => $alertsFuel] as $label => $a): ?>
+      <?php foreach (['Productos' => $alertsProduct, 'Gasolineras' => $alertsFuel, 'Gasolina por zona' => $alertsZone] as $label => $a): ?>
         <tr><td><?= $label ?></td><td class="r"><?= $a['new'] ?></td><td class="r"><?= $a['confirmed'] ?></td><td class="r"><?= $a['sent'] ?></td><td class="r"><?= $a['active'] ?></td><td class="r"><?= $a['pending'] ?></td></tr>
       <?php endforeach; ?>
     </tbody>

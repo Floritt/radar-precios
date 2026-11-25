@@ -435,7 +435,7 @@ function niche_icon(?string $nicheSlug, string $class = ''): string
 {
     $map = ['decor' => 'tree-evergreen', 'jugu' => 'lego', 'juego' => 'dice-five', 'perfum' => 'drop', 'jersei' => 'hoodie', 'pijama' => 'hoodie',
         'ropa' => 't-shirt', 'cocina' => 'cooking-pot', 'tecno' => 'headphones', 'lectura' => 'book-open', 'libro' => 'book-open',
-        'hogar' => 'house-line', 'deporte' => 'barbell', 'bebe' => 'baby', 'cuidado' => 'hand-soap', 'mascota' => 'paw-print', 'brico' => 'wrench', 'viaje' => 'suitcase-rolling', 'regalo' => 'gift'];
+        'hogar' => 'house-line', 'deporte' => 'barbell', 'bebe' => 'baby', 'cuidado' => 'hand-soap', 'mascota' => 'paw-print', 'brico' => 'wrench', 'viaje' => 'suitcase-rolling', 'regalo' => 'gift', 'coche' => 'car-profile'];
     foreach ($map as $key => $name) {
         if (str_contains((string) $nicheSlug, $key)) {
             return icon($name, $class);
@@ -573,3 +573,38 @@ function season_campaign(): ?array
     return null;
 }
 
+
+/* ---------- Accesorios de coche: el nicho que acompaña a la sección de gasolina ---------- */
+
+const CAR_NICHE = 'accesorios-de-coche';
+
+function car_niche(): ?array
+{
+    foreach (all_niches() as $n) {
+        if ($n['slug'] === CAR_NICHE) {
+            return $n;
+        }
+    }
+    return null;
+}
+
+/**
+ * Productos de coche: la baliza V16 primero y el resto rotando cada día, para que las páginas de gasolina no
+ * enseñen siempre los mismos.
+ */
+function car_products(int $limit = 4): array
+{
+    $n = car_niche();
+    if (!$n) {
+        return [];
+    }
+    $seed = (int) date('z') + 7;
+    return product_list('p.niche_id = ?', [(int) $n['id']], "CASE WHEN p.slug = 'baliza-v16-conectada' THEN 0 ELSE 1 END, (p.id * $seed) % 97", $limit);
+}
+
+/** Guías de coche publicadas. */
+function car_guides(int $limit = 3): array
+{
+    $n = car_niche();
+    return $n ? published_posts('po.niche_id = ?', [(int) $n['id']], $limit) : [];
+}

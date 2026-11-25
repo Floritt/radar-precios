@@ -38,6 +38,8 @@
   </section>
   <?php endif; ?>
 
+  <?php partial('zone-band', ['zones' => ['es' => 'Toda España'] + fuel_zone_options(), 'title' => 'Avísame cuando cambie el precio en mi zona', 'fuel' => '']); ?>
+
   <section class="block">
     <h2>Las gasolineras más baratas de España</h2>
     <?php partial('fuel-table', ['stations' => $cheapest, 'fuel' => $fuel, 'avg' => $today[$fuel]['avg'], 'showMuni' => true, 'base' => url('gasolina')]); ?>
@@ -57,12 +59,16 @@
     </table></div>
   </section>
 
+  <?php partial('car-strip'); ?>
+
   <section class="block fuel-faq">
     <h2>Preguntas frecuentes</h2>
     <h3>¿De dónde salen estos precios?</h3>
     <p>Del Geoportal de Gasolineras del Ministerio para la Transición Ecológica y el Reto Demográfico. Las gasolineras están obligadas a comunicar sus precios, y nosotros los actualizamos cada hora. Solo mostramos las de venta al público.</p>
     <h3>¿Cuándo es más barato repostar?</h3>
     <p>Depende de cada gasolinera. Por eso guardamos el precio de cada una cada día: en la ficha de cualquier gasolinera ves cómo ha cambiado y si hoy está por encima o por debajo de lo normal.</p>
+    <h3>¿Cómo funcionan los avisos?</h3>
+    <p>Eliges una zona (tu municipio, tu provincia o toda España), un carburante y cuántos céntimos tiene que cambiar el precio medio. Te escribimos cuando baja o sube esa cantidad, con las tres gasolineras más baratas de ese momento, y como mucho una vez al día. También puedes crear un aviso para una gasolinera concreta desde su ficha.</p>
     <h3>¿Por qué el precio del surtidor no coincide?</h3>
     <p>Las gasolineras pueden cambiar el precio varias veces al día. El válido es siempre el que marca el surtidor.</p>
   </section>

@@ -14,23 +14,38 @@ function published_posts(string $where = '1=1', array $params = [], int $limit =
 
 function page_home(): void
 {
-    $byDrop = 'p.at_low DESC, CASE WHEN p.change30 IS NULL THEN 1 ELSE 0 END, p.change30 ASC';
-    $deals = product_list('(p.at_low = 1 OR p.change30 < 0) AND p.best_price IS NOT NULL', [], $byDrop, 8);
-    $popular = rows(
-        "SELECT p.*, n.name AS niche_name, n.slug AS niche_slug, n.color AS niche_color,
-                (SELECT COUNT(*) FROM clicks c WHERE c.product_id = p.id AND c.created_at > ?) AS clicks30
-         FROM products p LEFT JOIN niches n ON n.id = p.niche_id
-         WHERE p.status = 'published' ORDER BY clicks30 DESC, p.updated_at DESC LIMIT 8",
-        [date('Y-m-d H:i:s', time() - 30 * 86400)]
-    );
+    $fuel = null;
+    if (fuel_enabled()) {
+        $key = fuel_key((string) input('c', 'g95'));
+        $day = substr((string) val('SELECT MAX(day) FROM fuel_stats WHERE province_id = 0'), 0, 10);
+        $provinces = [];
+        foreach (rows('SELECT province_id, avg, min, stations FROM fuel_stats WHERE day = ? AND fuel = ? AND province_id > 0 ORDER BY avg', [$day, $key]) as $r) {
+            $provinces[] = $r + ['name' => FUEL_PROVINCES[(int) $r['province_id']] ?? ''];
+        }
+        $fuel = [
+            'key' => $key,
+            'today' => fuel_today(0),
+            'verdict' => fuel_verdict(0, $key),
+            'series' => fuel_series(0, 90),
+            'provinces' => $provinces,
+            'cheapest' => fuel_stations('1 = 1', [], $key, 5),
+            'stations' => (int) val('SELECT COUNT(*) FROM fuel_stations WHERE active = 1'),
+            'updated' => setting('fuel_last_run'),
+        ];
+    }
     $GLOBALS['track'] = ['home', 0];
     render('home', [
-        'meta' => meta(['canonical' => absolute_url('')]),
-        'deals' => $deals,
-        'popular' => $popular,
-        'reviews' => published_posts("po.type = 'review'", [], 4),
-        'guides' => published_posts(section_where('blog'), [], 5),
-        'comparisons' => published_posts(section_where('comparison'), [], 4),
+        'meta' => meta([
+            'title' => $fuel ? 'Precio de la gasolina hoy y avisos cuando baje en tu zona' : '',
+            'description' => $fuel ? 'Precio de la gasolina y el diésel hoy en España, las gasolineras más baratas de tu municipio y avisos gratis por correo cuando bajen o suban en tu zona.' : '',
+            'canonical' => absolute_url(''),
+        ]),
+        'fuel' => $fuel,
+        'mailOn' => mail_enabled(),
+        'zones' => fuel_zone_options(),
+        'carProducts' => car_products(5),
+        'carGuides' => car_guides(3),
+        'guides' => published_posts(section_where('blog') . ' AND (po.niche_id IS NULL OR po.niche_id <> ?)', [(int) (car_niche()['id'] ?? 0)], 4),
     ]);
 }
 
@@ -322,6 +337,7 @@ function page_sitemap(): void
     if (fuel_enabled()) {
         $today = date('Y-m-d');
         $urls[] = ['gasolina', $today];
+        $urls[] = ['gasolina/avisos', $today];
         foreach (array_keys(FUEL_PROVINCES) as $pid) {
             $urls[] = ['gasolina/' . fuel_province_slug($pid), $today];
         }

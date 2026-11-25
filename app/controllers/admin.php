@@ -214,13 +214,17 @@ function admin_stats(): void
     foreach (rows("SELECT a.created_at, a.status, a.target_price, a.email, a.fuel, s.name, s.id AS sid, m.name AS muni_name FROM fuel_alerts a LEFT JOIN fuel_stations s ON s.id = a.station_id LEFT JOIN fuel_munis m ON m.id = s.muni_id ORDER BY a.created_at DESC LIMIT 15") as $r) {
         $signups[] = ['at' => $r['created_at'], 'type' => 'Gasolina', 'what' => fuel_name((string) $r['fuel']) . ' en ' . $r['name'] . ' (' . $r['muni_name'] . ')', 'url' => null, 'target' => fuel_money((float) $r['target_price']), 'who' => mask_email((string) $r['email']), 'status' => $r['status']];
     }
+    foreach (rows('SELECT created_at, status, zone, fuel, dir, step, email FROM zone_alerts ORDER BY created_at DESC LIMIT 15') as $r) {
+        $z = fuel_zone((string) $r['zone']);
+        $signups[] = ['at' => $r['created_at'], 'type' => 'Zona', 'what' => fuel_name((string) $r['fuel']) . ' ' . ($z['in'] ?? $r['zone']) . ', ' . (['down' => 'si baja', 'up' => 'si sube'][$r['dir']] ?? 'si baja o sube'), 'url' => null, 'target' => fuel_step_text((float) $r['step']), 'who' => mask_email((string) $r['email']), 'status' => $r['status']];
+    }
     usort($signups, fn ($a, $b) => strcmp((string) $b['at'], (string) $a['at']));
 
     admin_render('stats', [
         'days' => $days,
         'totals' => $totals + [
             'clicks' => (int) val('SELECT COUNT(*) FROM clicks WHERE created_at >= ?', [$fromTime]),
-            'fuel' => (int) val("SELECT COALESCE(SUM(views), 0) FROM visits WHERE day >= ? AND kind IN ('fuel', 'fprov', 'fmuni', 'fstat', 'fnear', 'fsearch')", [$fromDay]),
+            'fuel' => (int) val("SELECT COALESCE(SUM(views), 0) FROM visits WHERE day >= ? AND kind IN ('fuel', 'fprov', 'fmuni', 'fstat', 'fnear', 'fsearch', 'falert')", [$fromDay]),
         ],
         'series' => $series,
         'hours' => $hours,
@@ -240,6 +244,7 @@ function admin_stats(): void
         'webTerms' => $terms('web'),
         'alertsProduct' => $alertStats('alerts'),
         'alertsFuel' => $alertStats('fuel_alerts'),
+        'alertsZone' => $alertStats('zone_alerts'),
         'signups' => array_slice($signups, 0, 15),
         'products' => $build(rows("SELECT id, name FROM products WHERE status <> 'draft' ORDER BY name"), $views['product'], $clicksProduct, 'admin/productos/'),
         'posts' => $build(rows("SELECT id, title AS name FROM posts WHERE status = 'published' ORDER BY title"), $views['post'], $clicksPost, 'admin/articulos/'),

@@ -146,3 +146,12 @@ Sección en `/gasolina` con los precios de todas las gasolineras de España, a p
 
 Solo se muestran las gasolineras de venta al público. «Cerca de mí» usa la posición del navegador para esa búsqueda y no la guarda.
 
+### Avisos de gasolina
+
+- **Por gasolinera** (ficha de cada gasolinera): un correo cuando el carburante elegido baja del precio que pone el visitante. Se envía una vez.
+- **Por zona** (`/gasolina/avisos`, la portada y las páginas de provincia y municipio): un correo cuando el precio medio de España, una provincia o un municipio baja o sube 1, 2, 3 o 5 céntimos, con las tres gasolineras más baratas de ese momento. Como mucho uno al día por aviso y 300 por pasada. En los avisos solo de bajada, la referencia sube con el precio (avisa de la bajada desde el último máximo); en los de subida, baja con él.
+
+Los dos piden confirmar el correo, se borran si no se confirman en 7 días y cada correo lleva un enlace de baja. Las altas y envíos se ven en Estadísticas.
+
+La portada se centra en la gasolina; los accesorios de coche (`content/nichos/accesorios-de-coche.md`) aparecen en la portada y al pie de las páginas de gasolina.
+

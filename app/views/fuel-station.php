@@ -56,6 +56,7 @@ foreach (FUELS_MAIN as $f) { if ($s[$f] !== null) { $first = $f; break; } }
         <button class="btn btn--blue" type="submit">Crear aviso</button>
         <p class="fineprint">Te mandamos un correo para confirmarlo. Usamos tu correo solo para este aviso. <a href="<?= e(url('legal/privacidad')) ?>">Privacidad</a></p>
       </form>
+      <?php if ($s['muni_id']): ?><p class="zone-hint">¿Te da igual la gasolinera? <a href="<?= e(url('gasolina/avisos?zona=m' . (int) $s['muni_id'])) ?>">Avísame cuando baje en todo <?= e($s['muni_name']) ?></a></p><?php endif; ?>
     </aside>
     <?php endif; ?>
   </div>
@@ -71,4 +72,5 @@ foreach (FUELS_MAIN as $f) { if ($s[$f] !== null) { $first = $f; break; } }
   <?php endif; ?>
 
   <?php if ($s['muni_slug']): ?><p><a href="<?= e(url('gasolina/' . $pslug . '/' . $s['muni_slug'])) ?>">Ver todas las gasolineras de <?= e($s['muni_name']) ?></a></p><?php endif; ?>
+  <?php partial('car-strip'); ?>
 </div>

@@ -5,7 +5,7 @@ declare(strict_types=1);
  * Cambios de base de datos posteriores a la instalación. Se aplican solos una vez, en la primera
  * petición o tarea cron tras subir una versión nueva. schema_version en settings guarda el último aplicado.
  */
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
 
 function ensure_schema(): void
 {
@@ -135,6 +135,24 @@ function ensure_schema(): void
             hits INT NOT NULL DEFAULT 0,
             PRIMARY KEY (day, scope, term)
         )$tail",
+        // v8: avisos por zona (España, provincia o municipio) cuando la media baja o sube.
+        "CREATE TABLE IF NOT EXISTS zone_alerts (
+            id $id,
+            zone VARCHAR(12) NOT NULL,
+            fuel VARCHAR(12) NOT NULL,
+            dir VARCHAR(4) NOT NULL DEFAULT 'both',
+            step DECIMAL(5,3) NOT NULL DEFAULT 0.020,
+            ref_price DECIMAL(6,3) NULL,
+            ref_at DATETIME NULL,
+            email VARCHAR(190) NOT NULL,
+            code VARCHAR(32) NOT NULL,
+            status VARCHAR(12) NOT NULL DEFAULT 'pending',
+            created_at DATETIME NOT NULL,
+            activated_at DATETIME NULL,
+            sent_at DATETIME NULL,
+            sent_price DECIMAL(6,3) NULL,
+            sent_count INT NOT NULL DEFAULT 0
+        )$tail",
     ];
     $indexes = [
         ['uq_track_asin', 'track_requests', 'asin', true],
@@ -176,6 +194,9 @@ function ensure_schema(): void
     $indexes[] = ['uq_fuel_alert_code', 'fuel_alerts', 'code', true];
     $indexes[] = ['idx_fuel_alert_status', 'fuel_alerts', 'status, station_id', false];
     $indexes[] = ['idx_clicks_post', 'clicks', 'post_id, created_at', false];
+    $indexes[] = ['uq_zone_alert_code', 'zone_alerts', 'code', true];
+    $indexes[] = ['idx_zone_alert_status', 'zone_alerts', 'status', false];
+    $indexes[] = ['idx_zone_alert_email', 'zone_alerts', 'email', false];
     foreach ($indexes as [$name, $table, $cols, $unique]) {
         try {
             db()->exec(($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ') . ($mysql ? '' : 'IF NOT EXISTS ') . "$name ON $table ($cols)");

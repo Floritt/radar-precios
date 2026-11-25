@@ -605,3 +605,174 @@ small, .muted { color: var(--gris); }
 .fuel-band p { margin: 0; color: var(--gris); }
 .fuel-band:hover .btn { background: var(--azul-hover); }
 @media (max-width: 720px) { .fuel-band { grid-template-columns: auto minmax(0, 1fr); } .fuel-band .btn { grid-column: 1 / -1; } }
+
+/* ---------- Portada de gasolina ---------- */
+.fhero { background: var(--azul); color: #fff; padding-top: 34px; overflow: hidden; }
+.fhero__grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); gap: 56px; align-items: end; }
+.fhero__text { padding-bottom: 60px; align-self: center; }
+.fhero h1 { font-size: clamp(32px, 4.4vw, 50px); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 16px; max-width: 13em; }
+.fhero__lead { font-size: 18px; line-height: 1.5; max-width: 32em; color: rgba(255, 255, 255, 0.92); margin: 0 0 24px; }
+.fhero__search { display: flex; gap: 6px; background: #fff; border-radius: 14px; padding: 6px; box-shadow: 0 14px 34px rgba(8, 18, 84, 0.35); max-width: 540px; }
+.fhero__search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--tinta); padding: 12px 12px 12px 14px; outline: 0; border-radius: 10px; }
+.fhero__search input::placeholder { color: var(--gris); }
+.fhero__search:focus-within { box-shadow: 0 14px 34px rgba(8, 18, 84, 0.35), 0 0 0 3px var(--amarillo); }
+.fhero__search .btn { font-size: 16px; padding: 12px 20px; }
+.fhero__more { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin-top: 16px; }
+.fhero__near { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.7); }
+.fhero__near:hover { background: rgba(255, 255, 255, 0.12); }
+.fhero__near .icon, .fhero__link .icon { width: 18px; height: 18px; }
+.fhero__link { color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
+.fhero__msg { flex-basis: 100%; margin: 0; font-size: 14px; color: rgba(255, 255, 255, 0.85); }
+.fhero :focus-visible { outline-color: var(--amarillo); }
+
+/* El panel de precios, como el poste de una gasolinera. */
+.totem-wrap { display: flex; flex-direction: column; align-items: center; }
+.totem { width: 100%; max-width: 430px; background: var(--noche); border-radius: 18px; overflow: hidden; padding-bottom: 18px; box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.1), 0 24px 40px rgba(8, 18, 84, 0.35); }
+.totem__head { margin: 0; background: var(--amarillo); color: var(--tinta); font-family: var(--display); font-weight: 800; font-size: 15px; padding: 10px 22px; }
+.totem__rows { list-style: none; margin: 0; padding: 4px 22px 0; }
+.totem__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "fuel price" "chg price"; gap: 2px 16px; align-items: center; padding: 13px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.totem__fuel { grid-area: fuel; color: #fff; font-weight: 700; font-size: 16px; }
+.totem__fuel:hover { color: var(--amarillo); }
+.totem__row.is-current .totem__fuel::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--amarillo); margin-left: 8px; vertical-align: 2px; }
+.totem__price { grid-area: price; font-family: var(--display); font-weight: 800; font-size: 42px; line-height: 1; color: var(--amarillo); font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+.totem__price small { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.65); margin-left: 5px; letter-spacing: 0; }
+.totem__chg { grid-area: chg; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+.totem__chg span { font-weight: 400; color: rgba(255, 255, 255, 0.6); }
+.totem__chg .icon { width: 16px; height: 16px; }
+.totem__chg.is-down { color: #7EE2B8; }
+.totem__chg.is-up { color: #FFAB97; }
+.totem__spark { margin: 14px 22px 0; }
+.totem__spark svg { display: block; width: 100%; height: 56px; }
+.totem__line { fill: none; stroke-width: 2.2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.totem__line--g95 { stroke: var(--amarillo); }
+.totem__line--diesel { stroke: rgba(255, 255, 255, 0.7); }
+.totem__spark figcaption { margin-top: 6px; font-size: 13px; color: rgba(255, 255, 255, 0.65); }
+.totem__key { color: #fff; font-weight: 600; }
+.totem__key::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: 3px; }
+.totem__key--g95::before { background: var(--amarillo); }
+.totem__key--diesel::before { background: rgba(255, 255, 255, 0.7); }
+.totem__verdict { margin: 14px 22px 0; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.08); font-size: 14.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.88); }
+.totem__verdict strong { color: #fff; }
+.totem__verdict--low { background: rgba(255, 212, 59, 0.16); }
+.totem__verdict--low strong { color: var(--amarillo); }
+.totem__pole { width: 34px; height: 48px; background: var(--noche); border-radius: 0 0 2px 2px; }
+
+@media (max-width: 920px) {
+  .fhero { padding-top: 26px; }
+  .fhero__grid { grid-template-columns: 1fr; gap: 28px; }
+  .fhero__text { padding-bottom: 0; }
+  .totem { max-width: none; }
+  .totem__pole { height: 30px; }
+}
+@media (max-width: 520px) {
+  .fhero__search { flex-direction: column; padding: 8px; gap: 8px; }
+  .fhero__search input { padding: 12px; background: var(--niebla); }
+  .fhero__search .btn { width: 100%; }
+  .totem__rows, .totem__head { padding-inline: 18px; }
+  .totem__spark, .totem__verdict { margin-inline: 18px; }
+  .totem__price { font-size: 36px; }
+}
+
+/* ---------- Avisos por zona ---------- */
+.zone-sec { padding-top: 40px; }
+.zone-band { border: 2px solid var(--azul); border-radius: 18px; padding: 22px 24px 18px; background: #fff; }
+.zone-band__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 6px 32px; align-items: baseline; margin-bottom: 16px; }
+.zone-band__head h2 { font-size: clamp(22px, 2.4vw, 26px); margin: 0; }
+.zone-band__head p { margin: 0; color: var(--gris); font-size: 15.5px; }
+.zone-form label, .zone-form legend { display: block; margin: 0 0 6px; font-size: 14px; font-weight: 600; padding: 0; }
+.zone-form .field { width: 100%; }
+.zone-form__f { min-width: 0; margin: 0; border: 0; padding: 0; }
+.zone-form__fixed { margin: 0; padding: 11px 14px; border-radius: 10px; background: var(--niebla); font-weight: 700; }
+.zone-form__dir { display: flex; flex-wrap: wrap; gap: 6px; }
+.zone-form__dir legend { flex-basis: 100%; }
+.zone-form .zone-form__check { display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 10px 12px; border: 1.5px solid var(--linea-fuerte); border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; background: #fff; }
+.zone-form__check input { width: 17px; height: 17px; margin: 0; accent-color: var(--azul); }
+.zone-form__check .icon { width: 18px; height: 18px; color: var(--gris); }
+.zone-form__check:has(input:checked) { border-color: var(--azul); background: var(--azul-suave); }
+.zone-form__check:has(input:checked) .icon { color: var(--azul); }
+.zone-form__check:has(input:focus-visible) { outline: 3px solid var(--azul); outline-offset: 2px; }
+.zone-form__go .icon { width: 18px; height: 18px; }
+.zone-form__note { margin: 0; font-size: 13px; color: var(--gris); line-height: 1.5; }
+.zone-form--band { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto minmax(136px, 0.9fr) minmax(0, 1.3fr) auto; gap: 12px; align-items: end; }
+.zone-form--band .zone-form__go { height: 46px; }
+.zone-form--band .zone-form__note { grid-column: 1 / -1; }
+.zone-form--card { display: grid; gap: 14px; }
+.zone-form--card .zone-form__go { width: 100%; }
+@media (max-width: 1060px) {
+  .zone-form--band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .zone-form--band .zone-form__zone, .zone-form--band .zone-form__dir, .zone-form--band .zone-form__mail, .zone-form--band .zone-form__go { grid-column: 1 / -1; }
+  .zone-form--band .zone-form__zone { order: 1; }
+  .zone-form--band .zone-form__fuel { order: 2; }
+  .zone-form--band .zone-form__step { order: 3; }
+  .zone-form--band .zone-form__dir { order: 4; }
+  .zone-form--band .zone-form__mail { order: 5; }
+  .zone-form--band .zone-form__go { order: 6; }
+  .zone-form--band .zone-form__note { order: 7; }
+  .zone-band__head { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) { .zone-band { padding: 18px 16px 16px; border-radius: 16px; } }
+.zone-card { border: 2px solid var(--azul); border-radius: 18px; padding: 22px 24px; }
+.zone-card__title { font-size: 22px; margin-bottom: 14px; }
+.zone-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 48px; align-items: start; }
+.zone-page__side h2 { font-size: 20px; margin-bottom: 10px; }
+.zone-page__side .fuel-tools { margin-top: 12px; }
+.zone-steps { margin: 0 0 30px; padding-left: 22px; }
+.zone-steps li { margin-bottom: 10px; color: #333B60; }
+.zone-steps strong { color: var(--tinta); }
+@media (max-width: 860px) { .zone-page { grid-template-columns: 1fr; gap: 32px; } }
+.notice--error { background: var(--rojo-suave); color: #7A1E10; font-weight: 600; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.fuel-head__alert { margin: 14px 0 0; }
+.fuel-head__alert a { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
+.fuel-head__alert .icon { width: 18px; height: 18px; }
+.zone-hint { font-size: 14.5px; margin: 12px 0 0; color: var(--gris); }
+
+/* ---------- Provincias en la portada ---------- */
+.prov-rank { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 48px; }
+.prov-rank--one { grid-template-columns: minmax(0, 560px); }
+.prov-rank h3 { font-size: 15px; color: var(--gris); font-family: var(--body); font-weight: 600; letter-spacing: 0; margin: 0 0 6px; }
+.prov-list { list-style: none; margin: 0; padding: 0; counter-reset: prov; }
+.prov-list li { counter-increment: prov; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 92px; gap: 12px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--linea); }
+.prov-list li::before { content: counter(prov); font-family: var(--display); font-weight: 800; color: var(--gris); }
+.prov-list a { font-weight: 700; color: var(--tinta); }
+.prov-list a:hover { color: var(--azul); }
+.prov-list__price { font-family: var(--display); font-weight: 800; font-size: 19px; font-variant-numeric: tabular-nums; }
+.prov-list__diff { text-align: right; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.prov-rank + .fuel-legend { margin-top: 12px; }
+@media (max-width: 760px) { .prov-rank { grid-template-columns: 1fr; gap: 24px; } }
+
+/* ---------- Accesorios de coche ---------- */
+.car-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) repeat(2, minmax(0, 1fr)); gap: 14px; }
+.car-grid--strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.car-feature { grid-row: span 2; display: flex; flex-direction: column; gap: 4px; background: var(--noche); color: #fff; border-radius: 16px; padding: 24px; }
+.car-feature > .icon { width: 44px; height: 44px; color: var(--amarillo); margin-bottom: 8px; }
+.car-feature h3 { font-size: 24px; margin: 0 0 6px; }
+.car-feature p { color: rgba(255, 255, 255, 0.88); margin: 0 0 18px; }
+.car-feature__links { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.car-feature__links a:not(.btn) { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.car-feature :focus-visible { outline-color: var(--amarillo); }
+.ccard { display: flex; flex-direction: column; gap: 6px; background: #fff; border: 1px solid var(--linea); border-radius: 14px; padding: 16px 18px; color: var(--tinta); }
+.ccard:hover { text-decoration: none; border-color: var(--azul); }
+.ccard__name { font-family: var(--display); font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+.ccard:hover .ccard__name { color: var(--azul); }
+.ccard__why { font-size: 14.5px; color: #333B60; line-height: 1.45; }
+.ccard__fact { margin-top: auto; align-self: flex-start; padding: 4px 10px; border-radius: 8px; background: var(--niebla); font-size: 13px; line-height: 1.35; }
+.ccard__fact b { font-weight: 600; }
+.car-strip { margin-top: 8px; }
+@media (max-width: 980px) { .car-grid, .car-grid--strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .car-feature { grid-column: 1 / -1; grid-row: auto; } }
+@media (max-width: 560px) { .car-grid, .car-grid--strip { grid-template-columns: 1fr; } }
+
+/* ---------- Guías y Amazon en la portada ---------- */
+.guide-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 56px; }
+.guide-cols__title { font-size: 15px; color: var(--gris); font-family: var(--body); font-weight: 600; letter-spacing: 0; margin: 0 0 14px; }
+@media (max-width: 760px) { .guide-cols { grid-template-columns: 1fr; } }
+.amz { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; align-items: center; border: 1px solid var(--linea); border-radius: 18px; padding: 26px 28px; }
+.amz h2 { font-size: 22px; margin-bottom: 6px; }
+.amz p { color: var(--gris); margin-bottom: 14px; }
+.paste--light { box-shadow: none; border: 1.5px solid var(--linea-fuerte); }
+.paste--light:focus-within { box-shadow: 0 0 0 3px rgba(31, 63, 216, 0.2); border-color: var(--azul); }
+.amz .chips a { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 999px; background: var(--niebla); color: var(--tinta); font-size: 14px; font-weight: 600; }
+.amz .chips a:hover { text-decoration: none; background: var(--azul-suave); color: var(--azul); }
+.amz .chips .icon { width: 17px; height: 17px; color: var(--azul); }
+.amz .chips { list-style: none; margin: 0; padding: 0; }
+@media (max-width: 860px) { .amz { grid-template-columns: 1fr; padding: 22px 18px; } }

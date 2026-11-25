@@ -45,7 +45,7 @@ function fuel_home(): void
         'verdict' => fuel_verdict(0, $fuel),
         'chart' => fuel_series(0),
         'provinces' => $provinces,
-        'cheapest' => fuel_stations('1 = 1', [], $fuel, 10),
+        'cheapest' => fuel_cheapest_split($fuel, 10, 5),
         'updated' => setting('fuel_last_run'),
         'fuelChart' => true,
     ]);

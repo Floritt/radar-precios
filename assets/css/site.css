@@ -776,3 +776,9 @@ small, .muted { color: var(--gris); }
 .amz .chips .icon { width: 17px; height: 17px; color: var(--azul); }
 .amz .chips { list-style: none; margin: 0; padding: 0; }
 @media (max-width: 860px) { .amz { grid-template-columns: 1fr; padding: 22px 18px; } }
+
+/* Canarias, Ceuta y Melilla, aparte */
+.fuel-low__title { font-size: 19px; margin: 30px 0 4px; }
+.fuel-low__title + .fuel-note { margin: 0 0 12px; }
+.prov-low { margin: 14px 0 0; font-size: 15px; color: var(--gris); }
+.prov-low a { font-weight: 700; }

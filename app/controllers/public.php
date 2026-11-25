@@ -28,7 +28,7 @@ function page_home(): void
             'verdict' => fuel_verdict(0, $key),
             'series' => fuel_series(0, 90),
             'provinces' => $provinces,
-            'cheapest' => fuel_stations('1 = 1', [], $key, 5),
+            'cheapest' => fuel_cheapest_split($key, 5, 3),
             'stations' => (int) val('SELECT COUNT(*) FROM fuel_stations WHERE active = 1'),
             'updated' => setting('fuel_last_run'),
         ];

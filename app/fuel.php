@@ -32,6 +32,26 @@ const FUEL_PROVINCES = [
     50 => 'Zaragoza', 51 => 'Ceuta', 52 => 'Melilla',
 ];
 
+/** Canarias, Ceuta y Melilla: sus carburantes pagan menos impuestos, así que se listan aparte de la península y Baleares. */
+const FUEL_LOW_TAX = [35, 38, 51, 52];
+
+/** Filtro SQL de gasolineras de la península y Baleares ($in = false) o de Canarias, Ceuta y Melilla ($in = true). */
+function fuel_low_tax_where(bool $in): string
+{
+    return 's.province_id ' . ($in ? 'IN' : 'NOT IN') . ' (' . implode(', ', FUEL_LOW_TAX) . ')';
+}
+
+/** Las más baratas, separadas: ['main' => península y Baleares, 'low' => Canarias, Ceuta y Melilla], con la media de cada grupo. */
+function fuel_cheapest_split(string $fuel, int $main, int $low): array
+{
+    $out = [];
+    foreach (['main' => [false, $main], 'low' => [true, $low]] as $k => [$in, $n]) {
+        $where = fuel_low_tax_where($in);
+        $out[$k] = ['stations' => fuel_stations($where, [], $fuel, $n), 'avg' => fuel_area_stats($where, [], $fuel)['avg']];
+    }
+    return $out;
+}
+
 function fuel_enabled(): bool
 {
     static $on = null;

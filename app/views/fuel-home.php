@@ -41,8 +41,8 @@
   <?php partial('zone-band', ['zones' => ['es' => 'Toda España'] + fuel_zone_options(), 'title' => 'Avísame cuando cambie el precio en mi zona', 'fuel' => '']); ?>
 
   <section class="block">
-    <h2>Las gasolineras más baratas de España</h2>
-    <?php partial('fuel-table', ['stations' => $cheapest, 'fuel' => $fuel, 'avg' => $today[$fuel]['avg'], 'showMuni' => true, 'base' => url('gasolina')]); ?>
+    <h2>Las gasolineras más baratas de la península y Baleares</h2>
+    <?php partial('fuel-cheapest', ['split' => $cheapest, 'fuel' => $fuel, 'base' => url('gasolina'), 'hid' => 'h-fh-cheap']); ?>
   </section>
 
   <section class="block">

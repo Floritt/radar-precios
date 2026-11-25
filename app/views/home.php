@@ -118,9 +118,11 @@ $spark = function (array $series, string $key, int $w, int $h, float $lo, float 
       <?php partial('fuel-tabs', ['fuel' => $k, 'base' => url('')]); ?>
     </div>
     <?php
-    $provs = $fuel['provinces'];
+    $all = $fuel['provinces'];
     $nat = $t[$k]['avg'];
-    $groups = count($provs) > 10 ? [['Las más baratas', array_slice($provs, 0, 5)], ['Las más caras', array_reverse(array_slice($provs, -5))]] : [['De la más barata a la más cara', $provs]];
+    $provs = array_values(array_filter($all, fn ($p) => !in_array((int) $p['province_id'], FUEL_LOW_TAX, true)));
+    $lowProvs = array_values(array_filter($all, fn ($p) => in_array((int) $p['province_id'], FUEL_LOW_TAX, true)));
+    $groups = count($provs) > 10 ? [['Las más baratas de la península y Baleares', array_slice($provs, 0, 5)], ['Las más caras', array_reverse(array_slice($provs, -5))]] : [['De la más barata a la más cara', $provs]];
     ?>
     <div class="prov-rank<?= count($groups) === 1 ? ' prov-rank--one' : '' ?>">
       <?php foreach ($groups as [$title, $list]): ?>
@@ -138,18 +140,23 @@ $spark = function (array $series, string $key, int $w, int $h, float $lo, float 
       </div>
       <?php endforeach; ?>
     </div>
+    <?php if ($lowProvs): ?>
+    <p class="prov-low">Con menos impuestos:
+      <?php foreach ($lowProvs as $i => $p): ?><a href="<?= e(fuel_province_url((int) $p['province_id']) . ($k === 'g95' ? '' : '?c=' . $k)) ?>"><?= e($p['name']) ?></a> <?= e(fuel_money($p['avg'], false)) ?><?= $i < count($lowProvs) - 1 ? ', ' : '.' ?><?php endforeach; ?>
+    </p>
+    <?php endif; ?>
     <p class="fuel-legend"><?= e(fuel_name($k)) ?>, media de cada provincia en €/l y diferencia con la media de España.</p>
-    <a class="more" href="<?= e(url('gasolina' . ($k === 'g95' ? '' : '?c=' . $k))) ?>">Ver las <?= count($provs) ?> provincias y el gráfico</a>
+    <a class="more" href="<?= e(url('gasolina' . ($k === 'g95' ? '' : '?c=' . $k))) ?>">Ver las <?= count($all) ?> provincias y el gráfico</a>
   </div>
 </section>
 
 <section class="sec sec--tight" aria-labelledby="h-cheap">
   <div class="wrap">
     <div class="sec__head">
-      <h2 id="h-cheap">Las 5 gasolineras más baratas de España</h2>
+      <h2 id="h-cheap">Las 5 gasolineras más baratas de la península y Baleares</h2>
       <a href="<?= e(url('gasolina')) ?>">Busca las de tu municipio</a>
     </div>
-    <?php partial('fuel-table', ['stations' => $fuel['cheapest'], 'fuel' => $k, 'avg' => $nat, 'showMuni' => true, 'base' => url('')]); ?>
+    <?php partial('fuel-cheapest', ['split' => $fuel['cheapest'], 'fuel' => $k, 'base' => url(''), 'hid' => 'h-cheap']); ?>
   </div>
 </section>
 <?php endif; ?>

@@ -8,7 +8,7 @@
       <?= icon('bell') ?>
       <div>
         <h1>Avisos de precio de la gasolina</h1>
-        <p>Te escribimos cuando el precio medio de tu municipio, tu provincia o toda España baje o suba, con las tres gasolineras más baratas de ese momento.</p>
+        <p>Te escribimos cuando la gasolina baje o suba en tu código postal, tu provincia o toda España, cuando alguna gasolinera baje de tu precio o cada lunes con un resumen. Gratis.</p>
       </div>
     </div>
   </div>
